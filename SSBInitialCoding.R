@@ -29,7 +29,7 @@ for (i in 1:nrow(dataSPECMATS)) { #create for loop for finding four states of du
   dataifFSSB <- dataSPECMATS$Female_Homosexuality[i]
   dataifTSP <- dataSPECMATS$Typically.single.progeny.[i]
   if (dataifFSSB == 0) {
-    if (dataifTSP == "N") { 
+    if (dataifTSP == "N") {
       state <- 1 #no FSSB, no TSP
     } else {
       state <- 2 #no FSSB, yes TSP
@@ -56,7 +56,7 @@ phylo.d(dataSPECMATS,SPECMATSTREE, Species, Female_Homosexuality) #same analysis
 phylo.d(dataSPECMATS,SPECMATSTREE, Species, Male_Homosexuality) #same analysis for male SSB. Positive D (even higher) shows more differentiation between species than expected.
 
 #MCMCglmm analysis
-plot(SPECMATSTREE) #just brings this tree back in so R doesn't get mad at me 
+plot(SPECMATSTREE) #just brings this tree back in so R doesn't get mad at me
 inv.phylo <- inverseA(force.ultrametric(SPECMATSTREE), "TIPS")$Ainv #reads a tree and creates a matrix that tells us how much time two species have spent evolving together vs separately.
 prior <- list(G=list(G1=list(V=1,nu=0.02), #makes these things called priors, which are prior assumptions on variance distribution for the following model
               G1=list(V=1,nu=0.02)),
@@ -65,5 +65,63 @@ MCanalysis <- MCMCglmm(Female_Homosexuality~1, #runs MCMCglmm fancy linear regre
          random = ~Typically.single.progeny.+Progeny.Count,
          ginverse = list(Species=inv.phylo),
          prior = prior,
-         data = dataSPECMATS) 
+         data = dataSPECMATS)
 summary(MCanalysis)
+
+
+
+
+##################################################################################################################
+
+
+
+data <- read.csv("temp_data.csv", header = TRUE, sep = ",") #reads my csv collection
+
+names <- colnames(data)
+type <- c(0,NA,1,1,1,0,0,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+
+ind_names <- names[c(3:13,15:length(names))]
+ind_type <- type[c(3:13,15:length(names))]
+
+cat_names <- ind_names[which(ind_type==0)]
+#cat_names <- cat_names[1]
+quant_names <- ind_names[which(ind_type==1)]
+
+SSB <- as.factor(data$SSB)
+
+tests <- data.frame(matrix(NA,ncol=3,nrow=0))
+for (name in names) {
+  if (name %in% cat_names) {
+    ind <- as.factor(data[,which(colnames(data)==name)])
+    test <- chisq.test(x=SSB,y=ind)$p.value
+    if (test <= 0.05) {
+      row <- c(name=name,p=test,keep="Y")
+    } else {
+      row <- c(name=name,p=test,keep="N")
+    }
+    tests <- rbind(tests,row)
+    print(row)
+    print(chisq.test(x=SSB,y=ind)$observed)
+  }
+  if (name %in% quant_names) {
+    ind <- as.numeric(data[,which(colnames(data)==name)])
+    test <- t.test(ind ~ SSB, data=cbind(SSB,ind),na.rm=TRUE)$p.value
+    if (test <= 0.05) {
+      row <- c(name=name,p=test,keep="Y")
+    } else {
+      row <- c(name=name,p=test,keep="N")
+    }
+    tests <- rbind(tests,row)
+    print(row)
+    print(t.test(ind ~ SSB, data=cbind(SSB,ind),na.rm=TRUE)$estimate)
+  }
+}
+
+colnames(tests) <- c("name","p","keep")
+print(tests)
+
+
+
+dim <- as.factor(data$Radically.Dimorphic.Morphology.)
+
+chisq.test(x=SSB,y=dim)

@@ -1,0 +1,311 @@
+---
+title: "SSB Analyses"
+author: "Matthew Pottinger & Sarah Swiston"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    theme: cerulean
+---
+
+# {.tabset .tabset-pills}
+
+<!--
+#####################################################################
+#####################################################################
+SETUP: MARKDOWN, PACKAGES, DIRECTORIES, PLOT SETTINGS, & READING DATA
+#####################################################################
+#####################################################################
+-->
+
+## Setup
+
+This project is about same-sex sexual behavior in mammals. PROJECT DESCRIPTION HERE
+
+Here are some hypotheses:
+
+1. HYPOTHESIS 1
+2. HYPOTHESIS 2
+3. HYPOTHESIS 3
+
+```{r setup, echo=FALSE}
+# R markdown is used to create documents (in this case, an HTML document) out of R code and output
+# Code is in "chunks" that can be run, everything else is text
+# This code chunk sets up how the HTML file will be created from this markdown document when we "knit" it
+# By default, we want no code to run, no code to be shown, and no output to be shown
+# Then for each code chunk, we will decide whether to run it, show it, and show its results
+
+knitr::opts_chunk$set(eval=FALSE,echo=FALSE,results=FALSE,message=FALSE,warning=FALSE,tidy='styler')
+# eval    - whether the code will be run (evaluated) when we create our HTML file
+# echo    - whether the code will be shown (printed) when we create our HTML file
+# results - whether the results of the code will be shown (printed) when we create our HTML file
+# message - whether the messages output by R will be shown (printed) when we create our HTML file
+# warning - whether the warnings output by R will be shown (printed) when we create our HTML file
+
+set.seed(4) # For analyses requiring random numbers, we might want the same output every time
+RERUN <- FALSE # We don't want to automatically rerun lengthy analyses, so we manually turn this to TRUE when we want to run one
+```
+
+```{r packages, eval=TRUE}
+# Some functions are available in base R without installing any packages
+# However, packages (which are built by outside individuals) provide additional functions
+# All of the packages for this project are accessible on CRAN, a repository run by the R dev team
+# This code chunk is for loading different packages so we can access their functions
+# Note that we want to run this code (eval=TRUE) but we don't need to show it in our document
+
+library(this.path) # This package lets us get the filepath of the script we are running
+library(ape) # Used for handling trees
+library(phangorn) # Used for making MCC (maximum clade credibility) tree from posterior of trees
+library(caper) # Used for phylogenetic signal (d) analyses
+library(phytools) # Used for plotting trees
+library(diversitree) # Used for SSE analyses
+library(MCMCglmm) # Used for MCMCglmm analyses
+library(coda) # Used for analyzing MCMC output
+library(MCMCvis) # Used for analyzing MCMC output
+#library(phylolm) (this one is glitched rn, not installing properly)
+```
+
+```{r directories, eval=TRUE}
+# This code chunk sets the working directory for the analyses and creates some file paths for saving output
+# This can be done by hand too:
+# clicking session > setting working directory > to source file location
+
+setwd(this.path::here()) # Sets the working directory to the place where this file is located (using the "this.path" package)
+```
+
+## Dataset
+
+DESCRIPTION OF DATASET HERE
+
+```{r dataset, eval=TRUE, results=TRUE}
+# This code chunk reads in our data files
+# Note that we want to run this code (eval=TRUE) and show the output (results=TRUE), but we don't need to see it
+
+data <- read.csv("temp_data.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
+variables <- paste(colnames(data),collapse=", ")
+cat(variables)
+```
+
+```{r make_tree, echo=TRUE}
+# This code chunk reads our giant list of trees and combines them to make one "best" tree
+# We want to see this code (echo=TRUE), but we don't want to run it every time we do our analyses (it takes a while)
+# We have to manually type RERUN <- TRUE to get this to run
+
+if (RERUN) {
+  trees <- ape::read.tree("Complete_phylogeny.nex") # Reads all 1000 trees from a nexus file, and saves to "trees" variable (uses "ape" package)
+  phy <- phangorn::maxCladeCred(trees) # Generates a maximum clade credibility (best) tree from the 1000 trees
+  n_taxa <- length(phy$tip.label) # Gets the number of species from looking at the tip labels
+  phy$node.label <- c((n_taxa + 1):(n_taxa + phy$Nnode))
+  ape::write.tree(phy,"mcc_tree.txt") # Saves this tree to a file called "mcc_tree.txt"
+  
+  RERUN <- FALSE
+}
+```
+
+```{r tree, eval=TRUE}
+# This code chunk reads in our MCC tree (one best tree)
+
+phy <- ape::read.tree("mcc_tree.txt") # Reads our MCC tree from a file
+```
+
+These species are in the dataset but not in the tree. Some of the mismatches are due to extra comments, which should be removed.
+
+```{r specmats, eval=TRUE, results=TRUE}
+# This code chunk makes sure our species data and our phylogeny have the same taxa in them
+
+LON <- data$Species # Reduces species from my data to LON ("List of Names")
+phy$tip.label <- gsub("_"," ",phy$tip.label) # Converts underscores to space in the full trees data to match with mine
+check <- LON[which(!(LON %in% phy$tip.label))] # Lists species which are in mine that are not in theirs (species to check)
+cat(check,sep=", ") # Prints out the list of species that need to be checked
+
+SPECMATS <- LON[which((LON %in% phy$tip.label))] # Creates a variable SPECMATS for all the species of mine which match those in the full trees
+phy <- ape::keep.tip(phy, SPECMATS) # Creates a new tree reducing phy to just SPECMATS, can then plot this with plot.phylo(SPECMATSTREE)
+phy <- force.ultrametric(phy,message=FALSE) # Makes sure all tips are exactly at the present (ultrametric)
+
+data <- data[which((LON %in% phy$tip.label)),] # Creates dataset of SPECMATS (rows that match with the tree).
+```
+
+Here is the phylogeny that we are using, only including taxa which are in the species dataset.
+
+```{r plot_tree, eval=TRUE, results=TRUE, fig.align="center", fig.width=12, fig.height=12}
+phytools::plotTree(phy, type="fan", fsize=.5, asp=1) # This plots the tree that we are using (with only matching taxa) as a circle phylogeny
+```
+
+## Correlations
+
+DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
+
+```{r correlations, eval=TRUE, echo=TRUE, results="hold"}
+# This code chunk assesses how each independent variable correlates with SSB
+# It prints out each statistical test, and also creates a file called "correlations.csv" that documents them
+# Here we use results="hold" to tell R markdown to put all the output in one section
+
+names <- colnames(data) # Getting the names of the columns in the dataset and saving them to the "names" variable
+type <- c(0,NA,1,1,1,0,0,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0) # For each column, says whether it is categorical (0) or quantitative (1)
+
+ind_names <- names[c(3:13,15:length(names))] # These are the names of all the independent variables we are interested in
+ind_type <- type[c(3:13,15:length(names))] # These are the types of all the independent variables we are interested in
+
+cat_names <- ind_names[which(ind_type==0)] # These are all the names of categorical variables
+quant_names <- ind_names[which(ind_type==1)] # These are all the names of quantitative variables
+
+SSB <- as.factor(data$SSB) # We make the "SSB" variable by getting the SSB data column and making it into a "factor" (what R calls categorical data)
+
+tests <- data.frame(matrix(NA,ncol=3,nrow=0)) # This matrix will hold the results of our statistical tests for correlations
+for (name in names) { # We want to look at all the independent variables and check whether they are correlated with SSB
+  if (name %in% cat_names) { # Checking if this is a categorical variable
+    ind <- as.factor(data[,which(colnames(data)==name)]) # Turning our independent variable data into a "factor"
+    test <- suppressWarnings(chisq.test(x=SSB,y=ind)$p.value) # Performing a chi-square test of significance and getting the p-value from it
+    if (test <= 0.05) { # Checks if the p-value is significant - if yes, do the next thing
+      row <- c(name=name,p=test,keep="Y") # Recording "Y" in the "keep" column if the test shows significance
+    } else { # If the p-value was not significant, do this instead
+      row <- c(name=name,p=test,keep="N") # Recording "N" in the "keep" column if the test does not show significance
+    }
+    tests <- rbind(tests,row) # Adding the results of this test (for this variable) to the list of tests for all variables
+    cat(paste0("\nVariable: ",gsub("."," ",row[1],fixed=TRUE)," | p = ",round(as.numeric(row[2]),4)," | Significant: ",row[3]),"\n") # Printing the statistical test being performed
+    print(suppressWarnings(chisq.test(x=SSB,y=ind)$observed)) # Printing the details of this statistical test
+  }
+  if (name %in% quant_names) { # Checking if this is a quantitative variable
+    ind <- as.numeric(data[,which(colnames(data)==name)]) # Turning our independent variable data into "numeric" (if it isn't already)
+    test <- suppressWarnings(t.test(ind ~ SSB, data=cbind(SSB,ind),na.rm=TRUE)$p.value) # Performing a t-test of significance and getting the p-value from it
+    if (test <= 0.05) { # Checks if the p-value is significant - if yes, do the next thing
+      row <- c(name=name,p=test,keep="Y") # Recording "Y" in the "keep" column if the test shows significance
+    } else { # If the p-value was not significant, do this instead
+      row <- c(name=name,p=test,keep="N") # Recording "N" in the "keep" column if the test does not show significance
+    }
+    tests <- rbind(tests,row) # Adding the results of this test (for this variable) to the list of tests for all variables
+    cat(paste0("\nVariable: ",gsub("."," ",row[1],fixed=TRUE)," | p = ",round(as.numeric(row[2]),4)," | Significant: ",row[3]),"\n") # Printing the statistical test being performed
+    print(suppressWarnings(t.test(ind ~ SSB, data=cbind(SSB,ind),na.rm=TRUE)$estimate)) # Printing the details of this statistical test
+  }
+}
+
+colnames(tests) <- c("name","p","keep") # Naming the columns for our dataframe with all the statistical test results
+write.csv(tests,"correlations.csv",quote=FALSE,sep=",",row.names=FALSE,col.names=TRUE) # Saving our statistical tests to a file
+```
+
+## Phylogenetic Signal
+
+DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
+
+```{r signal, eval=TRUE, echo=TRUE, results="hold"}
+# This code chunk conducts a test for phylogenetic signal (d) using the "caper" package
+# d=1 indicates complete randomness of trait (no phylogenetic signal), all rest have phylogenetic signal
+# d=0 trait follows Brownian, d positive under 1 more different than Brownian, d negative more similar than Brownian
+
+caper::phylo.d(data, phy, Species, SSB) # Tests for phylogenetic signal in SSB, shows more differentiation than expected under Brownian structure
+caper::phylo.d(data, phy, Species, Typically.single.progeny.) # Tests for phylogenetic signal in typically single progeny, shows Brownian structure
+#caper::phylo.d(data, phy, Species, Female_Homosexuality) #same analysis for female SSB. Positive D shows more differentiation between species than expected.
+#caper::phylo.d(data, phy, Species, Male_Homosexuality) #same analysis for male SSB. Positive D (even higher) shows more differentiation between species than expected.
+```
+
+## Transition Rates
+
+DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
+
+(We will need to put FSSB and MSSB back in our dataset if we want to use them here)
+
+```{r ssb_tsp, eval=TRUE, echo=TRUE, results=TRUE}
+# This code chunk does an ancestral character estimation (ACE) for SSB using the "ape" package
+# It also determines the rates of transition between different characters / sets of characters
+# We use a CTMC to determine relationship between different variable in a matrix
+
+dataAFSSBmtrx <- matrix(c(0, 1, 2, 0),2) # Forms matrix for future use by AFSSB
+dataAFSSB <- ape::ace(data$SSB,phy, type = "discrete", model = dataAFSSBmtrx) # Reconstructed ancestral states of SSB
+
+for (i in 1:nrow(data)) { # Create for loop for finding four states of dual relation between FSSB and TSP
+  dataifFSSB <- data$SSB[i]
+  dataifTSP <- data$Typically.single.progeny.[i]
+  if (dataifFSSB == 0) {
+    if (dataifTSP == "N") {
+      state <- 1 # no FSSB, no TSP
+    } else {
+      state <- 2 # no FSSB, yes TSP
+    }
+  }else {
+  if (dataifTSP == "N") {
+      state <- 3 # yes FSSB, no TSP
+    } else {
+      state <- 4 # yes FSSB, yes TSP
+    }
+  }
+  data$FSSB_TSP[i] <- state # Takes new state info and adds it as a row to data named FSSB_TSP
+}
+
+dataAFSSB_TSPmtrx <- matrix(c(0, 1, 2, 0, 3, 0, 0, 4, 5, 0, 0, 6, 0, 7, 8, 0),4, byrow=TRUE) # Forms matrix for use in FSSB_TSP rate estimates, manually adjusted 0 terms for things we determine impossible
+dataAFSSB_TSP <- ape::ace(data$FSSB_TSP, phy, type = "discrete", model = dataAFSSB_TSPmtrx) # Generates rate matrix for AFSSB_TSP
+print(dataAFSSB_TSP)
+```
+
+## MCMCglmm
+
+DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
+
+```{r mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
+# This code chunk runs an MCMCglmm analysis
+
+data$Typically.single.progeny. <- as.factor(data$Typically.single.progeny.) # Making sure our yes/no data is "factor" type
+data$Progeny.Count <- as.numeric(data$Progeny.Count) # Making sure our count data is "numeric" type
+
+data_subset <- data[!is.na(data$Typically.single.progeny.),] # Removing rows with NA for TSP
+data_subset <- data[!is.na(data$Progeny.Count),] # Removing rows with NA for PC
+
+# Reads a tree and makes sure all tips are exactly at the present (ultrametric)
+# Then creates a matrix for how much time species pairs have spent evolving together vs separately
+inv.phylo <- inverseA(phy, "TIPS")$Ainv
+
+# Makes these things called priors, which are prior assumptions on variance distribution for the following model
+prior <- list(G=list(G1=list(V=1,nu=0.02)), # This is the prior on random effects, i.e. Species identity -- small nu means mostly flat
+              R=list(V=1,nu=0.02))          # This is the prior on your response variable, i.e. SSB -- small nu means mostly flat
+
+# Runs MCMCglmm fancy linear regression analysis
+MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~Typically.single.progeny.+Progeny.Count+1, # Formula for analysis: SSB is related to TSP, PC, and some intercept
+                random = ~Species, # Random effect -- species identity is a confounding factor in the analysis
+                family = "categorical", # Our response variable is categorical
+                ginverse = list(Species=inv.phylo), # These are our phylogenetic relationships, which cause covariance structure
+                prior = prior, # Telling the MCMC what our priors are
+                data = data_subset, # Telling the MCMC what our data is
+                nitt = 1000, # The number of iterations, i.e. samples, should do more for a real analysis
+                burnin = 100, # How long the MCMC spends "optimizing" before real samples
+                thin = 1, # How often to print output (every 1)
+                verbose = FALSE) # Don't write out too much stuff
+
+print(summary(MCMCanalysis$Sol))
+```
+
+## SSE
+
+DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
+
+SSE analyses (and other phylogenetic analyses) are sensitive to the sampling fraction, i.e. the number of taxa in the dataset compared to how many species are actually in the group. We should do some research to determine whether there are appropriate ways to handle this.
+
+```{r sse, echo=TRUE}
+# This code chunk runs a bisse analysis on just the taxa included in our dataset
+# We don't want this to run every time we knit -- only when we manually want to run it
+# To prevent us from running accidentally, we have RERUN <- FALSE at the start of the script
+# We have to manually type RERUN <- TRUE for this to run
+# We will save the MCMC to a file and have a separate code chunk to print a summary
+
+if (RERUN) {
+  states <- data$SSB # We are looking for state-dependent speciation, extinction, and transition rates for SSB
+  names(states) <- data$Species # diversitree requires us to name our states with species names
+  lik <- diversitree::make.bisse(phy, states) # This is our bisse model, with our tree and tip states
+  pars <- c(0.1, 0.1, 0.01, 0.01, 0.01, 0.01) # lambda 0 and 1 (speciation), mu 0 and 1 (extinction), q 01 and 10 (transition) initial values
+  n_iter <- 100 # The number of MCMC iterations, i.e. samples (will use more for a real analysis)
+  burnin <- 20 # The number of burnin iterations, i.e. how long we spend "optimizing" before real samples
+  
+  # Our MCMC analysis
+  # Our tuning parameter (for MCMC proposals) is 0.1
+  # We want to print to screen every 10 iterations
+  MCMCanalysis <- diversitree::mcmc(lik, pars, nsteps=n_iter, w=0.1, print.every=10)
+  MCMCresults <- MCMCanalysis[burnin:n_iter,] # Removing burnin iterations
+  write.table(MCMCresults,"bisse.tsv",quote=FALSE,sep="\t",row.names=FALSE,col.names=TRUE) # Saving our MCMC output to a file
+  
+  RERUN <- FALSE
+}
+```
+
+```{r sse_show, eval=TRUE, results=TRUE}
+MCMCresults <- read.csv("bisse.tsv",sep="\t") # Retrieving our MCMC results from the bisse.csv file
+MCMCsummary <- MCMCvis::MCMCsummary(coda::mcmc(MCMCresults),excl=c("i","p"),Rhat=FALSE,round=4) # Turning into MCMC object and summarizing output (excluding iteration and probability)
+print(MCMCsummary)
+```
