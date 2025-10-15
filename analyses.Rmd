@@ -20,13 +20,77 @@ SETUP: MARKDOWN, PACKAGES, DIRECTORIES, PLOT SETTINGS, & READING DATA
 
 ## Setup
 
-This project is about same-sex sexual behavior in mammals. PROJECT DESCRIPTION HERE
+This project is about same-sex sexual behavior (SSB) in mammals. It has previously been demonstrated that SSB has developed numerous times across the mammal phylogeny (Gómez et al. 2023), but the underlying patterns behind where and why SSB evolves remains largely unknown. This work serves to compare existing phylogenetic data for SSB's presence with that of other covariates, with the purpose of investigating potential ties between SSB and mammal sociality, maternal investment, confusion, diversification, and extinction. We approached our analysis of SSB under the traditional assumptions of the field, namely that SSB, as an energy intensive but reproductively unfruitful, is a largely nonadaptive or maladaptive trait. To test this, we broke our analysis into three primary sections: maternal investment, designed to investigate the energy costs involved in engaging in nonreproductive sexual behavior, sociality, designed to investigate at a deeper level previously established ties between social behavior and SSB, and confusion and maladaptation, designed test theories that posit SSB existing as rendering no fitness benefit. ANALYSES METHODS DETAILS HERE. The details of each category of study and individual hypotheses can be found below:
 
-Here are some hypotheses:
 
-1. HYPOTHESIS 1
-2. HYPOTHESIS 2
-3. HYPOTHESIS 3
+
+Maternal Investment:
+
+Hypothesis: Species with greater maternal investment need to allocate more resources to reproductively fruitful mating, and are thus less likely to exhibit SSB.
+
+Covariates:
+
+↑ in factor associated with ↑ in SSB: Alloparental Care, Progeny Count, Paternal Investment.
+
+↑ in factor associated with ↓ in SSB: Gestation Period, Wean Age, Birth Mass to Maternal Mass Ratio, Typically Single Progeny.
+
+
+
+Sociality:
+
+Hypothesis 1: Social species whose group structure involves increased time spent exclusively with the same sex will route more sexual behavior to same-sex interactions.
+
+Tested covariates:
+
+↑ in factor associated with ↑ in SSB: Female Exclusive Groups, Bachelor Groups.
+
+↑ in factor associated with ↓ in SSB: Multimale Groups, Harems, Varying Group Structures. 
+
+Hypothesis 2: Social species with highly coordinated and structured mating systems will be more intentional and selective in their mate choice, decreasing SSB prevalence.
+
+Tested covariates:
+
+↑ in factor associated with ↓ in SSB: Breeding Seasonality, Mating Aggregations in solitary species.
+
+Hypothesis 3: Territorial animals are more likely to exhibit SSB as a means of mitigating the risk of fatal conspecific violence.
+
+Tested covariates:
+
+↑ in factor associated with ↑ in SSB: Territoriality
+
+Note: The Nature paper that plotted out the phylogeny of SSB demonstrated that SSB often evolves subsequently to male adulticide, which they attributed to SSB potentially acting as a means of mitigation that allows for aggression release without necessitating more violence. This hypothesis is trying to build on that, which is why it doesn’t match the “Darwinian Paradox” approach of the others.
+
+Hypothesis 4: Solitary species that demonstrate occasional grouping are more likely to have same-sex interactions than purely solitary species, and are thus more likely to exhibit SSB.
+
+Tested covariates:
+
+↑ in factor associated with ↑ in SSB: Occasional Groupings in Solitary Species.
+
+Note: The same Nature paper already established that social species are associated with ↑ SSB, so this extends that to a deeper analysis of solitary species.
+
+
+
+Confusion and Maladaption:
+
+Hypothesis 1: Species with notably dimorphic external morphology (excluding sex organs) are less likely to confuse members of the same and opposite sex, and are therefore less likely to exhibit SSB.
+
+Tested covariates:
+
+↑ in factor associated with ↓ in SSB: Radically Dimorphic Morphology
+
+Hypothesis 2: Species with higher ages of maturity are more likely to observe SSB while young and try to replicate same-sex sexual interactions upon reaching adulthood.
+
+Tested covariates:
+
+↑ in factor associated with ↑ in SSB: Male Age of Maturity, Female Age of Maturity.
+
+Hypothesis 3: SSB is an energy intensive but reproductively unfruitful endeavor, and will therefore be associated with reduced species success.
+
+Tested covariates:
+
+↑ in SSB associated with ↑ in factor: High IUCN Endangerment Status, Extinction Rate.
+
+↑ in SSB associated with ↓ in factor: Diversification.
 
 ```{r setup, echo=FALSE}
 # R markdown is used to create documents (in this case, an HTML document) out of R code and output
