@@ -22,20 +22,6 @@ SETUP: MARKDOWN, PACKAGES, DIRECTORIES, PLOT SETTINGS, & READING DATA
 
 This project is about same-sex sexual behavior (SSB) in mammals. It has previously been demonstrated that SSB has developed numerous times across the mammal phylogeny (Gómez et al. 2023), but the underlying patterns behind where and why SSB evolves remains largely unknown. This work serves to compare existing phylogenetic data for SSB's presence with that of other covariates, with the purpose of investigating potential ties between SSB and mammal sociality, maternal investment, confusion, diversification, and extinction. We approached our analysis of SSB under the traditional assumptions of the field, namely that SSB, as an energy intensive but reproductively unfruitful, is a largely nonadaptive or maladaptive trait. To test this, we broke our analysis into three primary sections: maternal investment, designed to investigate the energy costs involved in engaging in nonreproductive sexual behavior, sociality, designed to investigate at a deeper level previously established ties between social behavior and SSB, and confusion and maladaptation, designed test theories that posit SSB existing as rendering no fitness benefit. ANALYSES METHODS DETAILS HERE. The details of each category of study and individual hypotheses can be found below:
 
-
-
-Maternal Investment:
-
-Hypothesis: Species with greater maternal investment need to allocate more resources to reproductively fruitful mating, and are thus less likely to exhibit SSB.
-
-Covariates:
-
-↑ in factor associated with ↑ in SSB: Alloparental Care, Progeny Count, Paternal Investment.
-
-↑ in factor associated with ↓ in SSB: Gestation Period, Wean Age, Birth Mass to Maternal Mass Ratio, Typically Single Progeny.
-
-
-
 Sociality:
 
 Hypothesis 1: Social species whose group structure involves increased time spent exclusively with the same sex will route more sexual behavior to same-sex interactions.
@@ -145,7 +131,9 @@ DESCRIPTION OF DATASET HERE
 # This code chunk reads in our data files
 # Note that we want to run this code (eval=TRUE) and show the output (results=TRUE), but we don't need to see it
 
-data <- read.csv("temp_data.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
+data <- read.csv("data_20251016.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
+print(data)
+
 variables <- paste(colnames(data),collapse=", ")
 cat(variables)
 ```
@@ -195,7 +183,132 @@ Here is the phylogeny that we are using, only including taxa which are in the sp
 phytools::plotTree(phy, type="fan", fsize=.5, asp=1) # This plots the tree that we are using (with only matching taxa) as a circle phylogeny
 ```
 
-## Correlations
+## Maternal Investment
+
+Hypothesis: Species with greater maternal investment need to allocate more resources to reproductively fruitful mating, and are thus less likely to exhibit SSB.
+
+Covariates:
+
+↑ in factor associated with ↑ in SSB: Alloparental Care, Progeny Count, Paternal Investment.
+
+↑ in factor associated with ↓ in SSB: Gestation Period, Wean Age, Birth Mass to Maternal Mass Ratio, Typically Single Progeny.
+
+```{r maternalinvestment_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
+# This code chunk runs an MCMCglmm analysis
+
+data_subset_cols <- cbind(data$SSB,
+                          data$Female_Homosexuality,
+                          data$Male_Homosexuality,
+                          data$Notable.Alloparental.Care.Beyond.Alerts.,
+                          data$Deep.Paternal.involvement.,
+                          data$Typically.single.progeny.,
+                          data$Progeny.Count,
+                          data$Gestation.Period..m.,
+                          data$Fully.Weaned.Age..m.) # Getting all the data columns we want for this analysis and putting them together in data_subset_cols
+data_subset_cols <- cbind(data_subset_cols, as.numeric(data$Birth.Mass..kg.) / as.numeric(data$Adult.Female.Mass..kg.)) # Adding a column for birth to female mass
+data_subset_cols <- gsub("Y","1",data_subset_cols) # Replacing Y with 1 and N with 0
+data_subset_cols <- gsub("N","0",data_subset_cols)
+data_subset_cols <- cbind(data$Species,data_subset_cols) # Adding species name column
+data_subset <- data.frame(data_subset_clean) # Turning our data columns into a dataframe (a type of object)
+for (i in 2:7) {
+  data_subset[[i]] <- as.factor(data_subset[[i]])
+} # Making our categorical columns into factors
+for (i in 8:11) {
+  data_subset[[i]] <- as.numeric(data_subset[[i]])
+} # Making our quantitative columns into numbers
+data_subset <- data_subset[complete.cases(data_subset),] # Removes incomplete cases (NAs)
+
+
+colnames(data_subset) <- c("Species","SSB","FSSB","MSSB","Allo","Pat","TSP","PC","Gest","Wean","Mass") # Gives our columns sensible names
+print(data_subset) # Prints that data
+
+# Reads a tree and makes sure all tips are exactly at the present (ultrametric)
+# Then creates a matrix for how much time species pairs have spent evolving together vs separately
+inv.phylo <- inverseA(phy, "TIPS")$Ainv
+
+# Makes these things called priors, which are prior assumptions on variance distribution for the following model
+prior <- list(G=list(G1=list(V=1,nu=0.02)), # This is the prior on random effects, i.e. Species identity -- small nu means mostly flat
+              R=list(V=1,nu=0.02))          # This is the prior on your response variable, i.e. SSB -- small nu means mostly flat
+
+# Runs MCMCglmm fancy linear regression analysis
+MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~Allo+Pat+TSP+PC+Gest+Wean+Mass+1, # Formula for analysis: SSB is related to TSP, PC, and some intercept
+                random = ~Species, # Random effect -- species identity is a confounding factor in the analysis
+                family = "categorical", # Our response variable is categorical
+                ginverse = list(Species=inv.phylo), # These are our phylogenetic relationships, which cause covariance structure
+                prior = prior, # Telling the MCMC what our priors are
+                data = data_subset, # Telling the MCMC what our data is
+                nitt = 100, # The number of iterations, i.e. samples, should do more for a real analysis
+                burnin = 10, # How long the MCMC spends "optimizing" before real samples
+                thin = 1, # How often to print output (every 1)
+                verbose = FALSE) # Don't write out too much stuff
+
+print(summary(MCMCanalysis$Sol))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Example Analyses
+
+### Correlations
 
 DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
 
@@ -247,7 +360,7 @@ colnames(tests) <- c("name","p","keep") # Naming the columns for our dataframe w
 write.csv(tests,"correlations.csv",quote=FALSE,sep=",",row.names=FALSE,col.names=TRUE) # Saving our statistical tests to a file
 ```
 
-## Phylogenetic Signal
+### Phylogenetic Signal
 
 DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
 
@@ -262,7 +375,7 @@ caper::phylo.d(data, phy, Species, Typically.single.progeny.) # Tests for phylog
 #caper::phylo.d(data, phy, Species, Male_Homosexuality) #same analysis for male SSB. Positive D (even higher) shows more differentiation between species than expected.
 ```
 
-## Transition Rates
+### Transition Rates
 
 DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
 
@@ -272,6 +385,7 @@ DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
 # This code chunk does an ancestral character estimation (ACE) for SSB using the "ape" package
 # It also determines the rates of transition between different characters / sets of characters
 # We use a CTMC to determine relationship between different variable in a matrix
+# Pagel's directional test: http://www.phytools.org/Cordoba2017/ex/9/Pagel94-method.html
 
 dataAFSSBmtrx <- matrix(c(0, 1, 2, 0),2) # Forms matrix for future use by AFSSB
 dataAFSSB <- ape::ace(data$SSB,phy, type = "discrete", model = dataAFSSBmtrx) # Reconstructed ancestral states of SSB
@@ -300,7 +414,7 @@ dataAFSSB_TSP <- ape::ace(data$FSSB_TSP, phy, type = "discrete", model = dataAFS
 print(dataAFSSB_TSP)
 ```
 
-## MCMCglmm
+### MCMCglmm
 
 DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
 
@@ -338,7 +452,7 @@ MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~Typically.single.progeny.+Progeny.Count+1
 print(summary(MCMCanalysis$Sol))
 ```
 
-## SSE
+### SSE
 
 DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
 
