@@ -22,62 +22,6 @@ SETUP: MARKDOWN, PACKAGES, DIRECTORIES, PLOT SETTINGS, & READING DATA
 
 This project is about same-sex sexual behavior (SSB) in mammals. It has previously been demonstrated that SSB has developed numerous times across the mammal phylogeny (Gómez et al. 2023), but the underlying patterns behind where and why SSB evolves remains largely unknown. This work serves to compare existing phylogenetic data for SSB's presence with that of other covariates, with the purpose of investigating potential ties between SSB and mammal sociality, maternal investment, confusion, diversification, and extinction. We approached our analysis of SSB under the traditional assumptions of the field, namely that SSB, as an energy intensive but reproductively unfruitful, is a largely nonadaptive or maladaptive trait. To test this, we broke our analysis into three primary sections: maternal investment, designed to investigate the energy costs involved in engaging in nonreproductive sexual behavior, sociality, designed to investigate at a deeper level previously established ties between social behavior and SSB, and confusion and maladaptation, designed test theories that posit SSB existing as rendering no fitness benefit. ANALYSES METHODS DETAILS HERE. The details of each category of study and individual hypotheses can be found below:
 
-Sociality:
-
-Hypothesis 1: Social species whose group structure involves increased time spent exclusively with the same sex will route more sexual behavior to same-sex interactions.
-
-Tested covariates:
-
-↑ in factor associated with ↑ in SSB: Female Exclusive Groups, Bachelor Groups.
-
-↑ in factor associated with ↓ in SSB: Multimale Groups, Harems, Varying Group Structures. 
-
-Hypothesis 2: Social species with highly coordinated and structured mating systems will be more intentional and selective in their mate choice, decreasing SSB prevalence.
-
-Tested covariates:
-
-↑ in factor associated with ↓ in SSB: Breeding Seasonality, Mating Aggregations in solitary species.
-
-Hypothesis 3: Territorial animals are more likely to exhibit SSB as a means of mitigating the risk of fatal conspecific violence.
-
-Tested covariates:
-
-↑ in factor associated with ↑ in SSB: Territoriality
-
-Note: The Nature paper that plotted out the phylogeny of SSB demonstrated that SSB often evolves subsequently to male adulticide, which they attributed to SSB potentially acting as a means of mitigation that allows for aggression release without necessitating more violence. This hypothesis is trying to build on that, which is why it doesn’t match the “Darwinian Paradox” approach of the others.
-
-Hypothesis 4: Solitary species that demonstrate occasional grouping are more likely to have same-sex interactions than purely solitary species, and are thus more likely to exhibit SSB.
-
-Tested covariates:
-
-↑ in factor associated with ↑ in SSB: Occasional Groupings in Solitary Species.
-
-Note: The same Nature paper already established that social species are associated with ↑ SSB, so this extends that to a deeper analysis of solitary species.
-
-
-
-Confusion and Maladaption:
-
-Hypothesis 1: Species with notably dimorphic external morphology (excluding sex organs) are less likely to confuse members of the same and opposite sex, and are therefore less likely to exhibit SSB.
-
-Tested covariates:
-
-↑ in factor associated with ↓ in SSB: Radically Dimorphic Morphology
-
-Hypothesis 2: Species with higher ages of maturity are more likely to observe SSB while young and try to replicate same-sex sexual interactions upon reaching adulthood.
-
-Tested covariates:
-
-↑ in factor associated with ↑ in SSB: Male Age of Maturity, Female Age of Maturity.
-
-Hypothesis 3: SSB is an energy intensive but reproductively unfruitful endeavor, and will therefore be associated with reduced species success.
-
-Tested covariates:
-
-↑ in SSB associated with ↑ in factor: High IUCN Endangerment Status, Extinction Rate.
-
-↑ in SSB associated with ↓ in factor: Diversification.
-
 ```{r setup, echo=FALSE}
 # R markdown is used to create documents (in this case, an HTML document) out of R code and output
 # Code is in "chunks" that can be run, everything else is text
@@ -131,11 +75,28 @@ DESCRIPTION OF DATASET HERE
 # This code chunk reads in our data files
 # Note that we want to run this code (eval=TRUE) and show the output (results=TRUE), but we don't need to see it
 
-data <- read.csv("data_20251016.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
-print(data)
+data_file <- read.csv("data_20251020.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
+print(data_file$Column.Name.Key[data_file$Column.Name.Key != ""]) # Prints the column name key
+print(data_file$Mating.Group.Structures.Key[data_file$Mating.Group.Structures.Key != ""]) # prints the group mating structures key
 
-variables <- paste(colnames(data),collapse=", ")
-cat(variables)
+data <- data.frame(data_file[,-which(colnames(data_file)=="Column.Name.Key" | colnames(data_file)=="Mating.Group.Structures.Key")]) # Removing keys from dataset
+
+quantitative <- c("GP","BM","AFM","MR","PC","FWA","FAM","MAM") # quantitative columns
+binary <- c("RDM","TSP","NB","SDT","GL","SPI","NAC","GIM","GFE","MMC","BG","DHE","DCA","DPMI","DIN","DFR","DGR","DCE","DMOC","SOG","FSSB","MSSB","SSB") # binary columns
+yn <- c("RDM","TSP","NB","SDT","GL","SPI","NAC","GIM","GFE","MMC","BG","DHE","DCA","DPMI","DIN","DFR","DGR","DCE","DMOC","SOG") # binary columns with y/n
+multiple <- c("MGS","IUCN","Modifiers") # categorical columns with multiple options
+categorical <- c(binary,multiple) # all categorical columns
+
+for (i in 1:ncol(data)) { # looping through all the columns to format each one correctly
+  col <- colnames(data)[i] # getting the name of the column we're working on
+  data[[col]] <- gsub("#N/A","",data[[col]]) # replacing any of the "#N/A" generated by excel with ""
+  data[[col]] <- gsub("^$",NA,data[[col]]) # replacing the blank "" with NA
+  if (col %in% quantitative) {data[[col]] <- as.numeric(data[[col]])} # formatting quantitative columns as numeric
+  if (col %in% yn) {data[[col]] <- gsub("Y","1",data[[col]]); data[[col]] <- gsub("N","0",data[[col]])} # swapping y/n for 1/0
+  if (col %in% categorical) {data[[col]] <- as.factor(data[[col]])} # formatting all categorical columns as factors
+}
+
+print(data)
 ```
 
 ```{r make_tree, echo=TRUE}
@@ -156,23 +117,24 @@ if (RERUN) {
 
 ```{r tree, eval=TRUE}
 # This code chunk reads in our MCC tree (one best tree)
+# This version of the tree has some names replaced with better names from our dataset
 
-phy <- ape::read.tree("mcc_tree.txt") # Reads our MCC tree from a file
+phy <- ape::read.tree("mcc_tree_for_us.txt") # Reads our MCC tree from a file
 ```
 
-These species are in the dataset but not in the tree. Some of the mismatches are due to extra comments, which should be removed.
+These species are in the dataset but not in the tree.
 
 ```{r specmats, eval=TRUE, results=TRUE}
 # This code chunk makes sure our species data and our phylogeny have the same taxa in them
 
 LON <- data$Species # Reduces species from my data to LON ("List of Names")
-phy$tip.label <- gsub("_"," ",phy$tip.label) # Converts underscores to space in the full trees data to match with mine
 check <- LON[which(!(LON %in% phy$tip.label))] # Lists species which are in mine that are not in theirs (species to check)
-cat(check,sep=", ") # Prints out the list of species that need to be checked
+print(paste0("Species to check: ",paste(check,collapse=", ")),quote=F) # Prints out the list of species that need to be checked
 
 SPECMATS <- LON[which((LON %in% phy$tip.label))] # Creates a variable SPECMATS for all the species of mine which match those in the full trees
 phy <- ape::keep.tip(phy, SPECMATS) # Creates a new tree reducing phy to just SPECMATS, can then plot this with plot.phylo(SPECMATSTREE)
 phy <- force.ultrametric(phy,message=FALSE) # Makes sure all tips are exactly at the present (ultrametric)
+print(paste0("Total species: ",length(phy$tip.label)),quote=F) # Prints out the number of species in the tree
 
 data <- data[which((LON %in% phy$tip.label)),] # Creates dataset of SPECMATS (rows that match with the tree).
 ```
@@ -183,155 +145,151 @@ Here is the phylogeny that we are using, only including taxa which are in the sp
 phytools::plotTree(phy, type="fan", fsize=.5, asp=1) # This plots the tree that we are using (with only matching taxa) as a circle phylogeny
 ```
 
+<!--
+##############################
+##############################
+MATERNAL INVESTMENT HYPOTHESES
+##############################
+##############################
+-->
+
 ## Maternal Investment
 
 Hypothesis: Species with greater maternal investment need to allocate more resources to reproductively fruitful mating, and are thus less likely to exhibit SSB.
 
 Covariates:
 
-↑ in factor associated with ↑ in SSB: Alloparental Care, Progeny Count, Paternal Investment.
+↑ in factor associated with ↑ in SSB: Alloparental Care (NAC), Progeny Count (PC), Paternal Investment (SPI)
 
-↑ in factor associated with ↓ in SSB: Gestation Period, Wean Age, Birth Mass to Maternal Mass Ratio, Typically Single Progeny.
+↑ in factor associated with ↓ in SSB: Gestation Period (GP), Wean Age (FWA), Birth Mass to Maternal Mass Ratio (MR), Typically Single Progeny (TSP)
 
 ```{r maternalinvestment_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
 # This code chunk runs an MCMCglmm analysis
 
-data_subset_cols <- cbind(data$SSB,
-                          data$Female_Homosexuality,
-                          data$Male_Homosexuality,
-                          data$Notable.Alloparental.Care.Beyond.Alerts.,
-                          data$Deep.Paternal.involvement.,
-                          data$Typically.single.progeny.,
-                          data$Progeny.Count,
-                          data$Gestation.Period..m.,
-                          data$Fully.Weaned.Age..m.) # Getting all the data columns we want for this analysis and putting them together in data_subset_cols
-data_subset_cols <- cbind(data_subset_cols, as.numeric(data$Birth.Mass..kg.) / as.numeric(data$Adult.Female.Mass..kg.)) # Adding a column for birth to female mass
-data_subset_cols <- gsub("Y","1",data_subset_cols) # Replacing Y with 1 and N with 0
-data_subset_cols <- gsub("N","0",data_subset_cols)
-data_subset_cols <- cbind(data$Species,data_subset_cols) # Adding species name column
-data_subset <- data.frame(data_subset_clean) # Turning our data columns into a dataframe (a type of object)
-for (i in 2:7) {
-  data_subset[[i]] <- as.factor(data_subset[[i]])
-} # Making our categorical columns into factors
-for (i in 8:11) {
-  data_subset[[i]] <- as.numeric(data_subset[[i]])
-} # Making our quantitative columns into numbers
-data_subset <- data_subset[complete.cases(data_subset),] # Removes incomplete cases (NAs)
-
-
-colnames(data_subset) <- c("Species","SSB","FSSB","MSSB","Allo","Pat","TSP","PC","Gest","Wean","Mass") # Gives our columns sensible names
-print(data_subset) # Prints that data
-
-# Reads a tree and makes sure all tips are exactly at the present (ultrametric)
-# Then creates a matrix for how much time species pairs have spent evolving together vs separately
-inv.phylo <- inverseA(phy, "TIPS")$Ainv
-
-# Makes these things called priors, which are prior assumptions on variance distribution for the following model
-prior <- list(G=list(G1=list(V=1,nu=0.02)), # This is the prior on random effects, i.e. Species identity -- small nu means mostly flat
-              R=list(V=1,nu=0.02))          # This is the prior on your response variable, i.e. SSB -- small nu means mostly flat
-
-# Runs MCMCglmm fancy linear regression analysis
-MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~Allo+Pat+TSP+PC+Gest+Wean+Mass+1, # Formula for analysis: SSB is related to TSP, PC, and some intercept
-                random = ~Species, # Random effect -- species identity is a confounding factor in the analysis
-                family = "categorical", # Our response variable is categorical
-                ginverse = list(Species=inv.phylo), # These are our phylogenetic relationships, which cause covariance structure
-                prior = prior, # Telling the MCMC what our priors are
-                data = data_subset, # Telling the MCMC what our data is
-                nitt = 100, # The number of iterations, i.e. samples, should do more for a real analysis
-                burnin = 10, # How long the MCMC spends "optimizing" before real samples
-                thin = 1, # How often to print output (every 1)
-                verbose = FALSE) # Don't write out too much stuff
-
-print(summary(MCMCanalysis$Sol))
+if (RERUN) {
+  data_subset <- data[,c("Species","NAC","PC","SPI","GP","FWA","MR","TSP","SSB","FSSB","MSSB")]
+  data_subset <- data_subset[complete.cases(data_subset),] # Removes incomplete cases (NAs)
+  print(data_subset) # Prints that data
+  
+  # Reads a tree and makes sure all tips are exactly at the present (ultrametric)
+  # Then creates a matrix for how much time species pairs have spent evolving together vs separately
+  inv.phylo <- inverseA(phy, "TIPS")$Ainv
+  
+  # Makes these things called priors, which are prior assumptions on variance distribution for the following model
+  prior <- list(G=list(G1=list(V=1,nu=0.02)), # This is the prior on random effects, i.e. Species identity -- small nu means mostly flat
+                R=list(V=1,nu=0.02))          # This is the prior on your response variable, i.e. SSB -- small nu means mostly flat
+  
+  # Runs MCMCglmm fancy linear regression analysis
+  MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~NAC+PC+SPI+GP+FWA+MR+TSP+1, # Formula for analysis: SSB is related to TSP, PC, and some intercept
+                  random = ~Species, # Random effect -- species identity is a confounding factor in the analysis
+                  family = "categorical", # Our response variable is categorical
+                  ginverse = list(Species=inv.phylo), # These are our phylogenetic relationships, which cause covariance structure
+                  prior = prior, # Telling the MCMC what our priors are
+                  data = data_subset, # Telling the MCMC what our data is
+                  nitt = 1000, # The number of iterations, i.e. samples, should do more for a real analysis
+                  burnin = 100, # How long the MCMC spends "optimizing" before real samples
+                  thin = 1, # How often to print output (every 1)
+                  verbose = FALSE) # Don't write out too much stuff
+  
+  print(summary(MCMCanalysis$Sol))
+}
 ```
 
+<!--
+####################
+####################
+SOCIALITY HYPOTHESES
+####################
+####################
+-->
 
+## Sociality
 
+Hypothesis 1: Social species whose group structure involves increased time spent exclusively with the same sex will route more sexual behavior to same-sex interactions.
 
+Tested covariates:
 
+↑ in factor associated with ↑ in SSB: Female Exclusive Groups, Bachelor Groups.
 
+↑ in factor associated with ↓ in SSB: Multimale Groups, Harems, Varying Group Structures. 
 
+Hypothesis 2: Social species with highly coordinated and structured mating systems will be more intentional and selective in their mate choice, decreasing SSB prevalence.
 
+Tested covariates:
 
+↑ in factor associated with ↓ in SSB: Breeding Seasonality, Mating Aggregations in solitary species.
 
+Hypothesis 3: Territorial animals are more likely to exhibit SSB as a means of mitigating the risk of fatal conspecific violence.
 
+Tested covariates:
 
+↑ in factor associated with ↑ in SSB: Territoriality
 
+Note: The Nature paper that plotted out the phylogeny of SSB demonstrated that SSB often evolves subsequently to male adulticide, which they attributed to SSB potentially acting as a means of mitigation that allows for aggression release without necessitating more violence. This hypothesis is trying to build on that, which is why it doesn’t match the “Darwinian Paradox” approach of the others.
 
+Hypothesis 4: Solitary species that demonstrate occasional grouping are more likely to have same-sex interactions than purely solitary species, and are thus more likely to exhibit SSB.
 
+Tested covariates:
 
+↑ in factor associated with ↑ in SSB: Occasional Groupings in Solitary Species.
 
+Note: The same Nature paper already established that social species are associated with ↑ SSB, so this extends that to a deeper analysis of solitary species.
 
+<!--
+####################################
+####################################
+CONFUSION & MALADAPTATION HYPOTHESES
+####################################
+####################################
+-->
 
+## Confusion & Maladaptation
 
+Hypothesis 1: Species with notably dimorphic external morphology (excluding sex organs) are less likely to confuse members of the same and opposite sex, and are therefore less likely to exhibit SSB.
 
+Tested covariates:
 
+↑ in factor associated with ↓ in SSB: Radically Dimorphic Morphology
 
+Hypothesis 2: Species with higher ages of maturity are more likely to observe SSB while young and try to replicate same-sex sexual interactions upon reaching adulthood.
 
+Tested covariates:
 
+↑ in factor associated with ↑ in SSB: Male Age of Maturity, Female Age of Maturity.
 
+Hypothesis 3: SSB is an energy intensive but reproductively unfruitful endeavor, and will therefore be associated with reduced species success.
 
+Tested covariates:
 
+↑ in SSB associated with ↑ in factor: High IUCN Endangerment Status, Extinction Rate.
 
+↑ in SSB associated with ↓ in factor: Diversification.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<!--
+#############################
+#############################
+EXAMPLE ANALYSIS OF EACH TYPE
+#############################
+#############################
+-->
 
 ## Example Analyses
 
 ### Correlations
 
-DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
+This analysis determines whether factors are significantly correlated with SSB, either via a chi-square test (categorical factors) or a t-test (quantitative factors). These tests do not incorporate phylogeny and are only used as a preliminary check for whether each factor should be analyzed more deeply.
 
 ```{r correlations, eval=TRUE, echo=TRUE, results="hold"}
 # This code chunk assesses how each independent variable correlates with SSB
 # It prints out each statistical test, and also creates a file called "correlations.csv" that documents them
 # Here we use results="hold" to tell R markdown to put all the output in one section
 
-names <- colnames(data) # Getting the names of the columns in the dataset and saving them to the "names" variable
-type <- c(0,NA,1,1,1,0,0,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0) # For each column, says whether it is categorical (0) or quantitative (1)
-
-ind_names <- names[c(3:13,15:length(names))] # These are the names of all the independent variables we are interested in
-ind_type <- type[c(3:13,15:length(names))] # These are the types of all the independent variables we are interested in
-
-cat_names <- ind_names[which(ind_type==0)] # These are all the names of categorical variables
-quant_names <- ind_names[which(ind_type==1)] # These are all the names of quantitative variables
-
-SSB <- as.factor(data$SSB) # We make the "SSB" variable by getting the SSB data column and making it into a "factor" (what R calls categorical data)
+SSB <- data$SSB
 
 tests <- data.frame(matrix(NA,ncol=3,nrow=0)) # This matrix will hold the results of our statistical tests for correlations
-for (name in names) { # We want to look at all the independent variables and check whether they are correlated with SSB
-  if (name %in% cat_names) { # Checking if this is a categorical variable
-    ind <- as.factor(data[,which(colnames(data)==name)]) # Turning our independent variable data into a "factor"
+for (name in colnames(data)) { # We want to look at all the independent variables and check whether they are correlated with SSB
+  if (name %in% categorical) { # Checking if this is a categorical variable
+    ind <- data[[name]] # Getting the data from the column
     test <- suppressWarnings(chisq.test(x=SSB,y=ind)$p.value) # Performing a chi-square test of significance and getting the p-value from it
     if (test <= 0.05) { # Checks if the p-value is significant - if yes, do the next thing
       row <- c(name=name,p=test,keep="Y") # Recording "Y" in the "keep" column if the test shows significance
@@ -342,8 +300,8 @@ for (name in names) { # We want to look at all the independent variables and che
     cat(paste0("\nVariable: ",gsub("."," ",row[1],fixed=TRUE)," | p = ",round(as.numeric(row[2]),4)," | Significant: ",row[3]),"\n") # Printing the statistical test being performed
     print(suppressWarnings(chisq.test(x=SSB,y=ind)$observed)) # Printing the details of this statistical test
   }
-  if (name %in% quant_names) { # Checking if this is a quantitative variable
-    ind <- as.numeric(data[,which(colnames(data)==name)]) # Turning our independent variable data into "numeric" (if it isn't already)
+  if (name %in% quantitative) { # Checking if this is a quantitative variable
+    ind <- data[[name]] # Getting the data from the column
     test <- suppressWarnings(t.test(ind ~ SSB, data=cbind(SSB,ind),na.rm=TRUE)$p.value) # Performing a t-test of significance and getting the p-value from it
     if (test <= 0.05) { # Checks if the p-value is significant - if yes, do the next thing
       row <- c(name=name,p=test,keep="Y") # Recording "Y" in the "keep" column if the test shows significance
@@ -362,7 +320,8 @@ write.csv(tests,"correlations.csv",quote=FALSE,sep=",",row.names=FALSE,col.names
 
 ### Phylogenetic Signal
 
-DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
+In this analysis, we are checking whether a particular binary trait shows phylogenetic signal. Essentially, do species which are more closely related show traits that are more similar? If d=1, this indicates that they do not (no phylogenetic signal) -- basically, the trait is totally random on the tree. Otherwise, the trait shows phylogenetic signal. The test also shows whether the trait follows a Brownian model, where trait similarity is based on the amount of time species spend evolving together. If d=0, this indicates that the trait follows a Brownian model. If d>0 (but d<1), this indicates that species are more different than expected under a Brownian model, while d<0 indicates that they are more similar.
+
 
 ```{r signal, eval=TRUE, echo=TRUE, results="hold"}
 # This code chunk conducts a test for phylogenetic signal (d) using the "caper" package
@@ -370,37 +329,34 @@ DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
 # d=0 trait follows Brownian, d positive under 1 more different than Brownian, d negative more similar than Brownian
 
 caper::phylo.d(data, phy, Species, SSB) # Tests for phylogenetic signal in SSB, shows more differentiation than expected under Brownian structure
-caper::phylo.d(data, phy, Species, Typically.single.progeny.) # Tests for phylogenetic signal in typically single progeny, shows Brownian structure
-#caper::phylo.d(data, phy, Species, Female_Homosexuality) #same analysis for female SSB. Positive D shows more differentiation between species than expected.
-#caper::phylo.d(data, phy, Species, Male_Homosexuality) #same analysis for male SSB. Positive D (even higher) shows more differentiation between species than expected.
+caper::phylo.d(data, phy, Species, FSSB) #same analysis for female SSB. Positive D shows more differentiation between species than expected.
+caper::phylo.d(data, phy, Species, MSSB) #same analysis for male SSB. Positive D shows more differentiation between species than expected.
+caper::phylo.d(data, phy, Species, TSP) # Tests for phylogenetic signal in typically single progeny, shows Brownian structure
 ```
 
 ### Transition Rates
 
-DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
+In this analysis, we are estimating transition rates between different combinations of traits (in this case, combinations of FSSB and TSP) based on a model that we define. We decide which rates are allowed to be different from one another, and then estimate rates under that model. This is somewhat different from Pagel's directional test, which compares multiple models (matrices of rate parameters) to see which one best describes the data. When we run Pagel's directional test we are also doing this, so we don't have to run this analysis separately.
 
-(We will need to put FSSB and MSSB back in our dataset if we want to use them here)
-
-```{r ssb_tsp, eval=TRUE, echo=TRUE, results=TRUE}
+```{r ard, eval=TRUE, echo=TRUE, results=TRUE}
 # This code chunk does an ancestral character estimation (ACE) for SSB using the "ape" package
 # It also determines the rates of transition between different characters / sets of characters
 # We use a CTMC to determine relationship between different variable in a matrix
-# Pagel's directional test: http://www.phytools.org/Cordoba2017/ex/9/Pagel94-method.html
 
 dataAFSSBmtrx <- matrix(c(0, 1, 2, 0),2) # Forms matrix for future use by AFSSB
 dataAFSSB <- ape::ace(data$SSB,phy, type = "discrete", model = dataAFSSBmtrx) # Reconstructed ancestral states of SSB
 
 for (i in 1:nrow(data)) { # Create for loop for finding four states of dual relation between FSSB and TSP
   dataifFSSB <- data$SSB[i]
-  dataifTSP <- data$Typically.single.progeny.[i]
+  dataifTSP <- data$TSP[i]
   if (dataifFSSB == 0) {
-    if (dataifTSP == "N") {
+    if (dataifTSP == 0) {
       state <- 1 # no FSSB, no TSP
     } else {
       state <- 2 # no FSSB, yes TSP
     }
   }else {
-  if (dataifTSP == "N") {
+  if (dataifTSP == 0) {
       state <- 3 # yes FSSB, no TSP
     } else {
       state <- 4 # yes FSSB, yes TSP
@@ -414,49 +370,84 @@ dataAFSSB_TSP <- ape::ace(data$FSSB_TSP, phy, type = "discrete", model = dataAFS
 print(dataAFSSB_TSP)
 ```
 
+In this analysis, we are comparing multiple models (matrices of rate parameters) to see which one best describes the data. We will compare 4 models:
+
+1. SSB and TSP evolve independently of one another
+2. SSB depends on TSP
+3. TSP depends on SSB
+4. Both SSB and TSP depend on one another
+
+```{r pagel, eval=TRUE, echo=TRUE, results=TRUE}
+# This code chunk does pagel's directional test
+# Pagel's directional test: http://www.phytools.org/Cordoba2017/ex/9/Pagel94-method.html
+# These take a long time to run, so don't be worried if results don't print immediately
+
+if (RERUN) {
+  FSSB <- setNames(data$FSSB,data$Species) # Naming our FSSB values with species names
+  TSP <- setNames(data$TSP,data$Species) # Naming our TSP values with species names
+  
+  fit_FSSB_TSP <- phytools::fitPagel(phy,FSSB,TSP) # Fitting models where FSSB and TSP are totally independent or dependent
+  fit_FSSB_TSP
+  plot(fit_FSSB_TSP,lwd.by.rate=TRUE)
+  
+  fit_FSSB <- phytools::fitPagel(phy,FSSB,TSP,dep.var="x") # Fitting models where FSSB depends on TSP
+  fit_FSSB
+  plot(fit_FSSB,lwd.by.rate=TRUE)
+  
+  fit_TSP <- phytools::fitPagel(phy,FSSB,TSP,dep.var="y") # Fitting models where TSP depends on FSSB
+  fit_TSP
+  plot(fit_TSP,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_FSSB_TSP$independent.AIC,
+                    fit_FSSB$dependent.AIC,
+                    fit_TSP$dependent.AIC,
+                    fit_FSSB_TSP$dependent.AIC),
+                  c("independent","dependent FSSB","dependent TSP","dependent FSSB & TSP"))
+  aic
+  aic.w(aic)
+}
+```
+
 ### MCMCglmm
 
-DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
-
-I want to double-check that removing data from the dataset doesn't require also removing those lines from the tree.
+This analysis determines how a collection of independent variables contribute to a dependent variable (in this case, SSB). It creates a function where SSB is a function of several variables, and the coefficients of those variables tell us whether the variable is significantly related to SSB. If the quantiles for a particular coefficient exclude 0, then the variable is significant. The sign of the coefficient tells us the direction of the relationship (positive = increased SSB, negative = decreased SSB).
 
 ```{r mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
 # This code chunk runs an MCMCglmm analysis
 
-data$Typically.single.progeny. <- as.factor(data$Typically.single.progeny.) # Making sure our yes/no data is "factor" type
-data$Progeny.Count <- as.numeric(data$Progeny.Count) # Making sure our count data is "numeric" type
-
-data_subset <- data[!is.na(data$Typically.single.progeny.),] # Removing rows with NA for TSP
-data_subset <- data[!is.na(data$Progeny.Count),] # Removing rows with NA for PC
-
-# Reads a tree and makes sure all tips are exactly at the present (ultrametric)
-# Then creates a matrix for how much time species pairs have spent evolving together vs separately
-inv.phylo <- inverseA(phy, "TIPS")$Ainv
-
-# Makes these things called priors, which are prior assumptions on variance distribution for the following model
-prior <- list(G=list(G1=list(V=1,nu=0.02)), # This is the prior on random effects, i.e. Species identity -- small nu means mostly flat
-              R=list(V=1,nu=0.02))          # This is the prior on your response variable, i.e. SSB -- small nu means mostly flat
-
-# Runs MCMCglmm fancy linear regression analysis
-MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~Typically.single.progeny.+Progeny.Count+1, # Formula for analysis: SSB is related to TSP, PC, and some intercept
-                random = ~Species, # Random effect -- species identity is a confounding factor in the analysis
-                family = "categorical", # Our response variable is categorical
-                ginverse = list(Species=inv.phylo), # These are our phylogenetic relationships, which cause covariance structure
-                prior = prior, # Telling the MCMC what our priors are
-                data = data_subset, # Telling the MCMC what our data is
-                nitt = 1000, # The number of iterations, i.e. samples, should do more for a real analysis
-                burnin = 100, # How long the MCMC spends "optimizing" before real samples
-                thin = 1, # How often to print output (every 1)
-                verbose = FALSE) # Don't write out too much stuff
-
-print(summary(MCMCanalysis$Sol))
+if (RERUN) {
+  data_subset <- data[,c("Species","TSP","SSB","FSSB","MSSB")]
+  data_subset <- data_subset[complete.cases(data_subset),] # Removes incomplete cases (NAs)
+  print(data_subset) # Prints that data
+  
+  # Reads a tree and makes sure all tips are exactly at the present (ultrametric)
+  # Then creates a matrix for how much time species pairs have spent evolving together vs separately
+  inv.phylo <- inverseA(phy, "TIPS")$Ainv
+  
+  # Makes these things called priors, which are prior assumptions on variance distribution for the following model
+  prior <- list(G=list(G1=list(V=1,nu=0.02)), # This is the prior on random effects, i.e. Species identity -- small nu means mostly flat
+                R=list(V=1,nu=0.02))          # This is the prior on your response variable, i.e. SSB -- small nu means mostly flat
+  
+  # Runs MCMCglmm fancy linear regression analysis
+  MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~TSP+1, # Formula for analysis: SSB is related to TSP, PC, and some intercept
+                  random = ~Species, # Random effect -- species identity is a confounding factor in the analysis
+                  family = "categorical", # Our response variable is categorical
+                  ginverse = list(Species=inv.phylo), # These are our phylogenetic relationships, which cause covariance structure
+                  prior = prior, # Telling the MCMC what our priors are
+                  data = data_subset, # Telling the MCMC what our data is
+                  nitt = 1000, # The number of iterations, i.e. samples, should do more for a real analysis
+                  burnin = 100, # How long the MCMC spends "optimizing" before real samples
+                  thin = 1, # How often to print output (every 1)
+                  verbose = FALSE) # Don't write out too much stuff
+  
+  print(summary(MCMCanalysis$Sol))
+}
 ```
 
 ### SSE
 
-DESCRIPTION OF WHAT WE ARE DOING IN THIS ANALYSIS
-
-SSE analyses (and other phylogenetic analyses) are sensitive to the sampling fraction, i.e. the number of taxa in the dataset compared to how many species are actually in the group. We should do some research to determine whether there are appropriate ways to handle this.
+This analyses determines whether a particular binary trait (in this case, SSB) is associated with different rates of speciation and extinction. This is a simple model that only uses one binary trait, but better models also have "hidden" states. These hidden states are not observed traits of the organisms, but allow rates to be different on different parts of the tree due to unobserved factors. SSE analyses (and other phylogenetic analyses) are sensitive to the sampling fraction, i.e. the number of taxa in the dataset compared to how many species are actually in the group. We should do some research to determine whether there are appropriate ways to handle this.
 
 ```{r sse, echo=TRUE}
 # This code chunk runs a bisse analysis on just the taxa included in our dataset
@@ -466,7 +457,7 @@ SSE analyses (and other phylogenetic analyses) are sensitive to the sampling fra
 # We will save the MCMC to a file and have a separate code chunk to print a summary
 
 if (RERUN) {
-  states <- data$SSB # We are looking for state-dependent speciation, extinction, and transition rates for SSB
+  states <- as.numeric(as.character(data$SSB)) # We need to make our SSB into a number instead of a factor for this analysis
   names(states) <- data$Species # diversitree requires us to name our states with species names
   lik <- diversitree::make.bisse(phy, states) # This is our bisse model, with our tree and tip states
   pars <- c(0.1, 0.1, 0.01, 0.01, 0.01, 0.01) # lambda 0 and 1 (speciation), mu 0 and 1 (extinction), q 01 and 10 (transition) initial values
