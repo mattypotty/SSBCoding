@@ -251,6 +251,72 @@ Tested covariates:
 
 ↑ in factor associated with ↓ in SSB: Radically Dimorphic Morphology
 
+```{r dimorphicmorphology_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
+# This code chunk runs an MCMCglmm analysis
+
+if (RERUN) {
+  data_subset <- data[,c("Species","RDM","SSB","FSSB","MSSB")]
+  data_subset <- data_subset[complete.cases(data_subset),] # Removes incomplete cases (NAs)
+  print(data_subset) # Prints that data
+  
+  # Reads a tree and makes sure all tips are exactly at the present (ultrametric)
+  # Then creates a matrix for how much time species pairs have spent evolving together vs separately
+  inv.phylo <- inverseA(phy, "TIPS")$Ainv
+  
+  # Makes these things called priors, which are prior assumptions on variance distribution for the following model
+  prior <- list(G=list(G1=list(V=1,nu=0.02)), # This is the prior on random effects, i.e. Species identity -- small nu means mostly flat
+                R=list(V=1,nu=0.02))          # This is the prior on your response variable, i.e. SSB -- small nu means mostly flat
+  
+  # Runs MCMCglmm fancy linear regression analysis
+  MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~RDM+1, # Formula for analysis: SSB is related to RDM and some intercept
+                  random = ~Species, # Random effect -- species identity is a confounding factor in the analysis
+                  family = "categorical", # Our response variable is categorical
+                  ginverse = list(Species=inv.phylo), # These are our phylogenetic relationships, which cause covariance structure
+                  prior = prior, # Telling the MCMC what our priors are
+                  data = data_subset, # Telling the MCMC what our data is
+                  nitt = 1000, # The number of iterations, i.e. samples, should do more for a real analysis
+                  burnin = 100, # How long the MCMC spends "optimizing" before real samples
+                  thin = 1, # How often to print output (every 1)
+                  verbose = FALSE) # Don't write out too much stuff
+  
+  print(summary(MCMCanalysis$Sol))
+}
+```
+
+```{r  RDMpagel, eval=TRUE, echo=TRUE, results=TRUE}
+# This code chunk does pagel's directional test
+# Pagel's directional test: http://www.phytools.org/Cordoba2017/ex/9/Pagel94-method.html
+# These take a long time to run, so don't be worried if results don't print immediately
+
+if (RERUN) {
+  SSB <- setNames(data$SSB,data$Species) # Naming our SSB values with species names
+  RDM <- setNames(data$RDM,data$Species) # Naming our RDM values with species names
+  
+  fit_SSB_RDM <- phytools::fitPagel(phy,SSB,RDM) # Fitting models where SSB and RDM are totally independent or dependent
+  fit_SSB_RDM
+  plot(fit_SSB_RDM,lwd.by.rate=TRUE)
+  
+  fit_SSB <- phytools::fitPagel(phy,SSB,RDM,dep.var="x") # Fitting models where SSB depends on RDM
+  fit_SSB
+  plot(fit_SSB,lwd.by.rate=TRUE)
+  
+  fit_RDM <- phytools::fitPagel(phy,SSB,RDM,dep.var="y") # Fitting models where RDM depends on SSB
+  fit_RDM
+  plot(fit_RDM,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_SSB_RDM$independent.AIC,
+                    fit_SSB$dependent.AIC,
+                    fit_RDM$dependent.AIC,
+                    fit_SSB_RDM$dependent.AIC),
+                  c("independent","dependent SSB","dependent RDM","dependent SSB & RDM"))
+  aic
+  aic.w(aic)
+}
+```
+
+
+
 Hypothesis 2: Species with higher ages of maturity are more likely to observe SSB while young and try to replicate same-sex sexual interactions upon reaching adulthood.
 
 Tested covariates:
