@@ -154,8 +154,8 @@ MATERNAL INVESTMENT HYPOTHESES
 -->
 
 ## Maternal Investment
-
-Hypothesis: Species with greater maternal investment need to allocate more resources to reproductively fruitful mating, and are thus less likely to exhibit SSB.
+### Hypothesis: 
+Species with greater maternal investment need to allocate more resources to reproductively fruitful mating, and are thus less likely to exhibit SSB.
 
 Covariates:
 
@@ -163,35 +163,347 @@ Covariates:
 
 ↑ in factor associated with ↓ in SSB: Gestation Period (GP), Wean Age (FWA), Birth Mass to Maternal Mass Ratio (MR), Typically Single Progeny (TSP)
 
-```{r maternalinvestment_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
-# This code chunk runs an MCMCglmm analysis
-
+```{r MI_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
+#Runs MCMCglmm for all our Maternal investment variables. Individual binary variables each get their own suite of pagels below.
 if (RERUN) {
+  #Read in data
   data_subset <- data[,c("Species","NAC","PC","SPI","GP","FWA","MR","TSP","SSB","FSSB","MSSB")]
-  data_subset <- data_subset[complete.cases(data_subset),] # Removes incomplete cases (NAs)
-  print(data_subset) # Prints that data
+  # Removes incomplete cases
+  data_subset <- data_subset[complete.cases(data_subset),]
+  #print(data_subset) #Remove first hashtag to print data
   
-  # Reads a tree and makes sure all tips are exactly at the present (ultrametric)
-  # Then creates a matrix for how much time species pairs have spent evolving together vs separately
+  # Read tree and verify ultrametric, form matrix for evolution time
   inv.phylo <- inverseA(phy, "TIPS")$Ainv
   
-  # Makes these things called priors, which are prior assumptions on variance distribution for the following model
-  prior <- list(G=list(G1=list(V=1,nu=0.02)), # This is the prior on random effects, i.e. Species identity -- small nu means mostly flat
-                R=list(V=1,nu=0.02))          # This is the prior on your response variable, i.e. SSB -- small nu means mostly flat
+  # Make priors
+  prior <- list(G=list(G1=list(V=1,nu=0.02)),
+                R=list(V=1,nu=0.02))
   
-  # Runs MCMCglmm fancy linear regression analysis
-  MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~NAC+PC+SPI+GP+FWA+MR+TSP+1, # Formula for analysis: SSB is related to TSP, PC, and some intercept
-                  random = ~Species, # Random effect -- species identity is a confounding factor in the analysis
-                  family = "categorical", # Our response variable is categorical
-                  ginverse = list(Species=inv.phylo), # These are our phylogenetic relationships, which cause covariance structure
-                  prior = prior, # Telling the MCMC what our priors are
-                  data = data_subset, # Telling the MCMC what our data is
-                  nitt = 1000, # The number of iterations, i.e. samples, should do more for a real analysis
-                  burnin = 100, # How long the MCMC spends "optimizing" before real samples
-                  thin = 1, # How often to print output (every 1)
-                  verbose = FALSE) # Don't write out too much stuff
+  # Running MCMCglmm
+  MI_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~NAC+PC+SPI+GP+FWA+MR+TSP+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
   
-  print(summary(MCMCanalysis$Sol))
+  MIf_MCMCanalysis <- MCMCglmm::MCMCglmm(FSSB~NAC+PC+SPI+GP+FWA+MR+TSP+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  MIm_MCMCanalysis <- MCMCglmm::MCMCglmm(MSSB~NAC+PC+SPI+GP+FWA+MR+TSP+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  print(summary(MI_MCMCanalysis$Sol))
+  print(summary(MIf_MCMCanalysis$Sol))
+  print(summary(MIm_MCMCanalysis$Sol))
+}
+```
+
+```{r  NAC_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  SSB <- setNames(data$SSB,data$Species)
+  NAC <- setNames(data$NAC,data$Species)
+  
+   # Fit models where SSB and NAC are totally independent or dependent
+  fit_SSB_NAC <- phytools::fitPagel(phy,SSB,NAC)
+  fit_SSB_NAC
+  plot(fit_SSB_NAC,lwd.by.rate=TRUE)
+  
+  # Fit model where SSB depends on NAC
+  fit_SSB <- phytools::fitPagel(phy,SSB,NAC,dep.var="x")
+  fit_SSB
+  plot(fit_SSB,lwd.by.rate=TRUE)
+  
+  # Fit model where NAC depends on SSB
+  fit_NAC <- phytools::fitPagel(phy,SSB,NAC,dep.var="y")
+  fit_NAC
+  plot(fit_NAC,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_SSB_NAC$independent.AIC,
+                    fit_SSB$dependent.AIC,
+                    fit_NAC$dependent.AIC,
+                    fit_SSB_NAC$dependent.AIC),
+                  c("independent","dependent SSB","dependent NAC","dependent SSB & NAC"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  NACf_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  FSSB <- setNames(data$FSSB,data$Species)
+  NAC <- setNames(data$NAC,data$Species)
+  
+   # Fit models where FSSB and NAC are totally independent or dependent
+  fit_FSSB_NAC <- phytools::fitPagel(phy,FSSB,NAC)
+  fit_FSSB_NAC
+  plot(fit_FSSB_NAC,lwd.by.rate=TRUE)
+  
+  # Fit model where FSSB depends on NAC
+  fit_FSSB <- phytools::fitPagel(phy,FSSB,NAC,dep.var="x")
+  fit_FSSB
+  plot(fit_FSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where NAC depends on SSB
+  fit_NAC <- phytools::fitPagel(phy,FSSB,NAC,dep.var="y")
+  fit_NAC
+  plot(fit_NAC,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_FSSB_NAC$independent.AIC,
+                    fit_FSSB$dependent.AIC,
+                    fit_NAC$dependent.AIC,
+                    fit_FSSB_NAC$dependent.AIC),
+                  c("independent","dependent FSSB","dependent NAC","dependent FSSB & NAC"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  NACm_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  MSSB <- setNames(data$MSSB,data$Species)
+  NAC <- setNames(data$NAC,data$Species)
+  
+   # Fit models where MSSB and NAC are totally independent or dependent
+  fit_MSSB_NAC <- phytools::fitPagel(phy,MSSB,NAC)
+  fit_MSSB_NAC
+  plot(fit_MSSB_NAC,lwd.by.rate=TRUE)
+  
+  # Fit model where MSSB depends on NAC
+  fit_MSSB <- phytools::fitPagel(phy,MSSB,NAC,dep.var="x")
+  fit_MSSB
+  plot(fit_MSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where NAC depends on MSSB
+  fit_NAC <- phytools::fitPagel(phy,MSSB,NAC,dep.var="y")
+  fit_NAC
+  plot(fit_NAC,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_MSSB_NAC$independent.AIC,
+                    fit_MSSB$dependent.AIC,
+                    fit_NAC$dependent.AIC,
+                    fit_MSSB_NAC$dependent.AIC),
+                  c("independent","dependent MSSB","dependent NAC","dependent MSSB & NAC"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  SPI_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  SSB <- setNames(data$SSB,data$Species)
+  SPI <- setNames(data$SPI,data$Species)
+  
+   # Fit models where SSB and SPI are totally independent or dependent
+  fit_SSB_SPI <- phytools::fitPagel(phy,SSB,SPI)
+  fit_SSB_SPI
+  plot(fit_SSB_SPI,lwd.by.rate=TRUE)
+  
+  # Fit model where SSB depends on SPI
+  fit_SSB <- phytools::fitPagel(phy,SSB,SPI,dep.var="x")
+  fit_SSB
+  plot(fit_SSB,lwd.by.rate=TRUE)
+  
+  # Fit model where SPI depends on SSB
+  fit_SPI <- phytools::fitPagel(phy,SSB,SPI,dep.var="y")
+  fit_SPI
+  plot(fit_SPI,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_SSB_SPI$independent.AIC,
+                    fit_SSB$dependent.AIC,
+                    fit_SPI$dependent.AIC,
+                    fit_SSB_SPI$dependent.AIC),
+                  c("independent","dependent SSB","dependent SPI","dependent SSB & SPI"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  SPIf_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  FSSB <- setNames(data$FSSB,data$Species)
+  SPI <- setNames(data$SPI,data$Species)
+  
+   # Fit models where FSSB and SPI are totally independent or dependent
+  fit_FSSB_SPI <- phytools::fitPagel(phy,FSSB,SPI)
+  fit_FSSB_SPI
+  plot(fit_FSSB_SPI,lwd.by.rate=TRUE)
+  
+  # Fit model where FSSB depends on SPI
+  fit_FSSB <- phytools::fitPagel(phy,FSSB,SPI,dep.var="x")
+  fit_FSSB
+  plot(fit_FSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where SPI depends on SSB
+  fit_SPI <- phytools::fitPagel(phy,FSSB,SPI,dep.var="y")
+  fit_SPI
+  plot(fit_SPI,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_FSSB_SPI$independent.AIC,
+                    fit_FSSB$dependent.AIC,
+                    fit_SPI$dependent.AIC,
+                    fit_FSSB_SPI$dependent.AIC),
+                  c("independent","dependent FSSB","dependent SPI","dependent FSSB & SPI"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  SPIm_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  MSSB <- setNames(data$MSSB,data$Species)
+  SPI <- setNames(data$SPI,data$Species)
+  
+   # Fit models where MSSB and SPI are totally independent or dependent
+  fit_MSSB_SPI <- phytools::fitPagel(phy,MSSB,SPI)
+  fit_MSSB_SPI
+  plot(fit_MSSB_SPI,lwd.by.rate=TRUE)
+  
+  # Fit model where MSSB depends on SPI
+  fit_MSSB <- phytools::fitPagel(phy,MSSB,SPI,dep.var="x")
+  fit_MSSB
+  plot(fit_MSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where SPI depends on MSSB
+  fit_SPI <- phytools::fitPagel(phy,MSSB,SPI,dep.var="y")
+  fit_SPI
+  plot(fit_SPI,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_MSSB_SPI$independent.AIC,
+                    fit_MSSB$dependent.AIC,
+                    fit_SPI$dependent.AIC,
+                    fit_MSSB_SPI$dependent.AIC),
+                  c("independent","dependent MSSB","dependent SPI","dependent MSSB & SPI"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  TSP_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  SSB <- setNames(data$SSB,data$Species)
+  TSP <- setNames(data$TSP,data$Species)
+  
+   # Fit models where SSB and TSP are totally independent or dependent
+  fit_SSB_TSP <- phytools::fitPagel(phy,SSB,TSP)
+  fit_SSB_TSP
+  plot(fit_SSB_TSP,lwd.by.rate=TRUE)
+  
+  # Fit model where SSB depends on TSP
+  fit_SSB <- phytools::fitPagel(phy,SSB,TSP,dep.var="x")
+  fit_SSB
+  plot(fit_SSB,lwd.by.rate=TRUE)
+  
+  # Fit model where TSP depends on SSB
+  fit_TSP <- phytools::fitPagel(phy,SSB,TSP,dep.var="y")
+  fit_TSP
+  plot(fit_TSP,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_SSB_TSP$independent.AIC,
+                    fit_SSB$dependent.AIC,
+                    fit_TSP$dependent.AIC,
+                    fit_SSB_TSP$dependent.AIC),
+                  c("independent","dependent SSB","dependent TSP","dependent SSB & TSP"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  TSPf_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  FSSB <- setNames(data$FSSB,data$Species)
+  TSP <- setNames(data$TSP,data$Species)
+  
+   # Fit models where FSSB and TSP are totally independent or dependent
+  fit_FSSB_TSP <- phytools::fitPagel(phy,FSSB,TSP)
+  fit_FSSB_TSP
+  plot(fit_FSSB_TSP,lwd.by.rate=TRUE)
+  
+  # Fit model where FSSB depends on TSP
+  fit_FSSB <- phytools::fitPagel(phy,FSSB,TSP,dep.var="x")
+  fit_FSSB
+  plot(fit_FSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where TSP depends on SSB
+  fit_TSP <- phytools::fitPagel(phy,FSSB,TSP,dep.var="y")
+  fit_TSP
+  plot(fit_TSP,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_FSSB_TSP$independent.AIC,
+                    fit_FSSB$dependent.AIC,
+                    fit_TSP$dependent.AIC,
+                    fit_FSSB_TSP$dependent.AIC),
+                  c("independent","dependent FSSB","dependent TSP","dependent FSSB & TSP"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  TSPm_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  MSSB <- setNames(data$MSSB,data$Species)
+  TSP <- setNames(data$TSP,data$Species)
+  
+   # Fit models where MSSB and TSP are totally independent or dependent
+  fit_MSSB_TSP <- phytools::fitPagel(phy,MSSB,TSP)
+  fit_MSSB_TSP
+  plot(fit_MSSB_TSP,lwd.by.rate=TRUE)
+  
+  # Fit model where MSSB depends on TSP
+  fit_MSSB <- phytools::fitPagel(phy,MSSB,TSP,dep.var="x")
+  fit_MSSB
+  plot(fit_MSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where TSP depends on MSSB
+  fit_TSP <- phytools::fitPagel(phy,MSSB,TSP,dep.var="y")
+  fit_TSP
+  plot(fit_TSP,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_MSSB_TSP$independent.AIC,
+                    fit_MSSB$dependent.AIC,
+                    fit_TSP$dependent.AIC,
+                    fit_MSSB_TSP$dependent.AIC),
+                  c("independent","dependent MSSB","dependent TSP","dependent MSSB & TSP"))
+  aic
+  aic.w(aic)
 }
 ```
 
@@ -204,22 +516,79 @@ SOCIALITY HYPOTHESES
 -->
 
 ## Sociality
-
-Hypothesis 1: Social species whose group structure involves increased time spent exclusively with the same sex will route more sexual behavior to same-sex interactions.
+### Hypothesis 1: 
+Social species whose group structure involves increased time spent exclusively with the same sex will route more sexual behavior to same-sex interactions.
 
 Tested covariates:
 
-↑ in factor associated with ↑ in SSB: Female Exclusive Groups, Bachelor Groups.
+↑ in group type associated with ↑ in SSB: MBG, HBG, FEG, SSG
 
-↑ in factor associated with ↓ in SSB: Multimale Groups, Harems, Varying Group Structures. 
+↑ in group type associated with ↓ in SSB: SOL, MOP, HAR, MMG, HVG
 
-Hypothesis 2: Social species with highly coordinated and structured mating systems will be more intentional and selective in their mate choice, decreasing SSB prevalence.
+```{r MGS_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
+ if (RERUN) {
+  #Read in data
+  data_subset <- data[,c("Species","MGS","SSB","FSSB","MSSB")] 
+  #Remove incomplete cases
+  data_subset <- data_subset[complete.cases(data_subset),]
+  #print(data_subset) #Remove first hashtag to print data
+  
+  # Read tree and verify ultrametric, form matrix for evolution time
+  inv.phylo <- inverseA(phy, "TIPS")$Ainv
+  
+  # Make priors
+  prior <- list(G=list(G1=list(V=1,nu=0.02)), 
+                R=list(V=1,nu=0.02))
+  
+  # Running MCMCglmms
+  MGS_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~MGS+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  MGSf_MCMCanalysis <- MCMCglmm::MCMCglmm(FSSB~MGS+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  MGSm_MCMCanalysis <- MCMCglmm::MCMCglmm(MSSB~MGS+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  print(summary(MGS_MCMCanalysis$Sol))
+  print(summary(MGSf_MCMCanalysis$Sol))
+  print(summary(MGSm_MCMCanalysis$Sol))
+}
+```
+
+### Hypothesis 2: 
+Social species with highly coordinated and structured mating systems will be more intentional and selective in their mate choice, decreasing SSB prevalence.
 
 Tested covariates:
 
 ↑ in factor associated with ↓ in SSB: Breeding Seasonality, Mating Aggregations in solitary species.
 
-Hypothesis 3: Territorial animals are more likely to exhibit SSB as a means of mitigating the risk of fatal conspecific violence.
+### Hypothesis 3: 
+Territorial animals are more likely to exhibit SSB as a means of mitigating the risk of fatal conspecific violence.
 
 Tested covariates:
 
@@ -227,13 +596,316 @@ Tested covariates:
 
 Note: The Nature paper that plotted out the phylogeny of SSB demonstrated that SSB often evolves subsequently to male adulticide, which they attributed to SSB potentially acting as a means of mitigation that allows for aggression release without necessitating more violence. This hypothesis is trying to build on that, which is why it doesn’t match the “Darwinian Paradox” approach of the others.
 
-Hypothesis 4: Solitary species that demonstrate occasional grouping are more likely to have same-sex interactions than purely solitary species, and are thus more likely to exhibit SSB.
+```{r SDT_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
+ if (RERUN) {
+  #Read in data
+  data_subset <- data[,c("Species","SDT","SSB","FSSB","MSSB")] 
+  #Remove incomplete cases
+  data_subset <- data_subset[complete.cases(data_subset),]
+  #print(data_subset) #Remove first hashtag to print data
+  
+  # Read tree and verify ultrametric, form matrix for evolution time
+  inv.phylo <- inverseA(phy, "TIPS")$Ainv
+  
+  # Make priors
+  prior <- list(G=list(G1=list(V=1,nu=0.02)), 
+                R=list(V=1,nu=0.02))
+  
+  # Running MCMCglmms
+  SDT_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~SDT+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  SDTf_MCMCanalysis <- MCMCglmm::MCMCglmm(FSSB~SDT+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  SDTm_MCMCanalysis <- MCMCglmm::MCMCglmm(MSSB~SDT+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  print(summary(SDT_MCMCanalysis$Sol))
+  print(summary(SDTf_MCMCanalysis$Sol))
+  print(summary(SDTm_MCMCanalysis$Sol))
+}
+```
+
+```{r  SDT_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  SSB <- setNames(data$SSB,data$Species)
+  SDT <- setNames(data$SDT,data$Species)
+  
+   # Fit models where SSB and SDT are totally independent or dependent
+  fit_SSB_SDT <- phytools::fitPagel(phy,SSB,SDT)
+  fit_SSB_SDT
+  plot(fit_SSB_SDT,lwd.by.rate=TRUE)
+  
+  # Fit model where SSB depends on SDT
+  fit_SSB <- phytools::fitPagel(phy,SSB,SDT,dep.var="x")
+  fit_SSB
+  plot(fit_SSB,lwd.by.rate=TRUE)
+  
+  # Fit model where SDT depends on SSB
+  fit_SDT <- phytools::fitPagel(phy,SSB,SDT,dep.var="y")
+  fit_SDT
+  plot(fit_SDT,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_SSB_SDT$independent.AIC,
+                    fit_SSB$dependent.AIC,
+                    fit_SDT$dependent.AIC,
+                    fit_SSB_SDT$dependent.AIC),
+                  c("independent","dependent SSB","dependent SDT","dependent SSB & SDT"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  SDTf_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  FSSB <- setNames(data$FSSB,data$Species)
+  SDT <- setNames(data$SDT,data$Species)
+  
+   # Fit models where FSSB and SDT are totally independent or dependent
+  fit_FSSB_SDT <- phytools::fitPagel(phy,FSSB,SDT)
+  fit_FSSB_SDT
+  plot(fit_FSSB_SDT,lwd.by.rate=TRUE)
+  
+  # Fit model where FSSB depends on SDT
+  fit_FSSB <- phytools::fitPagel(phy,FSSB,SDT,dep.var="x")
+  fit_FSSB
+  plot(fit_FSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where SDT depends on SSB
+  fit_SDT <- phytools::fitPagel(phy,FSSB,SDT,dep.var="y")
+  fit_SDT
+  plot(fit_SDT,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_FSSB_SDT$independent.AIC,
+                    fit_FSSB$dependent.AIC,
+                    fit_SDT$dependent.AIC,
+                    fit_FSSB_SDT$dependent.AIC),
+                  c("independent","dependent FSSB","dependent SDT","dependent FSSB & SDT"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  SDTm_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  MSSB <- setNames(data$MSSB,data$Species)
+  SDT <- setNames(data$SDT,data$Species)
+  
+   # Fit models where MSSB and SDT are totally independent or dependent
+  fit_MSSB_SDT <- phytools::fitPagel(phy,MSSB,SDT)
+  fit_MSSB_SDT
+  plot(fit_MSSB_SDT,lwd.by.rate=TRUE)
+  
+  # Fit model where MSSB depends on SDT
+  fit_MSSB <- phytools::fitPagel(phy,MSSB,SDT,dep.var="x")
+  fit_MSSB
+  plot(fit_MSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where SDT depends on MSSB
+  fit_SDT <- phytools::fitPagel(phy,MSSB,SDT,dep.var="y")
+  fit_SDT
+  plot(fit_SDT,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_MSSB_SDT$independent.AIC,
+                    fit_MSSB$dependent.AIC,
+                    fit_SDT$dependent.AIC,
+                    fit_MSSB_SDT$dependent.AIC),
+                  c("independent","dependent MSSB","dependent SDT","dependent MSSB & SDT"))
+  aic
+  aic.w(aic)
+}
+```
+
+### Hypothesis 4: 
+Solitary species that demonstrate occasional grouping are more likely to have same-sex interactions than purely solitary species, and are thus more likely to exhibit SSB.
 
 Tested covariates:
 
 ↑ in factor associated with ↑ in SSB: Occasional Groupings in Solitary Species.
 
 Note: The same Nature paper already established that social species are associated with ↑ SSB, so this extends that to a deeper analysis of solitary species.
+
+```{r SOG_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
+ if (RERUN) {
+  #Read in data
+  data_subset <- data[,c("Species","SOG","SSB","FSSB","MSSB")] 
+  #Remove incomplete cases
+  data_subset <- data_subset[complete.cases(data_subset),]
+  #print(data_subset) #Remove first hashtag to print data
+  
+  # Read tree and verify ultrametric, form matrix for evolution time
+  inv.phylo <- inverseA(phy, "TIPS")$Ainv
+  
+  # Make priors
+  prior <- list(G=list(G1=list(V=1,nu=0.02)), 
+                R=list(V=1,nu=0.02))
+  
+  # Running MCMCglmms
+  SOG_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~SOG+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  SOGf_MCMCanalysis <- MCMCglmm::MCMCglmm(FSSB~SOG+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  SOGm_MCMCanalysis <- MCMCglmm::MCMCglmm(MSSB~SOG+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  print(summary(SOG_MCMCanalysis$Sol))
+  print(summary(SOGf_MCMCanalysis$Sol))
+  print(summary(SOGm_MCMCanalysis$Sol))
+}
+```
+
+```{r  SOG_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  SSB <- setNames(data$SSB,data$Species)
+  SOG <- setNames(data$SOG,data$Species)
+  
+   # Fit models where SSB and SOG are totally independent or dependent
+  fit_SSB_SOG <- phytools::fitPagel(phy,SSB,SOG)
+  fit_SSB_SOG
+  plot(fit_SSB_SOG,lwd.by.rate=TRUE)
+  
+  # Fit model where SSB depends on SOG
+  fit_SSB <- phytools::fitPagel(phy,SSB,SOG,dep.var="x")
+  fit_SSB
+  plot(fit_SSB,lwd.by.rate=TRUE)
+  
+  # Fit model where SOG depends on SSB
+  fit_SOG <- phytools::fitPagel(phy,SSB,SOG,dep.var="y")
+  fit_SOG
+  plot(fit_SOG,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_SSB_SOG$independent.AIC,
+                    fit_SSB$dependent.AIC,
+                    fit_SOG$dependent.AIC,
+                    fit_SSB_SOG$dependent.AIC),
+                  c("independent","dependent SSB","dependent SOG","dependent SSB & SOG"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  SOGf_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  FSSB <- setNames(data$FSSB,data$Species)
+  SOG <- setNames(data$SOG,data$Species)
+  
+   # Fit models where FSSB and SOG are totally independent or dependent
+  fit_FSSB_SOG <- phytools::fitPagel(phy,FSSB,SOG)
+  fit_FSSB_SOG
+  plot(fit_FSSB_SOG,lwd.by.rate=TRUE)
+  
+  # Fit model where FSSB depends on SOG
+  fit_FSSB <- phytools::fitPagel(phy,FSSB,SOG,dep.var="x")
+  fit_FSSB
+  plot(fit_FSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where SOG depends on SSB
+  fit_SOG <- phytools::fitPagel(phy,FSSB,SOG,dep.var="y")
+  fit_SOG
+  plot(fit_SOG,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_FSSB_SOG$independent.AIC,
+                    fit_FSSB$dependent.AIC,
+                    fit_SOG$dependent.AIC,
+                    fit_FSSB_SOG$dependent.AIC),
+                  c("independent","dependent FSSB","dependent SOG","dependent FSSB & SOG"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  SOGm_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  MSSB <- setNames(data$MSSB,data$Species)
+  SOG <- setNames(data$SOG,data$Species)
+  
+   # Fit models where MSSB and SOG are totally independent or dependent
+  fit_MSSB_SOG <- phytools::fitPagel(phy,MSSB,SOG)
+  fit_MSSB_SOG
+  plot(fit_MSSB_SOG,lwd.by.rate=TRUE)
+  
+  # Fit model where MSSB depends on SOG
+  fit_MSSB <- phytools::fitPagel(phy,MSSB,SOG,dep.var="x")
+  fit_MSSB
+  plot(fit_MSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where SOG depends on MSSB
+  fit_SOG <- phytools::fitPagel(phy,MSSB,SOG,dep.var="y")
+  fit_SOG
+  plot(fit_SOG,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_MSSB_SOG$independent.AIC,
+                    fit_MSSB$dependent.AIC,
+                    fit_SOG$dependent.AIC,
+                    fit_MSSB_SOG$dependent.AIC),
+                  c("independent","dependent MSSB","dependent SOG","dependent MSSB & SOG"))
+  aic
+  aic.w(aic)
+}
+```
 
 <!--
 ####################################
@@ -244,15 +916,15 @@ CONFUSION & MALADAPTATION HYPOTHESES
 -->
 
 ## Confusion & Maladaptation
-
-Hypothesis 1: Species with notably dimorphic external morphology (excluding sex organs) are less likely to confuse members of the same and opposite sex, and are therefore less likely to exhibit SSB.
+### Hypothesis 1: 
+Species with notably dimorphic external morphology (excluding sex organs) are less likely to confuse members of the same and opposite sex, and are therefore less likely to exhibit SSB.
 
 Tested covariates:
 
 ↑ in factor associated with ↓ in SSB: Radically Dimorphic Morphology
 
 ```{r RDM_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
- {
+ if (RERUN) {
   #Read in data
   data_subset <- data[,c("Species","RDM","SSB","FSSB","MSSB")] 
   #Remove incomplete cases
@@ -402,23 +1074,322 @@ if (RERUN) {
 }
 ```
 
-
-
-
-
-Hypothesis 2: Species with higher ages of maturity are more likely to observe SSB while young and try to replicate same-sex sexual interactions upon reaching adulthood.
+### Hypothesis 2:
+Species with higher ages of maturity are more likely to observe SSB while young and try to replicate same-sex sexual interactions upon reaching adulthood.
 
 Tested covariates:
 
 ↑ in factor associated with ↑ in SSB: Male Age of Maturity, Female Age of Maturity.
 
-Hypothesis 3: SSB is an energy intensive but reproductively unfruitful endeavor, and will therefore be associated with reduced species success.
+```{r AM_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
+ if (RERUN) {
+  #Read in data
+  data_subset <- data[,c("Species","FAM", "MAM","SSB","FSSB","MSSB")] 
+  #Remove incomplete cases
+  data_subset <- data_subset[complete.cases(data_subset),]
+  #print(data_subset) #Remove first hashtag to print data
+  
+  # Read tree and verify ultrametric, form matrix for evolution time
+  inv.phylo <- inverseA(phy, "TIPS")$Ainv
+  
+  # Make priors
+  prior <- list(G=list(G1=list(V=1,nu=0.02)), 
+                R=list(V=1,nu=0.02))
+  
+  # Running MCMCglmms
+  AM_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~FAM+MAM+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  AMf_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~FAM+MAM+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  AMm_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~FAM+MAM+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  print(summary(AM_MCMCanalysis$Sol))
+  print(summary(AMf_MCMCanalysis$Sol))
+  print(summary(AMm_MCMCanalysis$Sol))
+}
+```
+
+```{r  FAM_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  SSB <- setNames(data$SSB,data$Species)
+  FAM <- setNames(data$FAM,data$Species)
+  
+   # Fit models where SSB and FAM are totally independent or dependent
+  fit_SSB_FAM <- phytools::fitPagel(phy,SSB,FAM)
+  fit_SSB_FAM
+  plot(fit_SSB_FAM,lwd.by.rate=TRUE)
+  
+  # Fit model where SSB depends on FAM
+  fit_SSB <- phytools::fitPagel(phy,SSB,FAM,dep.var="x")
+  fit_SSB
+  plot(fit_SSB,lwd.by.rate=TRUE)
+  
+  # Fit model where FAM depends on SSB
+  fit_FAM <- phytools::fitPagel(phy,SSB,FAM,dep.var="y")
+  fit_FAM
+  plot(fit_FAM,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_SSB_FAM$independent.AIC,
+                    fit_SSB$dependent.AIC,
+                    fit_FAM$dependent.AIC,
+                    fit_SSB_FAM$dependent.AIC),
+                  c("independent","dependent SSB","dependent FAM","dependent SSB & FAM"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  FAMf_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  FSSB <- setNames(data$FSSB,data$Species)
+  FAM <- setNames(data$FAM,data$Species)
+  
+   # Fit models where FSSB and FAM are totally independent or dependent
+  fit_FSSB_FAM <- phytools::fitPagel(phy,FSSB,FAM)
+  fit_FSSB_FAM
+  plot(fit_FSSB_FAM,lwd.by.rate=TRUE)
+  
+  # Fit model where FSSB depends on FAM
+  fit_FSSB <- phytools::fitPagel(phy,FSSB,FAM,dep.var="x")
+  fit_FSSB
+  plot(fit_FSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where FAM depends on SSB
+  fit_FAM <- phytools::fitPagel(phy,FSSB,FAM,dep.var="y")
+  fit_FAM
+  plot(fit_FAM,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_FSSB_FAM$independent.AIC,
+                    fit_FSSB$dependent.AIC,
+                    fit_FAM$dependent.AIC,
+                    fit_FSSB_FAM$dependent.AIC),
+                  c("independent","dependent FSSB","dependent FAM","dependent FSSB & FAM"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  FAMm_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  MSSB <- setNames(data$MSSB,data$Species)
+  FAM <- setNames(data$FAM,data$Species)
+  
+   # Fit models where MSSB and FAM are totally independent or dependent
+  fit_MSSB_FAM <- phytools::fitPagel(phy,MSSB,FAM)
+  fit_MSSB_FAM
+  plot(fit_MSSB_FAM,lwd.by.rate=TRUE)
+  
+  # Fit model where MSSB depends on FAM
+  fit_MSSB <- phytools::fitPagel(phy,MSSB,FAM,dep.var="x")
+  fit_MSSB
+  plot(fit_MSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where FAM depends on MSSB
+  fit_FAM <- phytools::fitPagel(phy,MSSB,FAM,dep.var="y")
+  fit_FAM
+  plot(fit_FAM,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_MSSB_FAM$independent.AIC,
+                    fit_MSSB$dependent.AIC,
+                    fit_FAM$dependent.AIC,
+                    fit_MSSB_FAM$dependent.AIC),
+                  c("independent","dependent MSSB","dependent FAM","dependent MSSB & FAM"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  MAM_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  SSB <- setNames(data$SSB,data$Species)
+  MAM <- setNames(data$MAM,data$Species)
+  
+   # Fit models where SSB and MAM are totally independent or dependent
+  fit_SSB_MAM <- phytools::fitPagel(phy,SSB,MAM)
+  fit_SSB_MAM
+  plot(fit_SSB_MAM,lwd.by.rate=TRUE)
+  
+  # Fit model where SSB depends on MAM
+  fit_SSB <- phytools::fitPagel(phy,SSB,MAM,dep.var="x")
+  fit_SSB
+  plot(fit_SSB,lwd.by.rate=TRUE)
+  
+  # Fit model where MAM depends on SSB
+  fit_MAM <- phytools::fitPagel(phy,SSB,MAM,dep.var="y")
+  fit_MAM
+  plot(fit_MAM,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_SSB_MAM$independent.AIC,
+                    fit_SSB$dependent.AIC,
+                    fit_MAM$dependent.AIC,
+                    fit_SSB_MAM$dependent.AIC),
+                  c("independent","dependent SSB","dependent MAM","dependent SSB & MAM"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  MAMf_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  FSSB <- setNames(data$FSSB,data$Species)
+  MAM <- setNames(data$MAM,data$Species)
+  
+   # Fit models where FSSB and MAM are totally independent or dependent
+  fit_FSSB_MAM <- phytools::fitPagel(phy,FSSB,MAM)
+  fit_FSSB_MAM
+  plot(fit_FSSB_MAM,lwd.by.rate=TRUE)
+  
+  # Fit model where FSSB depends on MAM
+  fit_FSSB <- phytools::fitPagel(phy,FSSB,MAM,dep.var="x")
+  fit_FSSB
+  plot(fit_FSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where MAM depends on SSB
+  fit_MAM <- phytools::fitPagel(phy,FSSB,MAM,dep.var="y")
+  fit_MAM
+  plot(fit_MAM,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_FSSB_MAM$independent.AIC,
+                    fit_FSSB$dependent.AIC,
+                    fit_MAM$dependent.AIC,
+                    fit_FSSB_MAM$dependent.AIC),
+                  c("independent","dependent FSSB","dependent MAM","dependent FSSB & MAM"))
+  aic
+  aic.w(aic)
+}
+```
+
+```{r  MAMm_pagel, eval=TRUE, echo=TRUE, results=TRUE}
+if (RERUN) {
+  #Assign species names
+  MSSB <- setNames(data$MSSB,data$Species)
+  MAM <- setNames(data$MAM,data$Species)
+  
+   # Fit models where MSSB and MAM are totally independent or dependent
+  fit_MSSB_MAM <- phytools::fitPagel(phy,MSSB,MAM)
+  fit_MSSB_MAM
+  plot(fit_MSSB_MAM,lwd.by.rate=TRUE)
+  
+  # Fit model where MSSB depends on MAM
+  fit_MSSB <- phytools::fitPagel(phy,MSSB,MAM,dep.var="x")
+  fit_MSSB
+  plot(fit_MSSB,lwd.by.rate=TRUE)
+  
+  # Fit model where MAM depends on MSSB
+  fit_MAM <- phytools::fitPagel(phy,MSSB,MAM,dep.var="y")
+  fit_MAM
+  plot(fit_MAM,lwd.by.rate=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_MSSB_MAM$independent.AIC,
+                    fit_MSSB$dependent.AIC,
+                    fit_MAM$dependent.AIC,
+                    fit_MSSB_MAM$dependent.AIC),
+                  c("independent","dependent MSSB","dependent MAM","dependent MSSB & MAM"))
+  aic
+  aic.w(aic)
+}
+```
+### Hypothesis 3: 
+SSB is an energy intensive but reproductively unfruitful endeavor, and will therefore be associated with reduced species success.
 
 Tested covariates:
 
 ↑ in SSB associated with ↑ in factor: High IUCN Endangerment Status, Extinction Rate.
 
 ↑ in SSB associated with ↓ in factor: Diversification.
+
+```{r IUCN_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE}
+ if (RERUN) {
+  #Read in data
+  data_subset <- data[,c("Species","IUCN","SSB","FSSB","MSSB")] 
+  #Remove incomplete cases
+  data_subset <- data_subset[complete.cases(data_subset),]
+  #print(data_subset) #Remove first hashtag to print data
+  
+  # Read tree and verify ultrametric, form matrix for evolution time
+  inv.phylo <- inverseA(phy, "TIPS")$Ainv
+  
+  # Make priors
+  prior <- list(G=list(G1=list(V=1,nu=0.02)), 
+                R=list(V=1,nu=0.02))
+  
+  # Running MCMCglmms
+  IUCN_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~IUCN+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  IUCNf_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~IUCN+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  IUCNm_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~IUCN+1,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = 1000,
+                  burnin = 100,
+                  thin = 1,
+                  verbose = FALSE)
+  
+  print(summary(IUCN_MCMCanalysis$Sol))
+  print(summary(IUCNf_MCMCanalysis$Sol))
+  print(summary(IUCNm_MCMCanalysis$Sol))
+}
+```
 
 <!--
 #############################
