@@ -50,6 +50,7 @@ RERUN <- FALSE # We don't want to automatically rerun lengthy analyses, so we ma
 library(this.path) # This package lets us get the filepath of the script we are running
 library(ape) # Used for handling trees
 library(phangorn) # Used for making MCC (maximum clade credibility) tree from posterior of trees
+library(castor) # Used for checking if tree is bifurcating
 library(caper) # Used for phylogenetic signal (d) analyses
 library(phytools) # Used for plotting trees
 library(diversitree) # Used for SSE analyses
@@ -105,11 +106,14 @@ print(data)
 # We have to manually type RERUN <- TRUE to get this to run
 
 if (RERUN) {
-  trees <- ape::read.tree("Complete_phylogeny.nex") # Reads all 1000 trees from a nexus file, and saves to "trees" variable (uses "ape" package)
+  #trees <- ape::read.tree("Complete_phylogeny.nex") # Reads all 1000 trees from a nexus file, and saves to "trees" variable (uses "ape" package)
+  trees <- ape::read.nexus("new_phylogeny.nex")
   phy <- phangorn::maxCladeCred(trees) # Generates a maximum clade credibility (best) tree from the 1000 trees
+  cat(paste0("Is Ultrametric? ", ape::is.ultrametric(phy)))
+  cat(paste0("Is Bifurcating? ", castor::is_bifurcating(phy)))
   n_taxa <- length(phy$tip.label) # Gets the number of species from looking at the tip labels
   phy$node.label <- c((n_taxa + 1):(n_taxa + phy$Nnode))
-  ape::write.tree(phy,"mcc_tree.txt") # Saves this tree to a file called "mcc_tree.txt"
+  ape::write.tree(phy,"new_mcc_tree.txt") # Saves this tree to a file called "mcc_tree.txt"
   
   RERUN <- FALSE
 }
