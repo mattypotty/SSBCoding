@@ -1,0 +1,160 @@
+##############################################################################################################################################################
+##################                                                                                                         ################################### 
+##################    These codes generates a tree with multiforcations. If a strictly bifurcating tree is desidered the   ################################### 
+##################    command PHYLO<-multi2di(PHYLO) needs to be run before YULE.gen or BD.gen for each family.            ################################### 
+##################                                                                                                         ################################### 
+##############################################################################################################################################################
+
+
+
+##############################################################################################################################################################
+###############################################################Load orders with genetic data##################################################################
+##############################################################################################################################################################
+library(ape)
+#Read in the orders where there are genetic analyses. This step is not nessecarily required. If they were just handled previously
+Afrosoricida<-read.tree("Afrosoricida.nex")
+Carnivora<-read.tree("Carnivora.nex")
+Cetartiodactyla<-read.tree("Cetartiodactyla.nex")
+Chiroptera<-read.tree("Chiroptera.nex")
+Cingulata<-read.tree("Cingulata.nex")
+Dasyromorphia<-read.tree("Dasyromorphia.nex")
+Didelmorphia<-read.tree("Didelmorphia.nex")
+Diprotodontia<-read.tree("Diprotodontia.nex")
+Eulipotyphla<-read.tree("Eulipotyphla.nex")
+Hyracoidea<-read.tree("Hyracoidea.nex")
+Lagomorphia<-read.tree("Lagomorphia.nex")
+Macroscelidea<-read.tree("Macroscelidea.nex")
+Paucituberculata<-read.tree("Paucituberculata.nex")
+Peramelemorphia<-read.tree("Peramelemorphia.nex")
+Perissodactyla<-read.tree("Perissodactyla.nex")
+Pilosa<-read.tree("Pilosa.nex")
+Primates<-read.tree("Primates.nex")
+Rodents<-read.tree("Rodents.nex")
+Scandentia<-read.tree("Scandentia.nex")
+Sirenea<-read.tree("Sirenea.nex")
+
+##############################################################################################################################################################
+###################################################################Handle the remaining orders################################################################
+##############################################################################################################################################################
+
+##############################################################################################################################################################
+#########################################################################Monotremata##########################################################################
+##############################################################################################################################################################
+
+#The relationship between the species following Australian Mammalogy 21: 1:45 (1999)
+Monotremata<-read.tree(text=" (Ornithorhynchus_anatinus:1, (Megalibgwilia_ramsayi:1, (Tachyglossus_aculeatus:1, (((Zaglossus_attenboroughi:1, Zaglossus_bartoni:1):1, Zaglossus_bruijnii:1):1,  Zaglossus_hacketti:1)):1):1):0;")
+Monotremata->PHYLO
+
+#Simulate potential branch lengths wihtin the order based on MRCA of order equal to 36.67 MYA based on Meredith et al (2011)
+BD.gen(36.67,0.904)
+PHYLO->Monotremata
+
+##############################################################################################################################################################
+#########################################################################Notoungulata#########################################################################
+##############################################################################################################################################################
+
+#The relationship between the species is based on the fact that Toxodon_platensis and Trigonodops_lopesi are sometimes considered conspecific
+PHYLO<-read.tree(text="((Toxodon_platensis:1, Trigonodops_lopesi:1):1, Mixotoxodon_larensis:1);")
+
+#Simulate potential branch lengths wihtin the order based on MRCA of order equal to 28 MYA since all species belong to the familyt Toxodontidae which appear in the Oligocene
+BD.gen(28,0.904)
+PHYLO->Notoungulata
+
+##############################################################################################################################################################
+#########################################################################Pholidota############################################################################
+##############################################################################################################################################################
+#The relationship between the species following Journal of Mammalian Evolution 16: 235-305 (2009)
+PHYLO<-read.tree(text="(((Smutsia_temminckii:1, Smutsia_gigantea:1):1, (Uromanis_tetradactyla:1, Phataginus_tricuspis:1):1):1, (Manis_pentadactyla:1, (Manis_culionensis:1, Manis_javanica:1):1):1):0;")
+Sister2("Manis_pentadactyla", "Manis_crassicaudata", "Manis_paleojavanica")
+
+#Simulate potential branch lengths wihtin the order based on MRCA of order equal to 25.26 MYA based on Meredith et al (2011)
+BD.gen(25.26,0.685)
+PHYLO->Pholidota
+
+##############################################################################################################################################################
+##########################################################################Proboscidae#########################################################################
+##############################################################################################################################################################
+
+#The relationship between the species following Quaternary International 126–128: 5-20 (2005) 5–20 and The Anatomical Record 293: 74-90 (2010)
+PHYLO<-read.tree(text="(((((((Elephas_iolensis:1, Elephas_maximus:1):1, (Elephas_antiquus:1, Elephas_cypriotes:1, Elephas_mnaidriensis:1, Elephas_namadicus:1, Elephas_naumanni:1, Elephas_tiliensis:1):1):1, Loxodonta_africana:1):1, ((Mammuthus_columbi:1, Mammuthus_exilis:1):1, Mammuthus_primigenius:1):1):1,Stegodon_orientalis:1):1, ((Stegomastodon_platensis:1, Stegomastodon_waringi:1):1, Cuvieronius_hyodon:1):1):1, Mammut_americanum:1) ;")
+Sister2("Stegodon_orientalis", "Stegodon_florensis", "Stegodon_trigonocephalus")
+
+#Simulate potential branch lengths wihtin the order based on MRCA of order equal to 26 MYA based on Roca (2008)
+BD.gen(26,0.904)
+PHYLO->Proboscidae
+
+##############################################################################################################################################################
+###########################################################Tubulidentata (and Bibymalagasia)##################################################################
+##############################################################################################################################################################
+#Create the tree
+Tubulidentata<-read.tree(text="(Orycteropus_afer:1, Plesiorycteropus_madagascariensis:1);")
+Tubulidentata->PHYLO
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with their closest relatives of 78.58 MYA following Meredith et al (2011)
+#A node called Rootnode_Tubulidentata is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Tubulidentata:1);"), PHYLO,1)
+BD.gen(78.58,0.904)
+PHYLO->Tubulidentata
+
+##############################################################################################################################################################
+########################################################################Lipoterma#############################################################################
+##############################################################################################################################################################
+#Create the tree by assuming family monophyly
+PHYLO<-read.tree(text="((Macrauchenia_patachonica:1, Xenorhinotherium_bahiense:1):1, Neolicaphrium_recens:1);")
+
+#The dating depends on the interorder relationship and will be handled later
+Lipoterma<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Lipoterma:1);"), PHYLO,1)
+
+##############################################################################################################################################################
+##############################################Merge orders to construct final phylogeny#######################################################################
+##############################################################################################################################################################
+
+#Create the inter order relationship. Only one tree is constructed here. All 1000 can be generated by taking all 1000 values of A1, A2 and A3 instead of just the first
+A1<-sample.int(1000,1000); A2<-sample.int(1000,1000); A3<-sample.int(1000,1000)
+if (A3[1]<501) {Advanced<-read.tree(text="((((((Carnivora:24.95,Pholidota:54.36):2.03, (Perissodactyla:12.41,  Lipoterma:0):12.41):0.33, Cetartiodactyla:16.61):0.04, Chiroptera:15.5):2.54, Eulipotyphla:7.25):7.44, ((Primates:10.5, (Cynocephalus_volans:7.41, Galeopterus_variegatus:7.41):74.63):1.29, ((Rodents:10.54, Lagomorphia:29.28):3.28, Scandentia:26.9):0.55):8.67);")} else 
+{Advanced<-read.tree(text="((((((Carnivora:24.95,Pholidota:54.36):2.03, Perissodactyla:24.82):0.33, (Cetartiodactyla:8.305, Lipoterma:0):8.305):0.04, Chiroptera:15.5):2.54, Eulipotyphla:7.25):7.44, ((Primates:10.5, (Cynocephalus_volans:7.41, Galeopterus_variegatus:7.41):74.63 ):1.29, ((Rodents:10.54, Lagomorphia:29.28):3.28, Scandentia:26.9):0.55):8.67);")}
+if (A2[1]<335) {Lower<-read.tree(text="((Advanced:7.38, (Cingulata:24.43, Pilosa:8.05):34.95):1.97, ((((Proboscidae:36.68, Hyracoidea:56.61):1.70, Sirenea:33.94):8.20, Notoungulata:44.58):8.31, (Tubulidentata:0, (Macroscelidea:28.19, Afrosoricida:9.12):1.25):2.31 ):20.46);")} else 
+if (A2[1]<501) {Lower<-read.tree(text="((Advanced:7.38, (Cingulata:24.43, Pilosa:8.05):34.95):1.97, ((((Proboscidae:36.68, Sirenea:32.24):1.70, Hyracoidea:58.31):8.20, Notoungulata:44.58):8.31, (Tubulidentata:0, (Macroscelidea:28.19, Afrosoricida:9.12):1.25):2.31 ):20.46);")} else 
+if (A2[1]<835) {Lower<-read.tree(text="((Advanced:7.38, (Cingulata:24.43, Pilosa:8.05):34.95):1.97, (((Proboscidae:36.68, Hyracoidea:56.61):1.60, Sirenea:33.84):16.61, ((Tubulidentata:0, (Macroscelidea:28.19, Afrosoricida:9.12):1.25):1.15, Notoungulata:51.73):1.16 ):20.46);")} else 
+{Lower<-read.tree(text="((Advanced:7.38, (Cingulata:24.43, Pilosa:8.05):34.95):1.97, (((Proboscidae:36.68, Sirenea:32.24):1.60, Hyracoidea:58.21):16.61, ((Tubulidentata:0, (Macroscelidea:28.19, Afrosoricida:9.12):1.25):1.15, Notoungulata:51.73):1.16 ):20.46);")}
+Theria<-bind.tree(Lower, Advanced,getNode(phylo4(Lower),"Advanced"))
+if (A1[1]<995) {Marsupials<-read.tree(text="((((((((Peramelemorphia:31.61, Dasyromorphia:29.6):1.68, (Notoryctes_caurinus:8.9,Notoryctes_typhlops:8.9):52.38):1, Diprotodontia:9.48):1.9, Dromiciops_gliroides:64.18):10.48,  Didelmorphia:43.23):7.13, Paucituberculata:70.13):108.16, Theria:88.6):27.89, Monotremata:181.17) ;")} else
+ {Marsupials<-read.tree(text="((((((((Peramelemorphia:31.61, (Notoryctes_caurinus:8.9,Notoryctes_typhlops:8.9):50.7):1.68,Diprotodontia:8.48):1, Dasyromorphia:32.28):1.9, Dromiciops_gliroides:64.18):10.48,  Didelmorphia:43.23):7.13, Paucituberculata:70.13):108.16, Theria:88.6):27.89, Monotremata:181.17) ;")}
+Mammals<-bind.tree(Marsupials, Theria,getNode(phylo4(Marsupials),"Theria"))
+ {Marsupials<-read.tree(text="((((((((Peramelemorphia:31.61, (Notoryctes_caurinus:8.9,Notoryctes_typhlops:8.9):50.7):1.68,Diprotodontia:8.48):1, Dasyromorphia:32.28):1.9, Dromiciops_gliroides:64.18):10.48,  Didelmorphia:43.23):7.13, Paucituberculata:70.13):108.16, Theria:88.6):27.89, Monotremata:181.17) ;")}
+Mammals<-bind.tree(Marsupials, Theria,getNode(phylo4(Marsupials),"Theria"))
+
+#Merge the orders one by one
+if(A3[1]<501) {Lipoterma->PHYLO; BD.gen(69.24,0.325); PHYLO->Lipoterma; Mammals<-bind.tree(Mammals, Lipoterma, getNode(phylo4(Mammals),"Lipoterma")); Mammals<-drop.tip(Mammals,"Rootnode_Lipoterma")} else {Lipoterma->PHYLO; BD.gen(73.675,0.325); PHYLO->Lipoterma; Mammals<-bind.tree(Mammals, Lipoterma, getNode(phylo4(Mammals),"Lipoterma")); Mammals<-drop.tip(Mammals,"Rootnode_Lipoterma")}
+Mammals<-bind.tree(Mammals, Carnivora, getNode(phylo4(Mammals),"Carnivora"))
+Mammals<-bind.tree(Mammals, Cetartiodactyla, getNode(phylo4(Mammals),"Cetartiodactyla"))
+Mammals<-bind.tree(Mammals, Chiroptera, getNode(phylo4(Mammals),"Chiroptera"))
+Mammals<-bind.tree(Mammals, Eulipotyphla, getNode(phylo4(Mammals),"Eulipotyphla"))
+Mammals<-bind.tree(Mammals, Lagomorphia, getNode(phylo4(Mammals),"Lagomorphia"))
+Mammals<-bind.tree(Mammals, Perissodactyla, getNode(phylo4(Mammals),"Perissodactyla"))
+Mammals<-bind.tree(Mammals, Primates, getNode(phylo4(Mammals),"Primates"))
+Mammals<-bind.tree(Mammals, Rodents, getNode(phylo4(Mammals),"Rodents"))
+Mammals<-bind.tree(Mammals, Scandentia, getNode(phylo4(Mammals),"Scandentia"))
+Mammals<-bind.tree(Mammals, Pholidota, getNode(phylo4(Mammals),"Pholidota"))
+Mammals<-bind.tree(Mammals, Afrosoricida, getNode(phylo4(Mammals),"Afrosoricida"))
+Mammals<-bind.tree(Mammals, Hyracoidea, getNode(phylo4(Mammals),"Hyracoidea"))
+Mammals<-bind.tree(Mammals, Sirenea, getNode(phylo4(Mammals),"Sirenea"))
+Mammals<-bind.tree(Mammals, Macroscelidea, getNode(phylo4(Mammals),"Macroscelidea"))
+Mammals<-bind.tree(Mammals, Pilosa, getNode(phylo4(Mammals),"Pilosa"))
+Mammals<-bind.tree(Mammals, Notoungulata, getNode(phylo4(Mammals),"Notoungulata"))
+Mammals<-bind.tree(Mammals, Proboscidae, getNode(phylo4(Mammals),"Proboscidae"))
+Mammals<-bind.tree(Mammals, Tubulidentata, getNode(phylo4(Mammals),"Tubulidentata")); Mammals<-drop.tip(Mammals,"Rootnode_Tubulidentata")
+Mammals<-bind.tree(Mammals, Cingulata, getNode(phylo4(Mammals),"Cingulata"))
+Mammals<-bind.tree(Mammals, Dasyromorphia, getNode(phylo4(Mammals),"Dasyromorphia"))
+Mammals<-bind.tree(Mammals, Didelmorphia, getNode(phylo4(Mammals),"Didelmorphia"))
+Mammals<-bind.tree(Mammals, Diprotodontia, getNode(phylo4(Mammals),"Diprotodontia"))
+Mammals<-bind.tree(Mammals, Paucituberculata, getNode(phylo4(Mammals),"Paucituberculata"))
+Mammals<-bind.tree(Mammals, Peramelemorphia, getNode(phylo4(Mammals),"Peramelemorphia"))
+Mammals<-bind.tree(Mammals, Monotremata, getNode(phylo4(Mammals),"Monotremata"))
+
+
+
+
+plot(Mammals, show.tip.label=F)
+is.ultrametric(Mammals)
+Mammals$tip.label

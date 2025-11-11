@@ -1,0 +1,22 @@
+################################################################################################################################################################
+################################################################Caenolestidae###################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution of Caenolestidae (only one family in the order)
+Caenolestidae<-read.tree(text="(Caenolestes_fuliginosus:1,(Lestoros_inca:1,Rhyncholestes_raphanurus:1):1);")
+PHYLO<-Caenolestidae
+
+#Place missing species of Caenolestes based on taconomy
+TR<-read.tree(text="(Caenolestes_caniventer:1, Caenolestes_condorensis:1, Caenolestes_convelatus:1, Caenolestes_fuliginosus:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),"Caenolestes_fuliginosus"))
+ 
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 11.66 MYA following Meredith et al (2011)
+BD.gen(11.66,0.904)
+PHYLO->Paucituberculata
+
+
+################################################################################################################################################################
+##########################################################Note that the order is identical to the family########################################################
+################################################################################################################################################################
+
+write.tree(Paucituberculata, "Paucituberculata.nex")

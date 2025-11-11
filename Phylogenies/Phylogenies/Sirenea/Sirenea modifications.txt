@@ -1,0 +1,37 @@
+################################################################################################################################################################
+###########################################################Trichechidae#########################################################################################
+################################################################################################################################################################
+#One of the trees of the family from the posterior distribution
+Trichechidae<-read.tree(text="(Trichechus_senegalensis:1,(Trichechus_manatus:1,Trichechus_inunguis:1):1);")
+PHYLO<-Trichechidae
+ 
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 30.44  MYA following Meredith et al (2011)
+#A node called Rootnode_Trichechidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Trichechidae:1);"), PHYLO,1)
+BD.gen(30.44,0.904)
+PHYLO->Trichechidae
+
+################################################################################################################################################################
+#############################################################Dugongidae#########################################################################################
+################################################################################################################################################################
+#The trivial tree of the two species in the family
+Dugongidae<-read.tree(text="(Dugong_dugon:1,Hydrodamalis_gigas:1);")
+PHYLO<-Dugongidae
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 30.44  MYA following Meredith et al (2011)
+#A node called Rootnode_Dugongidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Dugongidae:1);"), PHYLO,1)
+BD.gen(30.44,0.904)
+PHYLO->Dugongidae
+
+################################################################################################################################################################
+###########################################################The interfamily relationship#########################################################################
+################################################################################################################################################################
+
+#The relationsnip between the families in the order
+Sirenea<-read.tree(text="(Dugongidae:0, Trichechidae:0);")
+
+#Adding the families one by one
+Sirenea<-bind.tree(Sirenea, Dugongidae, getNode(phylo4(Sirenea),"Dugongidae")); Sirenea<-drop.tip(Sirenea, "Rootnode_Dugongidae")
+Sirenea<-bind.tree(Sirenea, Trichechidae, getNode(phylo4(Sirenea),"Trichechidae")); Sirenea<-drop.tip(Sirenea, "Rootnode_Trichechidae")
+write.tree(Sirenea, "Sirenea.nex")

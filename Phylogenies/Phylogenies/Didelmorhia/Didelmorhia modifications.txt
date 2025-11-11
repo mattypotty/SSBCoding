@@ -1,0 +1,93 @@
+
+################################################################################################################################################################
+###########################################################Didelmorphia#########################################################################################
+################################################################################################################################################################
+#One of the trees of the order (only one family in the order)
+Didelmorphia<-read.tree(text="(((((((Lestodelphys_halli:1,(Thylamys_venustus:1,(Thylamys_pallidior:1,(Thylamys_macrurus:1,Thylamys_pusillus:1):1):1):1):1,(((Gracilinanus_aceramarcae:1,(Gracilinanus_agilis:1,Gracilinanus_microtarsus:1):1):1,Gracilinanus_emiliae:1):1,(Cryptonanus_unduaviensis:1,Cryptonanus_chacoensis:1):1):1):1,(((Marmosops_impavidus:1,Marmosops_noctivagus:1):1,Marmosops_incanus:1):1,(Marmosops_pinheiroi:1,Marmosops_parvidens:1):1):1):1,(Metachirus_nudicaudatus:1,((Lutreolina_crassicaudata:1,((Philander_frenatus:1,(Philander_opossum:1,Philander_mcilhennyi:1):1):1,(Didelphis_virginiana:1,(Didelphis_marsupialis:1,Didelphis_albiventris:1):1):1):1):1,Chironectes_minimus:1):1):1):1,((Monodelphis_adusta:1,((Monodelphis_theresa:1,Monodelphis_brevicaudata:1):1,Monodelphis_emiliae:1):1):1,(Tlacuatzin_canescens:1,((((Micoureus_demerarae:1,Micoureus_regina:1):1,Marmosa_murina:1):1,Marmosa_lepida:1):1,(Marmosa_rubra:1,(Marmosa_robinsoni:1,Marmosa_mexicana:1):1):1):1):1):1):1,Hyladelphys_kalinowskii:1):1,(Glironia_venusta:1,(Caluromysiops_irrupta:1,(Caluromys_lanatus:1,Caluromys_philander:1):1):1):1);")
+PHYLO<-Didelmorphia
+#One of the trees for the genus Caluromys from the posterior distribution
+Caluromys<-read.tree(text="((Caluromys_derbianus:1,Caluromys_lanatus:1):1,Caluromys_philander:1);")
+MONOP.GROUP<-c("Caluromys_derbianus", "Caluromys_lanatus", "Caluromys_philander")
+#Merging the family tree with the tree for Caluromys
+Replace.groups(Caluromys, MONOP.GROUP)
+#One of the trees for the genus Didelphis from the posterior distribution
+Didelphis<-read.tree(text="(Didelphis_virginiana:1,((((Didelphis_imperfecta:1,Didelphis_pernigra:1):1,Didelphis_marsupialis:1):1,Didelphis_aurita:1):1,Didelphis_albiventris:1):1);")
+MONOP.GROUP<-c("Didelphis_albiventris", "Didelphis_aurita", "Didelphis_imperfecta", "Didelphis_marsupialis", "Didelphis_pernigra", "Didelphis_virginiana")
+#Merging the family tree with the tree for Didelphis
+Replace.groups(Didelphis, MONOP.GROUP)
+#One of the trees for the genus Marmosa from the posterior distribution
+Marmosa<-read.tree(text="(((Marmosa_murina:1,Marmosa_tyleriana:1):1,Marmosa_rubra:1):1,(((Marmosa_robinsoni:1,Marmosa_mexicana:1):1,Marmosa_xerophila:1):1,Marmosa_lepida:1):1);")
+MONOP.GROUP<-c("Marmosa_lepida", "Marmosa_mexicana", "Marmosa_murina", "Marmosa_robinsoni", "Marmosa_rubra", "Marmosa_tyleriana", "Marmosa_xerophila")#Merging the family tree with the tree for Myoictis
+#Merging the family tree with the tree for Marmosa
+Replace.groups(Marmosa, MONOP.GROUP)
+#One of the trees for the genus Micoureus from the posterior distribution
+Micoureus<-read.tree(text="((Micoureus_regina:1,Micoureus_constantiae:1):1,(Micoureus_paraguayanus:1,Micoureus_demerarae:1):1);")
+MONOP.GROUP<-c("Micoureus_demerarae", "Micoureus_regina", "Micoureus_constantiae", "Micoureus_paraguayanus")
+#Merging the family tree with the tree for Micoureus
+Replace.groups(Micoureus, MONOP.GROUP)
+#One of the trees for the genus Monodelphis from the posterior distribution
+Monodelphis<-read.tree(text="(Monodelphis_kunsi:1,(((Monodelphis_reigi:1,Monodelphis_adusta:1):1,Monodelphis_osgoodi:1):1,((((((Monodelphis_brevicaudata:1,(Monodelphis_domestica:1,Monodelphis_glirina:1):1):1,Monodelphis_iheringi:1):1,Monodelphis_americana:1):1,(Monodelphis_sorex:1,Monodelphis_dimidiata:1):1):1,Monodelphis_emiliae:1):1,(Monodelphis_theresa:1,Monodelphis_scalops:1):1):1):1);")
+MONOP.GROUP<-c("Monodelphis_adusta", "Monodelphis_brevicaudata", "Monodelphis_emiliae", "Monodelphis_theresa", "Monodelphis_americana", "Monodelphis_dimidiata", "Monodelphis_domestica", "Monodelphis_glirina", "Monodelphis_iheringi", "Monodelphis_kunsi", "Monodelphis_osgoodi", "Monodelphis_reigi", "Monodelphis_scalops", "Monodelphis_sorex")
+#Merging the family tree with the tree for Monodelphis
+Replace.groups(Monodelphis, MONOP.GROUP)
+#One of the trees for the genus Thylamus from the posterior distribution
+Thylamus<-read.tree(text="(((Thylamys_macrurus:1,(Thylamys_venustus:1,(Thylamys_cinderella:1,Thylamys_sponsorius:1):1):1):1,(Thylamys_pusillus:1,((Thylamys_pallidior:1,Thylamys_elegans:1):1,Thylamys_tatei:1):1):1):1,(Thylamys_karimii:1,Thylamys_velutinus:1):1);")
+MONOP.GROUP<-c("Thylamys_cinderella", "Thylamys_elegans", "Thylamys_karimii", "Thylamys_macrurus", "Thylamys_pallidior", "Thylamys_pusillus", "Thylamys_sponsorius", "Thylamys_tatei", "Thylamys_velutinus", "Thylamys_venustus")
+#Merging the family tree with the tree for Thylamus
+Replace.groups(Thylamus, MONOP.GROUP)
+
+#Place missing species of Gracilinanus based on Nature 446, 507-512 (2007)
+Sister1("Gracilinanus_emiliae",  "Gracilinanus_marica")
+SisterAnd1(c("Gracilinanus_emiliae",  "Gracilinanus_marica"), "Gracilinanus_dryas")
+#Place missing species of Cryptonanus based on taxonomy
+Rep_2_5("Cryptonanus_chacoensis", "Cryptonanus_unduaviensis", c("Cryptonanus_agricolai", "Cryptonanus_guahybae", "Cryptonanus_ignitus"))
+#Place missing species of Marmosa based on Nature 446, 507-512 (2007)
+Sister1( "Marmosa_murina", "Marmosa_quichua")
+SisterOrSing1(c("Marmosa_mexicana", "Marmosa_lepida", list(c("Marmosa_murina", "Marmosa_quichua")), "Marmosa_robinsoni", "Marmosa_rubra", "Marmosa_tyleriana", "Marmosa_xerophila"), "Marmosa_andersoni")
+
+#Place Philander_andersoni based on Nature 446, 507-512 (2007)
+Sister1("Philander_mcilhennyi", "Philander_andersoni")
+#Place species of Philander not covered in Nature 446, 507-512 (2007) based on taxonomy
+Start<-c("Philander_andersoni", "Philander_frenatus", "Philander_mcilhennyi", "Philander_opossum")
+MIS<-c("Philander_deltae", "Philander_mondolfii")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place missing species of Monodelphis based on Nature 446, 507-512 (2007) 
+Start<-c("Monodelphis_adusta", "Monodelphis_americana", "Monodelphis_brevicaudata", "Monodelphis_dimidiata", "Monodelphis_domestica", "Monodelphis_emiliae", "Monodelphis_glirina", "Monodelphis_iheringi", "Monodelphis_kunsi", "Monodelphis_osgoodi", "Monodelphis_reigi", "Monodelphis_scalops", "Monodelphis_sorex", "Monodelphis_theresa")
+MIS<-c("Monodelphis_ronaldi", "Monodelphis_maraxina", "Monodelphis_umbristriata", "Monodelphis_rubida", "Monodelphis_unistriata")
+MIS1<-MIS[sample.int(5, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(4, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+SisterOrSing1(c("Monodelphis_brevicaudata", "Monodelphis_glirina"), "Monodelphis_palliolata")
+#Place most species of Marmosops based on Nature 446, 507-512 (2007) 
+Rep_2_4("Marmosops_parvidens", "Marmosops_pinheiroi", c("Marmosops_bishopi", "Marmosops_juninensis"))
+SisterAnd1( c("Marmosops_bishopi", "Marmosops_juninensis", "Marmosops_parvidens", "Marmosops_pinheiroi"), "Marmosops_fuscatus")
+Start<-c("Marmosops_noctivagus", "Marmosops_incanus", "Marmosops_impavidus", list(c("Marmosops_parvidens", "Marmosops_pinheiroi")))
+MIS<-c("Marmosops_cracens", "Marmosops_invictus", "Marmosops_handleyi")
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+Sister1("Marmosops_impavidus", "Marmosops_neblina")
+Sister1("Marmosops_incanus", "Marmosops_paulensis")
+#Place species of Marmosops not covered by Nature 446, 507-512 (2007) based on taxonomy
+Start<-c("Marmosops_bishopi", "Marmosops_cracens", "Marmosops_fuscatus", "Marmosops_handleyi", "Marmosops_impavidus", "Marmosops_incanus", "Marmosops_invictus", "Marmosops_juninensis", "Marmosops_neblina", "Marmosops_noctivagus", "Marmosops_parvidens", "Marmosops_paulensis", "Marmosops_pinheiroi")
+MIS<-c("Marmosops_creightoni", "Marmosops_ocellatus")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place missing species of Micoureus based on Nature 446, 507-512 (2007) 
+Sister1( "Micoureus_regina", "Micoureus_phaeus")
+SisterOrSing1( c("Micoureus_constantiae",  list(c("Micoureus_demerarae", "Micoureus_paraguayanus")),  list(c("Micoureus_regina", "Micoureus_phaeus")))	, "Micoureus_alstoni")	
+#Place Chacodelphys as sister to Marmosa since they were formerly considered congeneric
+SisterAnd1(c("Marmosa_andersoni", "Marmosa_lepida", "Marmosa_mexicana", "Marmosa_murina", "Marmosa_quichua", "Marmosa_robinsoni", "Marmosa_rubra", "Marmosa_tyleriana", "Marmosa_xerophila"), "Chacodelphys_formosa")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 31.43 MYA following Meredith et al (2011)
+YULE.gen(31.43)
+PHYLO->Didelmorphia
+
+################################################################################################################################################################
+##########################################################Note that the order is identical to the family########################################################
+################################################################################################################################################################
+
+write.tree(Didelmorphia, "Didelmorphia.nex")

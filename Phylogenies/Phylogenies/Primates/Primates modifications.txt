@@ -1,0 +1,417 @@
+################################################################################################################################################################
+##############################################################Ceboidea##########################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Ceboidea<-read.tree(text="((((Chiropotes_chiropotes:1,(Cacajao_calvus:1,Cacajao_melanocephalus:1):1):1,(Pithecia_irrorata:1,Pithecia_pithecia:1):1):1,((Callicebus_nigrifrons:1,(Callicebus_personatus:1,Callicebus_coimbrai:1):1):1,((Callicebus_caligatus:1,Callicebus_donacophilus:1):1,((Callicebus_moloch:1,Callicebus_cupreus:1):1,Callicebus_brunneus:1):1):1):1):1,(((Alouatta_palliata:1,((Alouatta_sara:1,Alouatta_caraya:1):1,Alouatta_belzebul:1):1):1,(((Brachyteles_arachnoides:1,Brachyteles_hypoxanthus:1):1,(Lagothrix_lagotricha:1,Lagothrix_cana:1):1):1,((Ateles_chamek:1,Ateles_paniscus:1):1,(Ateles_fusciceps:1,((Ateles_geoffroyi:1,Ateles_belzebuth:1):1,Ateles_hybridus:1):1):1):1):1):1,((((Cebus_apella:1,(Cebus_robustus:1,Cebus_xanthosternos:1):1):1,(Cebus_olivaceus:1,(Cebus_albifrons:1,Cebus_capucinus:1):1):1):1,(Saimiri_boliviensis:1,((Saimiri_sciureus:1,Saimiri_oerstedii:1):1,Saimiri_ustus:1):1):1):1,(((Aotus_griseimembra:1,Aotus_trivirgatus:1):1,(Aotus_azarae:1,Aotus_nancymaae:1):1):1,((Saguinus_fuscicollis:1,(((Saguinus_mystax:1,Saguinus_labiatus:1):1,Saguinus_imperator:1):1,((Saguinus_oedipus:1,Saguinus_geoffroyi:1):1,((Saguinus_bicolor:1,Saguinus_martinsi:1):1,Saguinus_midas:1):1):1):1):1,((Callimico_goeldii:1,(((((Callithrix_penicillata:1,Callithrix_jacchus:1):1,Callithrix_kuhlii:1):1,Callithrix_geoffroyi:1):1,Callithrix_aurita:1):1,((Mico_argentatus:1,Mico_humeralifer:1):1,Cebuella_pygmaea:1):1):1):1,(Leontopithecus_rosalia:1,Leontopithecus_chrysomelas:1):1):1):1):1):1):1);")
+PHYLO<-Ceboidea
+#One of the trees for the genus Alouatta from the posterior distribution
+Alouatta<-read.tree(text="((((Alouatta_caraya:1,((Alouatta_macconnelli:1,Alouatta_sara:1):1,Alouatta_seniculus:1):1):1,(Alouatta_pigra:1,Alouatta_palliata:1):1):1,Alouatta_guariba:1):1,Alouatta_belzebul:1);")
+MONOP.GROUP<-c("Alouatta_belzebul", "Alouatta_caraya", "Alouatta_palliata", "Alouatta_sara", "Alouatta_guariba", "Alouatta_macconnelli", "Alouatta_pigra", "Alouatta_seniculus")
+#Merging the family tree with the tree for Alouatta
+Replace.groups(Alouatta, MONOP.GROUP)
+#One of the trees for the genus Aotus from the posterior distribution
+Aotus<-read.tree(text="((((Aotus_vociferans:1,((Aotus_lemurinus:1,Aotus_griseimembra:1):1,Aotus_nancymaae:1):1):1,Aotus_trivirgatus:1):1,Aotus_nigriceps:1):1,(Aotus_brumbacki:1,Aotus_azarae:1):1);")
+MONOP.GROUP<-c("Aotus_azarae", "Aotus_griseimembra", "Aotus_nancymaae", "Aotus_trivirgatus", "Aotus_brumbacki", "Aotus_lemurinus", "Aotus_nigriceps", "Aotus_vociferans")
+#Merging the family tree with the tree for Aotus
+Replace.groups(Aotus, MONOP.GROUP)
+#One of the trees for the genus Cacajao from the posterior distribution
+Cacajao<-read.tree(text="(Cacajao_calvus:1,((Cacajao_ayresi:1,Cacajao_hosomi:1):1,Cacajao_melanocephalus:1):1);")
+MONOP.GROUP<-c("Cacajao_ayresi", "Cacajao_calvus", "Cacajao_hosomi", "Cacajao_melanocephalus")
+#Merging the family tree with the tree for Cacajao
+Replace.groups(Cacajao, MONOP.GROUP)
+#One of the trees for the genus Callithrix from the posterior distribution
+Callithrix<-read.tree(text="((Callithrix_aurita:1,((Callithrix_jacchus:1,(Callithrix_geoffroyi:1,Callithrix_penicillata:1):1):1,Callithrix_kuhlii:1):1):1,Callibella_humilis:1);")
+MONOP.GROUP<-c("Callithrix_aurita", "Callithrix_geoffroyi", "Callithrix_jacchus", "Callithrix_kuhlii", "Callithrix_penicillata", "Callibella_humilis")
+#Merging the family tree with the tree for Callithrix
+Replace.groups(Callithrix, MONOP.GROUP)
+#One of the trees for the genus Leontopithecus from the posterior distribution
+Leontopithecus<-read.tree(text="(Leontopithecus_chrysopygus:1,(Leontopithecus_chrysomelas:1,Leontopithecus_rosalia:1):1);")
+MONOP.GROUP<-c("Leontopithecus_chrysomelas", "Leontopithecus_chrysopygus", "Leontopithecus_rosalia")
+#Merging the family tree with the tree for Leontopithecus
+Replace.groups(Leontopithecus, MONOP.GROUP)
+#One of the trees for the genus Saguinus from the posterior distribution
+Saguinus<-read.tree(text="((((Saguinus_fuscicollis:1,Saguinus_melanoleucus:1):1,(Saguinus_leucopus:1,Saguinus_tripartitus:1):1):1,Saguinus_nigricollis:1):1,(((Saguinus_mystax:1,Saguinus_labiatus:1):1,Saguinus_imperator:1):1,((Saguinus_geoffroyi:1,Saguinus_oedipus:1):1,((Saguinus_niger:1,Saguinus_midas:1):1,(Saguinus_martinsi:1,Saguinus_bicolor:1):1):1):1):1);")
+MONOP.GROUP<-c("Saguinus_bicolor", "Saguinus_fuscicollis", "Saguinus_geoffroyi", "Saguinus_imperator", "Saguinus_labiatus", "Saguinus_martinsi", "Saguinus_midas", "Saguinus_mystax", "Saguinus_oedipus", "Saguinus_leucopus", "Saguinus_melanoleucus", "Saguinus_niger", "Saguinus_nigricollis", "Saguinus_tripartitus")
+#Merging the family tree with the tree for Saguinus
+Replace.groups(Saguinus, MONOP.GROUP)
+
+#Place Ateles_marginatus based on Nature 446, 507-512 (2007)
+Sister1( "Ateles_chamek", "Ateles_marginatus")
+#Place missing species of Lagothri based on taxonomy
+Rep_2_4( "Lagothrix_cana", "Lagothrix_lagotricha", c("Lagothrix_lugens", "Lagothrix_poeppigii"))
+#Place Oreonax_flavicauda based on Nature 446, 507-512 (2007)
+SisterAnd1( c("Lagothrix_cana", "Lagothrix_lagotricha", "Lagothrix_lugens", "Lagothrix_poeppigii"), "Oreonax_flavicauda")
+#Place Protopithecus and Caipora each sisters to other genera in the subfamily
+Start<-c(list(c("Ateles_belzebuth", "Ateles_chamek", "Ateles_fusciceps", "Ateles_geoffroyi", "Ateles_hybridus", "Ateles_marginatus", "Ateles_paniscus")), list(c("Brachyteles_arachnoides", "Brachyteles_hypoxanthus")), list(c("Lagothrix_cana", "Lagothrix_lagotricha", "Lagothrix_lugens", "Lagothrix_poeppigii")), "Oreonax_flavicauda")
+MIS<-c("Protopithecus_brasiliensis", "Caipora_bambuiorum")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place Alouatta_nigerrima based on Nature 446, 507-512 (2007)
+Sister1(  "Alouatta_belzebul", "Alouatta_nigerrima")
+#Place Alouatta_arctoidea, Alouatta_juara and Alouatta_puruensis based on a former belief in conspecificity
+Rep_3_6( "Alouatta_seniculus", "Alouatta_macconnelli", "Alouatta_sara", c("Alouatta_arctoidea", "Alouatta_juara", "Alouatta_puruensis"))
+#Place Alouatta_ululata and Alouatta_discolor based on a former belief in conspecificity
+Sister2( "Alouatta_belzebul", "Alouatta_ululata", "Alouatta_discolor")
+#Place missing speccies of Aotus based on taxonomy
+Start<-c("Aotus_azarae", "Aotus_brumbacki", "Aotus_griseimembra", "Aotus_lemurinus", "Aotus_nancymaae", "Aotus_nigriceps","Aotus_trivirgatus", "Aotus_vociferans")
+MIS<-c("Aotus_jorgehernandezi", "Aotus_miconax", "Aotus_zonalis")
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place missing speccies of Chiropotes based on taxonomy
+TR<-read.tree(text="(Chiropotes_satanas:1, Chiropotes_chiropotes:1, Chiropotes_albinasus:1, Chiropotes_utahickae:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),  "Chiropotes_chiropotes"))
+Start<-c("Callicebus_nigrifrons", "Callicebus_personatus", "Callicebus_coimbrai")
+MIS<-c("Callicebus_barbarabrownae", "Callicebus_melanochir")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+Sister1( "Callicebus_brunneus", "Callicebus_hoffmannsi")
+Sister1(  "Callicebus_hoffmannsi", "Callicebus_baptista")
+Sister1( "Callicebus_moloch", "Callicebus_cinerascens")
+SisterOrSing1( c("Callicebus_brunneus", "Callicebus_moloch", "Callicebus_hoffmannsi", "Callicebus_baptista",  "Callicebus_cinerascens"), "Callicebus_bernhardi")
+Sister2( "Callicebus_cupreus", "Callicebus_ornatus", "Callicebus_discolor")
+SisterAnd1( c("Callicebus_cupreus", "Callicebus_ornatus", "Callicebus_discolor", "Callicebus_caligatus"), "Callicebus_dubius")
+Start<-c("Callicebus_cupreus", "Callicebus_ornatus", "Callicebus_discolor", "Callicebus_caligatus", "Callicebus_dubius")
+MIS<-c("Callicebus_aureipalatii", "Callicebus_stephennashi")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+Sister1( "Callicebus_donacophilus", "Callicebus_torquatus")
+TR<-read.tree(text="(Callicebus_torquatus:1,Callicebus_purinus:1,Callicebus_regulus:1,Callicebus_lucifer:1,Callicebus_lugens:1,Callicebus_medemi:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),  "Callicebus_torquatus"))
+TR<-read.tree(text="((Callicebus_donacophilus:1,Callicebus_pallescens:1):1,Callicebus_modestus:1,Callicebus_oenanthe:1,Callicebus_olallae:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),  "Callicebus_donacophilus"))
+#Place Antillothrix and Xenothrix combined as sister to Callicebus since Antillothrix and Xenothrix belong to the same tribe and all three genera to the same subfamily
+SisterAnd1(  c("Callicebus_nigrifrons", "Callicebus_personatus", "Callicebus_coimbrai", "Callicebus_barbarabrownae", "Callicebus_melanochir", "Callicebus_brunneus", "Callicebus_moloch", "Callicebus_hoffmannsi", "Callicebus_baptista",  "Callicebus_cinerascens", "Callicebus_bernhardi", "Callicebus_cupreus", "Callicebus_ornatus", "Callicebus_discolor", "Callicebus_caligatus", "Callicebus_dubius", "Callicebus_aureipalatii", "Callicebus_stephennashi", "Callicebus_torquatus", "Callicebus_purinus", "Callicebus_regulus", "Callicebus_lucifer", "Callicebus_lugens", "Callicebus_medemi", "Callicebus_donacophilus", "Callicebus_pallescens", "Callicebus_modestus", "Callicebus_oenanthe", "Callicebus_olallae"), "Antillothrix_bernensis")
+Sister1( "Antillothrix_bernensis", "Xenothrix_mcgregori")
+#Place Callithrix_flaviceps based on Nature 446, 507-512 (2007)
+Sister1( "Callithrix_aurita", "Callithrix_flaviceps")
+#Place most missing species of Cebus based on Nature 446, 507-512 (2007) or formerly believed conspecificity
+Sister1( "Cebus_robustus", "Cebus_nigritus")
+SisterOrSing1( c("Cebus_apella", "Cebus_robustus", "Cebus_nigritus", "Cebus_xanthosternos"), "Cebus_libidinosus")
+Sister1( "Cebus_libidinosus", "Cebus_cay")
+Sister1( "Cebus_olivaceus", "Cebus_kaapori")
+#Place remaining species of Cebus based on taxonomy
+Start<-c("Cebus_apella", "Cebus_robustus", "Cebus_nigritus", "Cebus_xanthosternos", "Cebus_libidinosus", "Cebus_albifrons", "Cebus_olivaceus", "Cebus_kaapori")
+MIS<-c("Cebus_flavius", "Cebus_macrocephalus")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place Leontopithecus_caissara based on Nature 446, 507-512 (2007)
+Sister1( "Leontopithecus_chrysopygus", "Leontopithecus_caissara")
+#Place most missing species of Mico based on formerly believed conspecificity
+TR<-read.tree(text="(Mico_argentatus:1, Mico_emiliae:1, Mico_intermedius:1, Mico_leucippe:1, Mico_melanurus:1, Mico_acariensis:1, Mico_marcai:1, Mico_nigriceps:1, Mico_manicorensis:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),  "Mico_argentatus"))
+TR<-read.tree(text="(Mico_humeralifer:1, Mico_chrysoleucus:1, Mico_mauesi:1, Mico_saterei:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),  "Mico_humeralifer"))
+#Place Mico_rondoni based on taxonomy
+SisterOrSing1(c("Mico_acariensis", "Mico_argentatus", "Mico_chrysoleucus", "Mico_emiliae", "Mico_humeralifer", "Mico_intermedius", "Mico_leucippe", "Mico_manicorensis", "Mico_marcai", "Mico_mauesi", "Mico_melanurus", "Mico_nigriceps", "Mico_saterei"), "Mico_rondoni")
+#Place missing species of Pithecia based on Nature 446, 507-512 (2007)
+SisterOrSing1(c("Pithecia_irrorata", "Pithecia_pithecia"), "Pithecia_aequatorialis")
+Sister2("Pithecia_irrorata", "Pithecia_albicans", "Pithecia_monachus")
+#Place Saguinus_inustus based on  Nature 446, 507-512 (2007)
+SisterOrSing1(c(list(c("Saguinus_bicolor", "Saguinus_martinsi", "Saguinus_midas", "Saguinus_niger", "Saguinus_geoffroyi", "Saguinus_oedipus", "Saguinus_imperator", "Saguinus_labiatus", "Saguinus_leucopus", "Saguinus_mystax")),  list(c("Saguinus_fuscicollis", "Saguinus_melanoleucus", "Saguinus_tripartitus", "Saguinus_nigricollis"))), "Saguinus_inustus")
+#Place Saimiri_vanzolinii based on Nature 446, 507-512 (2007)
+Sister1("Saimiri_boliviensis", "Saimiri_vanzolinii")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 14.59 MYA following Meredith et al (2011)
+YULE.gen(14.59)
+PHYLO->Ceboidea
+
+################################################################################################################################################################
+##############################################################Cercopithecidae###################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Cercopithecidae<-read.tree(text="(((((Cercopithecus_hamlyni:1,((((Cercopithecus_mona:1,Cercopithecus_campbelli:1):1,Cercopithecus_pogonias:1):1,Cercopithecus_neglectus:1):1,(Cercopithecus_diana:1,(((Cercopithecus_ascanius:1,Cercopithecus_cephus:1):1,(Cercopithecus_erythrogaster:1,Cercopithecus_petaurista:1):1):1,(Cercopithecus_nictitans:1,Cercopithecus_mitis:1):1):1):1):1):1,Miopithecus_ogouensis:1):1,((Erythrocebus_patas:1,((Cercopithecus_solatus:1,(Cercopithecus_preussi:1,Cercopithecus_lhoesti:1):1):1,(Chlorocebus_sabaeus:1,((Chlorocebus_cynosuros:1,Chlorocebus_pygerythrus:1):1,Chlorocebus_aethiops:1):1):1):1):1,Allenopithecus_nigroviridis:1):1):1,((((Cercocebus_torquatus:1,(Cercocebus_chrysogaster:1,Cercocebus_agilis:1):1):1,(Mandrillus_leucophaeus:1,Mandrillus_sphinx:1):1):1,(((Rungwecebus_kipunji:1,(((Papio_cynocephalus:1,Papio_anubis:1):1,(Papio_hamadryas:1,Papio_ursinus:1):1):1,Papio_papio:1):1):1,(Lophocebus_aterrimus:1,Lophocebus_albigena:1):1):1,Theropithecus_gelada:1):1):1,(Macaca_sylvanus:1,((Macaca_arctoides:1,((Macaca_radiata:1,Macaca_sinica:1):1,(Macaca_thibetana:1,Macaca_assamensis:1):1):1):1,((((Macaca_tonkeana:1,Macaca_maura:1):1,(Macaca_nigra:1,(Macaca_ochreata:1,(Macaca_hecki:1,Macaca_nigrescens:1):1):1):1):1,(Macaca_siberu:1,(Macaca_silenus:1,Macaca_nemestrina:1):1):1):1,(Macaca_fascicularis:1,(Macaca_mulatta:1,(Macaca_fuscata:1,Macaca_cyclopis:1):1):1):1):1):1):1):1):1,((((((Semnopithecus_hector:1,Semnopithecus_entellus:1):1,Trachypithecus_vetulus:1):1,(((Trachypithecus_cristatus:1,Trachypithecus_auratus:1):1,(Trachypithecus_phayrei:1,Trachypithecus_obscurus:1):1):1,((Trachypithecus_delacouri:1,Trachypithecus_francoisi:1):1,Trachypithecus_hatinhensis:1):1):1):1,((Rhinopithecus_avunculus:1,Rhinopithecus_brelichi:1):1,((Pygathrix_nigripes:1,(Pygathrix_nemaeus:1,Pygathrix_cinerea:1):1):1,(Nasalis_larvatus:1,Simias_concolor:1):1):1):1):1,(Presbytis_comata:1,Presbytis_melalophos:1):1):1,(((Colobus_guereza:1,Colobus_polykomos:1):1,Colobus_angolensis:1):1,Procolobus_badius:1):1):1);")
+PHYLO<-Cercopithecidae
+#One of the trees for the genus  Cercocebus from the posterior distribution
+Cercocebus<-read.tree(text="(((Cercocebus_galeritus:1,Cercocebus_agilis:1):1,Cercocebus_chrysogaster:1):1,(Cercocebus_atys:1,Cercocebus_torquatus:1):1);")
+MONOP.GROUP<-c("Cercocebus_agilis", "Cercocebus_chrysogaster", "Cercocebus_torquatus", "Cercocebus_atys", "Cercocebus_galeritus")
+#Merging the family tree with the tree for  Cercocebus
+Replace.groups( Cercocebus, MONOP.GROUP)
+#One of the trees for the genus  Chlorocebus from the posterior distribution
+Chlorocebus<-read.tree(text="(((Chlorocebus_tantalus:1,Chlorocebus_pygerythrus:1):1,(Chlorocebus_aethiops:1,Chlorocebus_cynosuros:1):1):1,Chlorocebus_sabaeus:1);")
+MONOP.GROUP<-c("Chlorocebus_aethiops", "Chlorocebus_cynosuros", "Chlorocebus_pygerythrus", "Chlorocebus_sabaeus", "Chlorocebus_tantalus")
+#Merging the family tree with the tree for  Chlorocebus
+Replace.groups( Chlorocebus, MONOP.GROUP)
+#One of the trees for the genus  Colobus from the posterior distribution
+Colobus<-read.tree(text="((Colobus_angolensis:1,((Colobus_polykomos:1,Colobus_vellerosus:1):1,Colobus_guereza:1):1):1,Colobus_satanas:1);")
+MONOP.GROUP<-c("Colobus_angolensis", "Colobus_guereza", "Colobus_polykomos", "Colobus_satanas", "Colobus_vellerosus")
+#Merging the family tree with the tree for  Colobus
+Replace.groups( Colobus, MONOP.GROUP)
+#One of the trees for the genus Macaca from the posterior distribution
+Macaca<-read.tree(text="((((Macaca_fascicularis:1,((Macaca_cyclopis:1,Macaca_mulatta:1):1,Macaca_fuscata:1):1):1,(Macaca_arctoides:1,(((Macaca_assamensis:1,Macaca_thibetana:1):1,Macaca_munzala:1):1,(Macaca_sinica:1,Macaca_radiata:1):1):1):1):1,(((((Macaca_nemestrina:1,Macaca_leonina:1):1,Macaca_silenus:1):1,Macaca_siberu:1):1,Macaca_pagensis:1):1,(Macaca_nigra:1,((Macaca_maura:1,(Macaca_nigrescens:1,Macaca_hecki:1):1):1,(Macaca_ochreata:1,Macaca_tonkeana:1):1):1):1):1):1,Macaca_sylvanus:1);")
+MONOP.GROUP<-c("Macaca_arctoides", "Macaca_assamensis", "Macaca_cyclopis", "Macaca_fascicularis", "Macaca_fuscata", "Macaca_hecki", "Macaca_leonina", "Macaca_maura", "Macaca_mulatta", "Macaca_munzala", "Macaca_nemestrina", "Macaca_nigra", "Macaca_nigrescens", "Macaca_ochreata", "Macaca_pagensis", "Macaca_radiata", "Macaca_siberu", "Macaca_silenus", "Macaca_sinica", "Macaca_sylvanus", "Macaca_thibetana", "Macaca_tonkeana")
+#Merging the family tree with the tree for Macaca
+Replace.groups(Macaca, MONOP.GROUP)
+#One of the trees for the genus Presbytis from the posterior distribution
+Presbytis<-read.tree(text="(((Presbytis_chrysomelas:1,(Presbytis_hosei:1,Presbytis_frontata:1):1):1,(Presbytis_potenziani:1,((Presbytis_rubicunda:1,Presbytis_melalophos:1):1,Presbytis_comata:1):1):1):1,Presbytis_thomasi:1);")
+MONOP.GROUP<-c("Presbytis_comata", "Presbytis_melalophos", "Presbytis_chrysomelas", "Presbytis_frontata", "Presbytis_hosei", "Presbytis_potenziani", "Presbytis_rubicunda", "Presbytis_thomasi")
+#Merging the family tree with the tree for Presbytis
+Replace.groups(Presbytis, MONOP.GROUP)
+#One of the trees for the genus Procolobus from the posterior distribution
+Procolobus<-read.tree(text="(Procolobus_verus:1,(((Procolobus_pennantii:1,Procolobus_preussi:1):1,Procolobus_badius:1):1,((Procolobus_gordonorum:1,Procolobus_kirkii:1):1,Procolobus_rufomitratus:1):1):1);")
+MONOP.GROUP<-c("Procolobus_badius", "Procolobus_gordonorum", "Procolobus_kirkii", "Procolobus_pennantii", "Procolobus_preussi", "Procolobus_rufomitratus", "Procolobus_verus")
+#Merging the family tree with the tree for Procolobus
+Replace.groups(Procolobus, MONOP.GROUP)
+#One of the trees for the genus Rhinopithecus from the posterior distribution
+Rhinopithecus<-read.tree(text="(Rhinopithecus_brelichi:1,(Rhinopithecus_avunculus:1,(Rhinopithecus_roxellana:1,Rhinopithecus_bieti:1):1):1);")
+MONOP.GROUP<-c("Rhinopithecus_avunculus", "Rhinopithecus_bieti", "Rhinopithecus_brelichi", "Rhinopithecus_roxellana")
+#Merging the family tree with the tree for Rhinopithecus
+Replace.groups(Rhinopithecus, MONOP.GROUP)
+#One of the trees for the genus Trachypithecus from the posterior distribution
+Trachypithecus<-read.tree(text="(((Trachypithecus_cristatus:1,(Trachypithecus_auratus:1,Trachypithecus_germaini:1):1):1,((Trachypithecus_phayrei:1,(((Trachypithecus_delacouri:1,Trachypithecus_laotum:1):1,(Trachypithecus_poliocephalus:1,Trachypithecus_francoisi:1):1):1,Trachypithecus_hatinhensis:1):1):1,(Trachypithecus_obscurus:1,Trachypithecus_barbei:1):1):1):1,((Trachypithecus_geei:1,(Trachypithecus_johnii:1,Trachypithecus_vetulus:1):1):1,Trachypithecus_pileatus:1):1);")
+MONOP.GROUP<-c("Trachypithecus_auratus", "Trachypithecus_cristatus", "Trachypithecus_delacouri", "Trachypithecus_francoisi", "Trachypithecus_hatinhensis", "Trachypithecus_obscurus", "Trachypithecus_phayrei", "Trachypithecus_vetulus", "Trachypithecus_barbei", "Trachypithecus_geei", "Trachypithecus_germaini", "Trachypithecus_johnii", "Trachypithecus_laotum", "Trachypithecus_pileatus", "Trachypithecus_poliocephalus")
+#Merging the family tree with the tree for Trachypithecus
+Replace.groups(Trachypithecus, MONOP.GROUP)
+#Place Cercocebus_sanjei based on taxonomy
+SisterOrSing1(c("Cercocebus_agilis", "Cercocebus_chrysogaster", "Cercocebus_galeritus", "Cercocebus_torquatus", "Cercocebus_atys"),  "Cercocebus_sanjei")
+#Place missing species of Cercopithecus based on Nature 446, 507-512 (2007)
+Sister1("Cercopithecus_diana", "Cercopithecus_dryas")
+Start<-c("Cercopithecus_ascanius", "Cercopithecus_cephus", "Cercopithecus_erythrogaster", "Cercopithecus_petaurista")
+MIS<-c("Cercopithecus_erythrotis", "Cercopithecus_sclateri")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place Chlorocebus_djamdjamensis based on taxonomy
+SisterOrSing1(c("Chlorocebus_aethiops", "Chlorocebus_cynosuros", "Chlorocebus_pygerythrus", "Chlorocebus_sabaeus", "Chlorocebus_tantalus"), "Chlorocebus_djamdjamensis")
+#Place missing species of Presbytis based on Nature 446, 507-512 (2007)
+TR<-read.tree(text="(Presbytis_femoralis:1,Presbytis_chrysomelas:1,Presbytis_natunae:1,Presbytis_siamensis:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),  "Presbytis_chrysomelas"))
+#Place Miopithecus_talapoin based on taxonomy
+Sister1("Miopithecus_ogouensis", "Miopithecus_talapoin")
+#Place missing species of Semnopithecus based on taxonomy
+Rep_2_7("Semnopithecus_entellus", "Semnopithecus_hector", c("Semnopithecus_ajax", "Semnopithecus_dussumieri", "Semnopithecus_hypoleucos", "Semnopithecus_priam", "Semnopithecus_schistaceus"))
+#Place Trachypithecus_shortridgei based on Nature 446, 507-512 (2007)
+Sister1("Trachypithecus_pileatus", "Trachypithecus_shortridgei")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 17.6 MYA following Perelman et al (2011) 
+YULE.gen(17.6)
+PHYLO->Cercopithecidae
+
+################################################################################################################################################################
+##############################################################Cheirogaleidae (and Lepilemuridae)################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Cheirogaleidae<-read.tree(text="((Lepilemur_jamesorum:1,((Lepilemur_dorsalis:1,(Lepilemur_ankaranensis:1,Lepilemur_septentrionalis:1):1):1,Lepilemur_ruficaudatus:1):1):1,(Phaner_furcifer:1,((Microcebus_murinus:1,(Allocebus_trichotis:1,Mirza_zaza:1):1):1,Cheirogaleus_medius:1):1):1);")
+PHYLO<-Cheirogaleidae
+#One of the trees for the genus  Cheirogaleus from the posterior distribution
+Cheirogaleus<-read.tree(text="(((Cheirogaleus_major:1,Cheirogaleus_crossleyi:1):1,Cheirogaleus_medius:1):1,Cheirogaleus_sibreei:1);")
+MONOP.GROUP<-c("Cheirogaleus_medius", "Cheirogaleus_crossleyi", "Cheirogaleus_major", "Cheirogaleus_sibreei")
+#Merging the family tree with the tree for  Cheirogaleus
+Replace.groups( Cheirogaleus, MONOP.GROUP)
+#One of the trees for the genus  Lepilemur from the posterior distribution
+Lepilemur<-read.tree(text="((Lepilemur_seali:1,((Lepilemur_fleuretae:1,Lepilemur_mustelinus:1):1,Lepilemur_wrightae:1):1):1,(((Lepilemur_leucopus:1,Lepilemur_petteri:1):1,((Lepilemur_ruficaudatus:1,Lepilemur_hubbardorum:1):1,Lepilemur_randrianasoloi:1):1):1,(((Lepilemur_otto:1,((Lepilemur_betsileo:1,Lepilemur_edwardsi:1):1,Lepilemur_grewcockorum:1):1):1,Lepilemur_microdon:1):1,(((Lepilemur_sahamalazensis:1,(Lepilemur_ahmansonorum:1,Lepilemur_aeeclis:1):1):1,(Lepilemur_tymerlachsonorum:1,((Lepilemur_milanoii:1,Lepilemur_jamesorum:1):1,(Lepilemur_mittermeieri:1,(Lepilemur_ankaranensis:1,Lepilemur_dorsalis:1):1):1):1):1):1,Lepilemur_septentrionalis:1):1):1):1);")
+MONOP.GROUP<-c("Lepilemur_aeeclis", "Lepilemur_ahmansonorum", "Lepilemur_ankaranensis", "Lepilemur_betsileo", "Lepilemur_dorsalis", "Lepilemur_edwardsi", "Lepilemur_fleuretae", "Lepilemur_grewcockorum", "Lepilemur_hubbardorum", "Lepilemur_jamesorum", "Lepilemur_leucopus", "Lepilemur_microdon", "Lepilemur_milanoii", "Lepilemur_mittermeieri", "Lepilemur_mustelinus", "Lepilemur_otto", "Lepilemur_petteri", "Lepilemur_randrianasoloi", "Lepilemur_ruficaudatus", "Lepilemur_sahamalazensis", "Lepilemur_seali", "Lepilemur_septentrionalis", "Lepilemur_tymerlachsonorum", "Lepilemur_wrightae")
+#Merging the family tree with the tree for  Lepilemur
+Replace.groups( Lepilemur, MONOP.GROUP)
+#One of the trees for the genus  Microcebus from the posterior distribution
+Microcebus<-read.tree(text="(((Microcebus_ravelobensis:1,Microcebus_bongolavensis:1):1,Microcebus_danfossorum:1):1,(Microcebus_griseorufus:1,(((Microcebus_myoxinus:1,Microcebus_murinus:1):1,Microcebus_lehilahytsara:1):1,((Microcebus_berthae:1,Microcebus_rufus:1):1,((((Microcebus_simmonsi:1,(Microcebus_mamiratra:1,Microcebus_sambiranensis:1):1):1,Microcebus_jollyae:1):1,Microcebus_mittermeieri:1):1,Microcebus_tavaratra:1):1):1):1):1);")
+MONOP.GROUP<-c("Microcebus_berthae", "Microcebus_bongolavensis", "Microcebus_danfossorum", "Microcebus_griseorufus", "Microcebus_jollyae", "Microcebus_lehilahytsara", "Microcebus_mamiratra", "Microcebus_mittermeieri", "Microcebus_murinus", "Microcebus_myoxinus", "Microcebus_ravelobensis", "Microcebus_rufus", "Microcebus_sambiranensis", "Microcebus_simmonsi", "Microcebus_tavaratra")
+#Merging the family tree with the tree for  Microcebus
+Replace.groups( Microcebus, MONOP.GROUP)
+
+#Place missing species of Phaner based on taxonomy
+TR<-read.tree(text="(Phaner_furcifer:1,Phaner_electromontis:1,Phaner_pallescens:1,Phaner_parienti:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),  "Phaner_furcifer"))
+#Place Mirza_coquereli based on taxonomy
+Sister1("Mirza_zaza", "Mirza_coquereli")
+#Place missing species of Cheirogaleus based on species groups
+Sister1("Cheirogaleus_medius", "Cheirogaleus_adipicaudatus")
+Start<-c("Cheirogaleus_crossleyi", "Cheirogaleus_major", "Cheirogaleus_sibreei")
+MIS<-c("Cheirogaleus_ravus", "Cheirogaleus_minusculus")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 24.57 MYA following Perelman et al (2011) 
+BD.gen(24.57,0.685)
+PHYLO->Cheirogaleidae
+
+################################################################################################################################################################
+#############################################################Daubentoniidae#####################################################################################
+################################################################################################################################################################
+#The trivial tree of the two species in the family
+Daubentoniidae<-read.tree(text="(Daubentonia_madagascariensis:1, Daubentonia_robustus:1);")
+PHYLO<-Daubentoniidae
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 51.56 MYA following Meredith et al (2011)
+#A node called Rootnode_Daubentoniidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Daubentoniidae:1);"), PHYLO,1)
+BD.gen(51.56,0.685)
+PHYLO->Daubentoniidae
+
+################################################################################################################################################################
+########################################################################Galagidae###############################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Galagidae<-read.tree(text="((Euoticus_elegantulus:1,(((Galago_moholi:1,Galago_senegalensis:1):1,Galago_gallarum:1):1,Galago_matschiei:1):1):1,((Galagoides_demidovii:1,(Galagoides_granti:1,Galagoides_zanzibaricus:1):1):1,((Sciurocheirus_alleni:1,Sciurocheirus_gabonensis:1):1,(Otolemur_crassicaudatus:1,Otolemur_garnettii:1):1):1):1);")
+PHYLO<-Galagidae
+
+#Place Euoticus_pallidus based on taxonomy
+Sister1("Euoticus_elegantulus", "Euoticus_pallidus")
+#Place missing species of Galagoides based on taxonomy
+Rep_3_8("Galagoides_demidovii", "Galagoides_granti", "Galagoides_zanzibaricus", c("Galagoides_cocos", "Galagoides_nyasae", "Galagoides_orinus", "Galagoides_rondoensis", "Galagoides_thomasi"))
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 19.9  MYA following Perelman et al (2011) 
+BD.gen(19.9,0.685)
+PHYLO->Galagidae
+
+################################################################################################################################################################
+#######################################################################Hominidae################################################################################
+################################################################################################################################################################
+
+#Read the tree of the family based on Nature 431, 1055-1061 (2004), Nature 483, 169-175 (2012) and Science 338, 222-226 (2012)
+PHYLO<-read.tree(text="((((((Homo_sapiens:1, Homo_neanderthalensis:1):1, Homo_Denisovans:1):1,  (Homo_erectus:1, Homo_floresiensis:1):1):1, (Pan_paniscus:1, Pan_troglodytes:1):1):1, (Gorilla_beringei:1, Gorilla_gorilla:1):1):1, (Pongo_abelii:1, Pongo_pygmaeus:1):1:):0;")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 10.59  MYA. Length of basal branch from Perelman et al (2011). Age of root from Meredith et al (2011)
+YULE.gen(10.59)
+PHYLO->Hominidae
+
+################################################################################################################################################################
+#######################################################################Hylobatidae##############################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Hylobatidae<-read.tree(text="((Symphalangus_syndactylus:1,((Nomascus_gabriellae:1,(Nomascus_leucogenys:1,Nomascus_siki:1):1):1,Nomascus_concolor:1):1):1,(Hoolock_leuconedys:1,((((Hylobates_klossii:1,Hylobates_lar:1):1,Hylobates_moloch:1):1,(Hylobates_muelleri:1,Hylobates_agilis:1):1):1,Hylobates_pileatus:1):1):1);")
+PHYLO<-Hylobatidae
+#One of the trees for the genus  Hylobates from the posterior distribution
+Hylobates<-read.tree(text="(Hylobates_klossii:1,(((Hylobates_moloch:1,((Hylobates_albibarbis:1,Hylobates_agilis:1):1,Hylobates_lar:1):1):1,Hylobates_muelleri:1):1,Hylobates_pileatus:1):1);")
+MONOP.GROUP<-c("Hylobates_agilis", "Hylobates_albibarbis", "Hylobates_klossii", "Hylobates_lar", "Hylobates_moloch", "Hylobates_muelleri", "Hylobates_pileatus")
+#Merging the family tree with the tree for  Hylobates
+Replace.groups(Hylobates, MONOP.GROUP)
+#One of the trees for the genus  Nomascus from the posterior distribution
+Nomascus<-read.tree(text="((Nomascus_hainanus:1,((Nomascus_gabriellae:1,Nomascus_leucogenys:1):1,Nomascus_concolor:1):1):1,Nomascus_nasutus:1);")
+MONOP.GROUP<-c("Nomascus_concolor", "Nomascus_gabriellae", "Nomascus_hainanus", "Nomascus_leucogenys", "Nomascus_nasutus", "Nomascus_siki")
+#Merging the family tree with the tree for  Nomascus
+Replace.groups(Nomascus, MONOP.GROUP)
+
+#Place Hoolock_hoolock based on taxonomy
+Sister1("Hoolock_leuconedys", "Hoolock_hoolock")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 8.9 MYA following Perelman et al (2011) 
+YULE.gen(8.9)
+PHYLO->Hylobatidae
+
+################################################################################################################################################################
+#####################################################Indriidae (and Archaeolemuridae and Palaeopropithecidae)###################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Indridae<-read.tree(text="(Indri_indri:1,(Avahi_laniger:1,((Propithecus_diadema:1,Propithecus_edwardsi:1):1,((Propithecus_coquereli:1,Propithecus_tattersalli:1):1,Propithecus_verreauxi:1):1):1):1);")
+PHYLO<-Indridae
+#One of the trees for the genus  Avahi from the posterior distribution
+Avahi<-read.tree(text="(((Avahi_unicolor:1,Avahi_cleesei:1):1,Avahi_occidentalis:1):1,((Avahi_betsileo:1,((Avahi_laniger:1,Avahi_meridionalis:1):1,Avahi_ramanantsoavanai:1):1):1,Avahi_peyrierasi:1):1);")
+MONOP.GROUP<-c("Avahi_betsileo", "Avahi_cleesei", "Avahi_laniger", "Avahi_meridionalis", "Avahi_occidentalis", "Avahi_peyrierasi", "Avahi_ramanantsoavanai", "Avahi_unicolor")
+#Merging the family tree with the tree for  Avahi
+Replace.groups(Avahi, MONOP.GROUP)
+#One of the trees for the genus  Propithecus from the posterior distribution
+Propithecus<-read.tree(text="((((Propithecus_coronatus:1,Propithecus_deckenii:1):1,Propithecus_verreauxi:1):1,(Propithecus_tattersalli:1,Propithecus_coquereli:1):1):1,((Propithecus_perrieri:1,Propithecus_edwardsi:1):1,Propithecus_diadema:1):1);")
+MONOP.GROUP<-c("Propithecus_coquereli", "Propithecus_coronatus", "Propithecus_deckenii", "Propithecus_diadema", "Propithecus_edwardsi", "Propithecus_perrieri", "Propithecus_tattersalli", "Propithecus_verreauxi")
+#Merging the family tree with the tree for  Propithecus
+Replace.groups(Propithecus, MONOP.GROUP)
+PHYLO->Indridae
+
+#Place Indridae, Archaeolemuridae and Palaeopropithecidae in a tritomi based on BMC Evolutionary Biology  8, 121 (2008)
+PHYLO<-read.tree(text="(Indridae:1, A:1);")
+Sister2("Indridae", "Archaeolemuridae", "Palaeopropithecidae") 
+PHYLO<-drop.tip(PHYLO, "A")
+Archaeolemuridae<-read.tree(text="(Hadropithecus_stenognathus :1, (Archaeolemur_edwardsi:1, Archaeolemur_majori:1):1);")
+Palaeopropithecidae<-read.tree(text="(Archaeoindris_fontoynonti :1, Babakotia_radofilai :1, (Mesopropithecus_globiceps:1, Mesopropithecus_pithecoides:1):1, (Palaeopropithecus_ingens:1, Palaeopropithecus_maximus:1):1):1;")
+PHYLO<<-bind.tree(PHYLO, Archaeolemuridae,  getNode(phylo4(PHYLO), "Archaeolemuridae"))
+PHYLO<<-bind.tree(PHYLO, Indridae,  getNode(phylo4(PHYLO), "Indridae"))
+PHYLO<<-bind.tree(PHYLO, Palaeopropithecidae,  getNode(phylo4(PHYLO), "Palaeopropithecidae"))
+#Place Propithecus_candidus based on taxonomy
+SisterOrSing1(c("Propithecus_coquereli", "Propithecus_coronatus", "Propithecus_deckenii", "Propithecus_diadema", "Propithecus_edwardsi", "Propithecus_perrieri", "Propithecus_tattersalli", "Propithecus_verreauxi"), "Propithecus_candidus")
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 28.57 MYA following Meredith et al (2011)
+#A node called Rootnode_Indriidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Indriidae:1);"), PHYLO,1)
+BD.gen(28.57,0.685)
+PHYLO->Indriidae
+
+
+################################################################################################################################################################
+##################################################################Lemuridae (and Megalapapidae)#################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Lemuridae<-read.tree(text="((((Eulemur_rubriventer:1,((Eulemur_coronatus:1,Eulemur_macaco:1):1,(Eulemur_mongoz:1,((Eulemur_sanfordi:1,(Eulemur_albifrons:1,Eulemur_fulvus:1):1):1,(Eulemur_collaris:1,Eulemur_rufus:1):1):1):1):1):1,Prolemur_simus:1):1,((Hapalemur_occidentalis:1,Hapalemur_griseus:1):1,Lemur_catta:1):1):1,(Varecia_variegata:1,Varecia_rubra:1):1);")
+PHYLO<-Lemuridae
+#One of the trees for the genus  Eulemur from the posterior distribution
+Eulemur<-read.tree(text="(((Eulemur_rubriventer:1,Eulemur_mongoz:1):1,(Eulemur_collaris:1,((Eulemur_fulvus:1,(Eulemur_sanfordi:1,Eulemur_albifrons:1):1):1,Eulemur_rufus:1):1):1):1,(Eulemur_macaco:1,Eulemur_coronatus:1):1);")
+MONOP.GROUP<-c("Eulemur_albifrons", "Eulemur_collaris", "Eulemur_coronatus", "Eulemur_fulvus", "Eulemur_macaco", "Eulemur_mongoz", "Eulemur_rubriventer", "Eulemur_rufus", "Eulemur_sanfordi")
+#Merging the family tree with the tree for  Eulemur
+Replace.groups(Eulemur, MONOP.GROUP)
+#One of the trees for the genus  Hapalemur from the posterior distribution
+Hapalemur<-read.tree(text="(((Hapalemur_griseus:1,Hapalemur_meridionalis:1):1,Hapalemur_occidentalis:1):1,Hapalemur_aureus:1);")
+MONOP.GROUP<-c("Hapalemur_aureus", "Hapalemur_griseus", "Hapalemur_meridionalis", "Hapalemur_occidentalis")
+#Merging the family tree with the tree for  Hapalemur
+Replace.groups(Hapalemur, MONOP.GROUP)
+
+#Place Megalapapidae as a sister to Lemuridae based on BMC Evolutionary Biology  8, 121 (2008)
+PHYLO->Lemuridae
+PHYLO<-read.tree(text="(Megaladapis_edwardsi:1, Lemuridae:1);")
+PHYLO<<-bind.tree(PHYLO, Lemuridae,  getNode(phylo4(PHYLO), "Lemuridae"))
+Sister2("Megaladapis_edwardsi", "Megaladapis_grandidieri", "Megaladapis_madagascariensis")
+#Place missing species of Eulemur based on taxonomy
+Start<-c("Eulemur_albifrons", "Eulemur_collaris", "Eulemur_coronatus","Eulemur_fulvus", "Eulemur_macaco", "Eulemur_mongoz", "Eulemur_rubriventer", "Eulemur_rufus", "Eulemur_sanfordi")
+MIS<-c("Eulemur_cinereiceps", "Eulemur_rufifrons")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place Hapalemur_alaotrensis based on former believed conspecifity
+Sister1("Hapalemur_griseus", "Hapalemur_alaotrensis")
+#Place Pachylemur as sister to another genus in the family
+SisterOrSing1(c(list(c("Eulemur_albifrons", "Eulemur_cinereiceps", "Eulemur_collaris", "Eulemur_coronatus", "Eulemur_coronatus", "Eulemur_fulvus", "Eulemur_macaco", "Eulemur_mongoz", "Eulemur_rubriventer", "Eulemur_rufus", "Eulemur_sanfordi", "Eulemur_rufifrons")), list(c("Hapalemur_alaotrensis", "Hapalemur_aureus", "Hapalemur_griseus", "Hapalemur_meridionalis", "Hapalemur_occidentalis")), "Lemur_catta", "Prolemur_simus", list(c("Varecia_rubra", "Varecia_variegata"))), "Pachylemur_insignis")
+Sister1("Pachylemur_insignis", "Pachylemur_jullyi")
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 29.57 MYA following Meredith et al (2011)
+#A node called Rootnode_Lemuridae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Lemuridae:1);"), PHYLO,1)
+BD.gen(29.57,0.685)
+PHYLO->Lemuridae
+
+################################################################################################################################################################
+#######################################################################Lorisidae################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Lorisidae<-read.tree(text="((Perodicticus_potto:1,Arctocebus_calabarensis:1):1,(Loris_tardigradus:1,(Nycticebus_pygmaeus:1,(Nycticebus_bengalensis:1,Nycticebus_coucang:1):1):1):1);")
+PHYLO<-Lorisidae
+
+#One of the trees for the genus  Nycticebus from the posterior distribution
+Nycticebus<-read.tree(text="(Nycticebus_pygmaeus:1,(Nycticebus_menagensis:1,((Nycticebus_javanicus:1,Nycticebus_coucang:1):1,Nycticebus_bengalensis:1):1):1);")
+MONOP.GROUP<-c("Nycticebus_bengalensis", "Nycticebus_coucang", "Nycticebus_javanicus", "Nycticebus_menagensis", "Nycticebus_pygmaeus")
+#Merging the family tree with the tree for  Nycticebus
+Replace.groups(Nycticebus, MONOP.GROUP)
+
+#Place Arctocebus_aureus based on taxonomy
+Sister1("Arctocebus_calabarensis", "Arctocebus_aureus")
+#Place Loris_lydekkerianus based on taxonomy
+Sister1("Loris_tardigradus", "Loris_lydekkerianus")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 32.35 MYA. Length of basal branch from Perelman et al (2011). Age of root from Meredith et al (2011)
+BD.gen(32.35,0.685)
+PHYLO->Lorisidae
+
+################################################################################################################################################################
+###########################################################The interfamily relationship#########################################################################
+################################################################################################################################################################
+
+#The relationsnip between the families in the order
+Primates<-read.tree(text="(((((Cheirogaleidae:4, Indriidae:0):1, Lemuridae:0):21.99, Daubentoniidae:0):3.53, (Galagidae:15.45, Lorisidae:3):19.74):16.45, ((Ceboidea:15.54, ((Hominidae:3.8, Hylobatidae:5.49):6.17, Cercopithecidae:2.96):9.57):32.28, (Tarsius_bancanus:20.6, Tarsius_dentatus:20.6, Tarsius_lariang:20.6, Tarsius_pelengensis:20.6, Tarsius_pumilus:20.6, Tarsius_sangirensis:20.6, Tarsius_syrichta:20.6, Tarsius_tarsier:20.6):41.81):9.13);")
+
+#Adding the families one by one
+Primates<-bind.tree(Primates, Ceboidea, getNode(phylo4(Primates),"Ceboidea"))
+Primates<-bind.tree(Primates, Cercopithecidae, getNode(phylo4(Primates),"Cercopithecidae"))
+Primates<-bind.tree(Primates, Cheirogaleidae, getNode(phylo4(Primates),"Cheirogaleidae"))
+Primates<-bind.tree(Primates, Daubentoniidae, getNode(phylo4(Primates),"Daubentoniidae"));Primates<-drop.tip(Primates, "Rootnode_Daubentoniidae")
+Primates<-bind.tree(Primates, Galagidae, getNode(phylo4(Primates),"Galagidae"))
+Primates<-bind.tree(Primates, Hominidae, getNode(phylo4(Primates),"Hominidae"))
+Primates<-bind.tree(Primates, Hylobatidae, getNode(phylo4(Primates),"Hylobatidae"))
+Primates<-bind.tree(Primates, Indriidae, getNode(phylo4(Primates),"Indriidae"));Primates<-drop.tip(Primates, "Rootnode_Indriidae")
+Primates<-bind.tree(Primates, Lemuridae, getNode(phylo4(Primates),"Lemuridae"));Primates<-drop.tip(Primates, "Rootnode_Lemuridae")
+Primates<-bind.tree(Primates, Lorisidae, getNode(phylo4(Primates),"Lorisidae"))
+
+is.ultrametric(Primates)
+write.tree(Primates,"Primates.nex")

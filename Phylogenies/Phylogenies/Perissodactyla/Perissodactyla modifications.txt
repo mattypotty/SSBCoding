@@ -1,0 +1,58 @@
+################################################################################################################################################################
+###########################################################Equuidae#############################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Equuidae<-read.tree(text="(((Equus_africanus:1,Equus_zebra:1):1,(Equus_grevyi:1,((Equus_ovodovi:1,(Equus_kiang:1,Equus_hemionus:1):1):1,Equus_quagga:1):1):1):1,(Equus_hydruntinus:1,(Equus_ferus:1,((Hippidion_devillei:1,Hippidion_principale:1):1,Equus_semiplicatus:1):1):1):1);")
+PHYLO<-Equuidae
+ 
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 5 MYA following Meredith et al (2011)
+BD.gen(5,0.329)
+PHYLO->Equidae
+
+################################################################################################################################################################
+###########################################################Rhinoceridae#########################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Rhinoceridae<-read.tree(text="(((Rhinoceros_sondaicus:1,Rhinoceros_unicornis:1):1,(Coelodonta_antiquitatis:1,Dicerorhinus_sumatrensis:1):1):1,(Ceratotherium_simum:1,Diceros_bicornis:1):1);")
+PHYLO<-Rhinoceridae
+
+#Place Elasmotherium as sister to the rest of the family since it belonged to another subfamily
+TR<-read.tree(text="(Elasmotherium_sibiricum:1, A:1);")
+PHYLO<<-bind.tree(TR, PHYLO ,  getNode(phylo4(TR),"A"))
+
+#Place Stephanorhinus as sister to Coelodonta or Dicerorhinus based on tribal assigmnet
+SisterOrSing1(c("Coelodonta_antiquitatis", "Dicerorhinus_sumatrensis"), "Stephanorhinus_hemitoechus")
+Sister1("Stephanorhinus_hemitoechus", "Stephanorhinus_kirchbergensis")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 42 MYA. Oldest fossils~40 mya assigned to subfamily. Root of subfamilies must be older
+BD.gen(42,0.329)
+PHYLO->Rhinoceridae
+
+################################################################################################################################################################
+##############################################################Tapiridae#########################################################################################
+################################################################################################################################################################
+#Create a family level tree assuming monophyly of new world tapirs, and with the internal relationship of new world tapirs following Journal of Vertebrate Paleontology 27: 504-511 (2007)
+PHYLO<-read.tree(text="(Tapirus_indicus:1, AAA:1):0;"); Sister2("Tapirus_indicus", "Tapirus_augustus", "Tapirus_terrestris"); PHYLO<-drop.tip(PHYLO, "AAA")
+PHYLO<-bind.tree(PHYLO, read.tree(text="(((Tapirus_copei:1, Tapirus_veroensis:1):1,  Tapirus_bairdii:1):1, Tapirus_terrestris:1):1;") ,  getNode(phylo4(PHYLO),"Tapirus_terrestris")); Sister2("Tapirus_terrestris", "Tapirus_pinchaque", "Tapirus_rondoniensis")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 20 MYA. Oldest fossils of the family are Miocene
+BD.gen(20,0.329)
+PHYLO->Tapiridae
+
+
+################################################################################################################################################################
+###########################################################The interfamily relationship#########################################################################
+################################################################################################################################################################
+
+#The relationsnip between the families in the order
+Perissodactyla<-read.tree(text="((Tapiridae:31.83, Rhinoceridae:9.83):5, Equidae:51.83);")
+
+#Adding the families one by one
+Perissodactyla<-bind.tree(Perissodactyla, Equidae, getNode(phylo4(Perissodactyla),"Equidae"))
+Perissodactyla<-bind.tree(Perissodactyla, Rhinoceridae, getNode(phylo4(Perissodactyla),"Rhinoceridae"))
+Perissodactyla<-bind.tree(Perissodactyla, Tapiridae, getNode(phylo4(Perissodactyla),"Tapiridae"))
+
+write.tree(Perissodactyla, "Perissodactyla.nex")
+

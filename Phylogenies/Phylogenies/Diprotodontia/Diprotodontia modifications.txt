@@ -1,0 +1,261 @@
+################################################################################################################################################################
+##################################################################Burramyidae###################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Burramyidae<-read.tree(text="(Burramys_parvus:1,((Cercartetus_lepidus:1,Cercartetus_concinnus:1):1,Cercartetus_nanus:1):1);")
+PHYLO<-Burramyidae
+#One of the trees for the genus Cercartetus from the posterior distribution
+Cercartetus<-read.tree(text="(Cercartetus_lepidus:1,(Cercartetus_nanus:1,(Cercartetus_caudatus:1,Cercartetus_concinnus:1):1):1);")
+#One of the trees for the genus Cercartetus from the posterior distribution
+MONOP.GROUP<-c("Cercartetus_caudatus", "Cercartetus_concinnus", "Cercartetus_lepidus", "Cercartetus_nanus")
+#Merging the family tree with the tree for Cercartetus
+Replace.groups(Cercartetus, MONOP.GROUP)
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 34.8 MYA following Meredith et al (2009)
+YULE.gen(34.8)
+PHYLO->Burramyidae
+
+################################################################################################################################################################
+##################################################################Macropopodidae################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Macropopodidae<-read.tree(text="(Lagostrophus_fasciatus:1,((Onychogalea_fraenata:1,Onychogalea_unguifera:1):1,(((((((Macropus_irma:1,(Macropus_rufogriseus:1,((Macropus_eugenii:1,Macropus_agilis:1):1,(Macropus_parryi:1,Macropus_parma:1):1):1):1):1,Wallabia_bicolor:1):1,((Macropus_antilopinus:1,Macropus_robustus:1):1,Macropus_rufus:1):1):1,(Macropus_giganteus:1,Macropus_fuliginosus:1):1):1,(Lagorchestes_hirsutus:1,Lagorchestes_conspicillatus:1):1):1,Setonix_brachyurus:1):1,(((Thylogale_stigmatica:1,Thylogale_brunii:1):1,((Dendrolagus_goodfellowi:1,Dendrolagus_dorianus:1):1,((Petrogale_xanthopus:1,Petrogale_lateralis:1):1,Petrogale_concinna:1):1):1):1,(Dorcopsulus_vanheurni:1,Dorcopsis_muelleri:1):1):1):1):1);")
+PHYLO<-Macropopodidae
+#One of the trees for the genus Dendrolagus from the posterior distribution
+Dendrolagus<-read.tree(text="(((Dendrolagus_lumholtzi:1,Dendrolagus_bennettianus:1):1,((Dendrolagus_notatus:1,Dendrolagus_dorianus:1):1,Dendrolagus_stellarum:1):1):1,(((Dendrolagus_goodfellowi:1,Dendrolagus_matschiei:1):1,Dendrolagus_spadix:1):1,Dendrolagus_inustus:1):1);")
+#One of the trees for the genus Dendrolagus from the posterior distribution
+MONOP.GROUP<-c("Dendrolagus_dorianus", "Dendrolagus_goodfellowi", "Dendrolagus_bennettianus", "Dendrolagus_inustus", "Dendrolagus_lumholtzi", "Dendrolagus_matschiei", "Dendrolagus_notatus", "Dendrolagus_spadix", "Dendrolagus_stellarum")
+#Merging the family tree with the tree for Dendrolagus
+Replace.groups(Dendrolagus, MONOP.GROUP)
+#One of the trees for the genus Petrogale from the posterior distribution
+Petrogale<-read.tree(text="(((Petrogale_persephone:1,(Petrogale_coenensis:1,((Petrogale_rothschildi:1,(Petrogale_lateralis:1,(((Petrogale_penicillata:1,Petrogale_herberti:1):1,(Petrogale_inornata:1,((Petrogale_mareeba:1,Petrogale_assimilis:1):1,Petrogale_sharmani:1):1):1):1,Petrogale_purpureicollis:1):1):1):1,Petrogale_godmani:1):1):1):1,(Petrogale_burbidgei:1,(Petrogale_brachyotis:1,Petrogale_concinna:1):1):1):1,Petrogale_xanthopus:1);")
+#One of the trees for the genus Petrogale from the posterior distribution
+MONOP.GROUP<-c("Petrogale_assimilis", "Petrogale_brachyotis", "Petrogale_burbidgei", "Petrogale_coenensis", "Petrogale_concinna", "Petrogale_godmani", "Petrogale_herberti", "Petrogale_inornata", "Petrogale_lateralis", "Petrogale_mareeba", "Petrogale_penicillata", "Petrogale_persephone", "Petrogale_purpureicollis", "Petrogale_rothschildi", "Petrogale_sharmani", "Petrogale_xanthopus")
+#Merging the family tree with the tree for Petrogale
+Replace.groups(Petrogale, MONOP.GROUP)
+#One of the trees for the genus Thylogale from the posterior distribution
+Thylogale<-read.tree(text="((Thylogale_thetis:1,(Thylogale_stigmatica:1,(Thylogale_lanatus:1,((Thylogale_brunii:1,Thylogale_calabyi:1):1,Thylogale_browni:1):1):1):1):1,Thylogale_billardierii:1);")
+#One of the trees for the genus Thylogale from the posterior distribution
+MONOP.GROUP<-c("Thylogale_brunii", "Thylogale_stigmatica", "Thylogale_thetis", "Thylogale_billardierii", "Thylogale_browni", "Thylogale_calabyi", "Thylogale_lanatus")
+#Merging the family tree with the tree for Thylogale
+Replace.groups(Thylogale, MONOP.GROUP)
+
+#Place the extinct subfamily Sthenurinae as sister to all extant species. The phylogeny of Sthenurinae based on Systematics and Evolution of the Sthenurine Kangaroos. Prideaux G. 2004 University of California Press
+TR<-read.tree(text="((((((Procoptodon_goliah:1, Procoptodon_gilli:1):1, Procoptodon_browneorum:1):1, Simosthenurus_occidentalis:1):1, Metasthenurus_newtonae:1):1, (((Sthenurus_stirlingi:1, Sthenurus_tindalei:1):1, Sthenurus_atlas:1):1, Sthenurus_andersoni:1):1):1, A:1):1;")
+PHYLO<<-bind.tree(TR, PHYLO ,  getNode(phylo4(TR),"A"))
+#Place Dendrolagus_scottae based on Nature 446, 507-512 (2007
+SisterAnd1( c("Dendrolagus_dorianus", "Dendrolagus_stellarum"), "Dendrolagus_scottae")
+#Place Dendrolagus_mayri based on uncertain species status
+SisterOrSing1(c("Dendrolagus_dorianus","Dendrolagus_notatus"),  "Dendrolagus_mayri")
+#Place Dendrolagus_pulcherrimus based on Nature 446, 507-512 (2007
+Sister1("Dendrolagus_goodfellowi", "Dendrolagus_pulcherrimus")
+#Place Dendrolagus_ursinus based on Nature 446, 507-512 (2007
+SisterAnd1(c("Dendrolagus_dorianus", "Dendrolagus_notatus", "Dendrolagus_mayri", "Dendrolagus_stellarum", "Dendrolagus_scottae", "Dendrolagus_goodfellowi", "Dendrolagus_pulcherrimus", "Dendrolagus_matschiei", "Dendrolagus_spadix"),"Dendrolagus_ursinus")
+#Place Dendrolagus_mbaiso based on taxonomy
+SisterOrSing1(c("Dendrolagus_bennettianus", "Dendrolagus_dorianus", "Dendrolagus_notatus", "Dendrolagus_mayri",  "Dendrolagus_stellarum", "Dendrolagus_scottae", "Dendrolagus_goodfellowi", "Dendrolagus_pulcherrimus", "Dendrolagus_matschiei", "Dendrolagus_spadix", "Dendrolagus_ursinus", "Dendrolagus_inustus", "Dendrolagus_lumholtzi"), c("Dendrolagus_mbaiso"))
+#Place missing species of Dorcopsis based on taxonomy
+TR<-read.tree(text="(Dorcopsis_atrata:1, Dorcopsis_hageni:1, Dorcopsis_luctuosa:1, Dorcopsis_muelleri:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),"Dorcopsis_muelleri"))
+#Place missing species of Lagorchestes based on taxonomy
+Rep_2_4("Lagorchestes_conspicillatus", "Lagorchestes_hirsutus", c("Lagorchestes_asomatus", "Lagorchestes_leporides"))
+#Place Troposodon as sister to Lagostrophus which is only extant memeber of the same subfamily
+Sister1("Lagostrophus_fasciatus", "Troposodon_minor")
+#Place Macropus_bernardus and Macropus_dorsalis based on Nature 446, 507-512 (2007
+SisterAnd1(c("Macropus_antilopinus", "Macropus_rufus", "Macropus_robustus"), "Macropus_bernardus")
+Sister1("Macropus_parma", "Macropus_dorsalis")
+#Place Macropus_greyi and Macropus_ferragus based on taxonomy (subgenera)
+SisterOrSing1(c("Macropus_agilis", "Macropus_dorsalis", "Macropus_eugenii", "Macropus_irma", "Macropus_parma", "Macropus_parryi", "Macropus_rufogriseus"), "Macropus_greyi")
+SisterOrSing1(c("Macropus_fuliginosus", "Macropus_giganteus"), "Macropus_ferragus")
+#Place Onychogalea_lunata" based on taxonomy
+SisterOrSing1(c("Onychogalea_fraenata", "Onychogalea_unguifera"), "Onychogalea_lunata")
+#Place Thylogale_christenseni based on taxonomy
+SisterOrSing1(c("Thylogale_billardierii", "Thylogale_browni", "Thylogale_brunii", "Thylogale_calabyi", "Thylogale_lanatus", "Thylogale_stigmatica", "Thylogale_thetis"), c("Thylogale_christenseni"))
+#Place Wallabia_kitcheneri based on taxonomy
+Sister1("Wallabia_bicolor", "Wallabia_kitcheneri")
+#Place Dorcopsulus_macleayi based on taxonomy
+Sister1("Dorcopsulus_vanheurni", "Dorcopsulus_macleayi")
+#Place Protemnodon as sister to one of the extant genera in the subfamily
+SisterOrSing1(c(list(c("Dendrolagus_bennettianus", "Dendrolagus_dorianus", "Dendrolagus_goodfellowi", "Dendrolagus_inustus", "Dendrolagus_lumholtzi", "Dendrolagus_matschiei", "Dendrolagus_mayri", "Dendrolagus_mbaiso", "Dendrolagus_notatus", "Dendrolagus_pulcherrimus", "Dendrolagus_scottae", "Dendrolagus_spadix", "Dendrolagus_stellarum",  "Dendrolagus_ursinus")), list(c("Dorcopsis_atrata", "Dorcopsis_hageni", "Dorcopsis_luctuosa", "Dorcopsis_muelleri")), list(c("Dorcopsulus_macleayi", "Dorcopsulus_vanheurni")), list(c("Lagorchestes_asomatus", "Lagorchestes_conspicillatus", "Lagorchestes_hirsutus", "Lagorchestes_leporides")), "Troposodon_minor", list(c("Macropus_agilis", "Macropus_antilopinus", "Macropus_bernardus", "Macropus_dorsalis", "Macropus_eugenii", "Macropus_ferragus", "Macropus_fuliginosus", "Macropus_giganteus", "Macropus_greyi", "Macropus_irma", "Macropus_parma", "Macropus_parryi", "Macropus_robustus", "Macropus_rufogriseus", "Macropus_rufus")), 
+list(c("Onychogalea_fraenata", "Onychogalea_lunata", "Onychogalea_unguifera")), list(c("Petrogale_assimilis", "Petrogale_brachyotis", "Petrogale_burbidgei", "Petrogale_coenensis", "Petrogale_concinna", "Petrogale_godmani", "Petrogale_herberti", "Petrogale_inornata", "Petrogale_lateralis", "Petrogale_mareeba", "Petrogale_penicillata", "Petrogale_persephone", "Petrogale_purpureicollis", "Petrogale_rothschildi", "Petrogale_sharmani", "Petrogale_xanthopus")), "Setonix_brachyurus", list(c("Thylogale_billardierii", "Thylogale_browni", "Thylogale_brunii", "Thylogale_calabyi", "Thylogale_lanatus", "Thylogale_stigmatica", "Thylogale_thetis", "Thylogale_christenseni")), list(c("Wallabia_bicolor", "Wallabia_kitcheneri"))), "Protemnodon_anak")
+TR<-read.tree(text="(Protemnodon_anak:1, Protemnodon_brehus:1, Protemnodon_hopei:1, Protemnodon_nombe:1, Protemnodon_roechus:1, Protemnodon_tumbuna:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),"Protemnodon_anak"))
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 13.8 MYA following Meredith et al (2009)
+YULE.gen(13.8)
+PHYLO->Macropopodidae
+
+################################################################################################################################################################
+##################################################################Petauridae####################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Petauridae<-read.tree(text="")
+PHYLO<-Petauridae
+#One of the trees for the genus Petaurus from the posterior distribution
+Petaurus<-read.tree(text="")
+#One of the trees for the genus Petaurus from the posterior distribution
+MONOP.GROUP<-c("Petaurus_abidi", "Petaurus_breviceps", "Petaurus_norfolcensis", "Petaurus_australis", "Petaurus_gracilis")
+#Merging the family tree with the tree for Petaurus
+Replace.groups(Petaurus, MONOP.GROUP)
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 23.3 MYA following Meredith et al (2009)
+YULE.gen(23.3)
+PHYLO->Petauridae
+
+################################################################################################################################################################
+##################################################################Petauridae####################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Petauridae<-read.tree(text="((Gymnobelideus_leadbeateri:1,(Petaurus_abidi:1,(Petaurus_breviceps:1,Petaurus_norfolcensis:1):1):1):1,(Dactylopsila_trivirgata:1,Dactylonax_palpator:1):1);")
+PHYLO<-Petauridae
+#One of the trees for the genus Petaurus from the posterior distribution
+Petaurus<-read.tree(text="((Petaurus_abidi:1,((Petaurus_norfolcensis:1,Petaurus_gracilis:1):1,Petaurus_breviceps:1):1):1,Petaurus_australis:1);")
+#One of the trees for the genus Petaurus from the posterior distribution
+MONOP.GROUP<-c("Petaurus_abidi", "Petaurus_breviceps", "Petaurus_norfolcensis", "Petaurus_australis", "Petaurus_gracilis")
+#Merging the family tree with the tree for Petaurus
+Replace.groups(Petaurus, MONOP.GROUP)
+
+#Place missing species of Dactylopsila based on taxonomy
+TR<-read.tree(text="(Dactylopsila_megalura:1,  Dactylopsila_tatei:1, Dactylopsila_trivirgata:1,	Dactylopsila_kambuayai:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),"Dactylopsila_trivirgata"))
+#Place Petaurus_biacensis based on Nature 446, 507-512 (2007
+Sister1("Petaurus_breviceps", "Petaurus_biacensis")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 23.3 MYA following Meredith et al (2009)
+YULE.gen(23.3)
+PHYLO->Petauridae
+
+
+################################################################################################################################################################
+##################################################################Phalangeridae#################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Phalangeridae<-read.tree(text="(((Strigocuscus_celebensis:1,Ailurops_ursinus:1):1,((Strigocuscus_pelengensis:1,(Phalanger_orientalis:1,Phalanger_gymnotis:1):1):1,(Spilocuscus_maculatus:1,Spilocuscus_rufoniger:1):1):1):1,(Wyulda_squamicaudata:1,(Trichosurus_vulpecula:1,Trichosurus_caninus:1):1):1);")
+PHYLO<-Phalangeridae
+#One of the trees for the genus Phalanger from the posterior distribution
+Phalanger<-read.tree(text="((((Phalanger_vestitus:1,(Phalanger_carmelitae:1,Phalanger_orientalis:1):1):1,Phalanger_sericeus:1):1,Phalanger_lullulae:1):1,Phalanger_gymnotis:1);")
+#One of the trees for the genus Phalanger from the posterior distribution
+MONOP.GROUP<-c("Phalanger_gymnotis", "Phalanger_orientalis", "Phalanger_carmelitae", "Phalanger_lullulae")
+#Merging the family tree with the tree for Phalanger
+Replace.groups(Phalanger, MONOP.GROUP)
+
+#Place Ailurops_melanotis based on taxonomy
+Sister1("Ailurops_ursinus", "Ailurops_melanotis")
+#Place missing species of Dactylopsila based on taxonomy
+Rep_2_5("Spilocuscus_maculatus", "Spilocuscus_rufoniger", c("Spilocuscus_papuensis", "Spilocuscus_kraemeri", "Spilocuscus_wilsoni"))
+#Place Trichosurus_cunninghami based on taxonomy
+SisterOrSing1(c("Trichosurus_caninus",  "Trichosurus_vulpecula"), "Trichosurus_cunninghami")
+#Place most missing species of Phalanger based on Nature 446, 507-512 (2007
+Sister2("Phalanger_orientalis", "Phalanger_intercastellanus", "Phalanger_mimicus")
+SisterAnd1(c("Phalanger_carmelitae", "Phalanger_orientalis", "Phalanger_intercastellanus", "Phalanger_mimicus", "Phalanger_sericeus", "Phalanger_lullulae", "Phalanger_gymnotis", "Phalanger_vestitus"), "Phalanger_matanim")
+Sister1("Phalanger_matanim", "Phalanger_ornatus")
+#Place missing species of Phalanger not covered in Nature 446, 507-512 (2007) based on taxonomy
+Start<-c("Phalanger_carmelitae", "Phalanger_orientalis", "Phalanger_intercastellanus", "Phalanger_mimicus", "Phalanger_sericeus", "Phalanger_lullulae", "Phalanger_gymnotis", "Phalanger_vestitus",  "Phalanger_matanim", "Phalanger_ornatus")
+MIS<-c("Phalanger_alexandrae", "Phalanger_matabiru", "Phalanger_rothschildi")
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 17.4 MYA following Meredith et al (2009)
+YULE.gen(17.4)
+PHYLO->Phalangeridae
+
+################################################################################################################################################################
+#####################################################################Potoroidae#################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Potoroidae<-read.tree(text="(((Potorous_tridactylus:1,Potorous_longipes:1):1,Caloprymnus_campestris:1):1,((Bettongia_gaimardi:1,Bettongia_penicillata:1):1,Aepyprymnus_rufescens:1):1);")
+PHYLO<-Potoroidae
+#One of the trees for the genus Bettongia from the posterior distribution
+Bettongia<-read.tree(text="(Bettongia_lesueur:1,(Bettongia_penicillata:1,(Bettongia_gaimardi:1,Bettongia_tropica:1):1):1);")
+#One of the trees for the genus Bettongia from the posterior distribution
+MONOP.GROUP<-c("Bettongia_gaimardi", "Bettongia_penicillata", "Bettongia_lesueur", "Bettongia_tropica")
+#Merging the family tree with the tree for Bettongia
+Replace.groups(Bettongia, MONOP.GROUP)
+#One of the trees for the genus Potorous from the posterior distribution
+Potorous<-read.tree(text="(((Potorous_longipes:1,Potorous_gilbertii:1):1,Potorous_platyops:1):1,Potorous_tridactylus:1);")
+#One of the trees for the genus Potorous from the posterior distribution
+MONOP.GROUP<-c("Potorous_gilbertii", "Potorous_longipes", "Potorous_platyops", "Potorous_tridactylus")
+#Merging the family tree with the tree for Potorous
+Replace.groups(Potorous, MONOP.GROUP)
+
+#Place Bettongia_pusilla based on taxonomy
+SisterOrSing1(c("Bettongia_gaimardi", "Bettongia_lesueur", "Bettongia_penicillata", "Bettongia_tropica" ), "Bettongia_pusilla")
+#Place the extinct genera Propleopus and Borungaboodie as sisters of extant genera of the family
+Start<-c("Aepyprymnus_rufescens", list(c("Bettongia_gaimardi", "Bettongia_lesueur", "Bettongia_penicillata", "Bettongia_tropica", "Bettongia_pusilla")), "Caloprymnus_campestris", list(c("Potorous_gilbertii", "Potorous_longipes", "Potorous_platyops", "Potorous_tridactylus")))
+MIS<-c("Propleopus_oscillans", "Borungaboodie_hatcheri")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 13.1 MYA following Meredith et al (2009)
+YULE.gen(13.1)
+PHYLO->Potoroidae
+
+
+################################################################################################################################################################
+#####################################################################Pseudocheiridae############################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Pseudocheiridae<-read.tree(text="(((Hemibelideus_lemuroides:1,Petauroides_volans:1):1,((((Pseudochirulus_forbesi:1,(Pseudochirulus_mayeri:1,Pseudochirulus_caroli:1):1):1,Pseudochirulus_canescens:1):1,Pseudochirulus_herbertensis:1):1,Pseudocheirus_peregrinus:1):1):1,(Pseudochirops_archeri:1,(Petropseudes_dahli:1,((Pseudochirops_albertisii:1,Pseudochirops_cupreus:1):1,Pseudochirops_corinnae:1):1):1):1);")
+PHYLO<-Pseudocheiridae
+
+#Place Petauroides_ayamaruensis based on taxonomy
+Sister1("Petauroides_volans", "Petauroides_ayamaruensis")
+#Place Pseudocheirus_occidentalis based on taxonomy
+Sister1("Pseudocheirus_peregrinus", "Pseudocheirus_occidentalis")
+#Place Pseudochirops_coronatus based on Nature 446, 507-512 (2007)
+Sister1("Pseudochirops_albertisii", "Pseudochirops_coronatus")
+#Place Pseudochirulus_cinereus and Pseudochirulus_larvatus based on Nature 446, 507-512 (2007)
+Sister1("Pseudochirulus_herbertensis", "Pseudochirulus_cinereus")
+Sister1("Pseudochirulus_forbesi", "Pseudochirulus_larvatus")
+#Place Pseudochirulus_schlegeli based on taxonomy
+SisterOrSing1(c("Pseudochirulus_canescens", "Pseudochirulus_caroli", "Pseudochirulus_cinereus", "Pseudochirulus_forbesi", "Pseudochirulus_herbertensis", "Pseudochirulus_larvatus", "Pseudochirulus_mayeri"), "Pseudochirulus_schlegeli")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 24.9 MYA following Meredith et al (2009)
+YULE.gen(24.9)
+PHYLO->Pseudocheiridae
+
+################################################################################################################################################################
+#####################################################################Vombatiformes##############################################################################
+################################################################################################################################################################
+#The most members of the suborder are extinct. Tree of extant species is trivial based on assumptions of family and genus monophyly. Tree of extinct species based on Australian Mammalogy 21: 1:45 (1999)
+Vombatiformes<-read.tree(text="((((((Phascolomys_medius:1, Phascolonus_gigas:1):1, (Lasiorhinus_krefftii:1, Lasiorhinus_latifrons:1):1):1, (Vombatus_ursinus:1, Vombatus_hacketti:1):1):1, (((Maokopia_ronaldi:1, Zygomaturus_trilobus:1):1, Diprotodon_optatum:1):1, Palorchestes_azeal:1):1):1, Thylacoleo_carnifex:1):1, Phascolarctos_cinereus:1):0;")
+PHYLO<-Vombatiformes
+#Simulate potential branch lengths wihtin the family based on MRCA of suborder equal to 24.9 MYA following Meredith et al (2009)
+YULE.gen(32.52)
+PHYLO->Vombatiformes
+
+################################################################################################################################################################
+###########################################################The interfamily relationship#########################################################################
+################################################################################################################################################################
+
+#The relationsnip between the families in the order. Families with one or two species are already added
+Diprotodontia<-read.tree(text="(Vombatiformes:20.28, ((Burramyidae:9.07, Phalangeridae:26.47):4.55,(((Macropopodidae:7.35, Potoroidae:9.05):9.99, Hypsiprymnodon_moschatus:32.14):14.96, (((Petauridae:11.46, Pseudocheiridae:9.86):3.36, Tarsipes_rostratus:38.12):3.92, (Acrobates_pygmaeus:25.1, Distoechurus_pennatus:25.1):16.94):5.06):1.32):4.38);")
+
+#Adding the families one by one
+Diprotodontia<-bind.tree(Diprotodontia, Burramyidae, getNode(phylo4(Diprotodontia),"Burramyidae"))
+Diprotodontia<-bind.tree(Diprotodontia, Macropopodidae, getNode(phylo4(Diprotodontia),"Macropopodidae"))
+Diprotodontia<-bind.tree(Diprotodontia, Petauridae, getNode(phylo4(Diprotodontia),"Petauridae"))
+Diprotodontia<-bind.tree(Diprotodontia, Phalangeridae, getNode(phylo4(Diprotodontia),"Phalangeridae"))
+Diprotodontia<-bind.tree(Diprotodontia, Potoroidae, getNode(phylo4(Diprotodontia),"Potoroidae"))
+Diprotodontia<-bind.tree(Diprotodontia, Pseudocheiridae, getNode(phylo4(Diprotodontia),"Pseudocheiridae"))
+Diprotodontia<-bind.tree(Diprotodontia, Vombatiformes, getNode(phylo4(Diprotodontia),"Vombatiformes"))
+
+write.tree(Diprotodontia, "Diprotodontia.nex")
+
+
+
+
+
+
+
+
+
+
+

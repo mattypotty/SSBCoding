@@ -1,0 +1,490 @@
+################################################################################################################################################################
+###########################################################Antilocapridae#######################################################################################
+################################################################################################################################################################
+#Only one extant species. Relationship based on tribal asignment and discussed species status
+Antilocapridae<-read.tree(text="(Antilocapra_americana:1, (Capromeryx_minor:1,(Stockoceros_conklingi:1,Tetrameryx_shuleri:1):1):1);")
+PHYLO<-Antilocapridae
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 19.69 MYA following Meredith et al (2011)
+#A node called Rootnode_Antilocapra is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Antilocapra:1);"), PHYLO,1)
+BD.gen(19.69,0.685)
+PHYLO->Antilocapridae
+
+################################################################################################################################################################
+##################################################################Balaenidae####################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Balaenidae<-read.tree(text="(((Eubalaena_japonica:1,Eubalaena_glacialis:1):1,Balaena_mysticetus:1):1,Eubalaena_australis:1);");
+PHYLO<-Balaenidae
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 17.77 MYA following Meredith et al (2011)
+#A node called Rootnode_Balaenidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Balaenidae:1);"), PHYLO,1)
+BD.gen(17.77,0.685)
+PHYLO->Balaenidae
+
+################################################################################################################################################################
+##################################################################Balaenopteridae###############################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Balaenopteridae<-read.tree(text="((Balaenoptera_musculus:1,((Balaenoptera_borealis:1,Balaenoptera_edeni:1):1,(Balaenoptera_physalus:1,Megaptera_novaeangliae:1):1):1):1,(Balaenoptera_bonaerensis:1,Balaenoptera_acutorostrata:1):1);")
+PHYLO<-Balaenopteridae
+#One of the trees for the genus Balaenoptera from the posterior distribution
+Balaenoptera<-read.tree(text="(Balaenoptera_physalus:1,((Balaenoptera_acutorostrata:1,Balaenoptera_bonaerensis:1):1,(((Balaenoptera_borealis:1,Balaenoptera_omurai:1):1,Balaenoptera_edeni:1):1,Balaenoptera_musculus:1):1):1);")
+MONOP.GROUP<-c("Balaenoptera_acutorostrata", "Balaenoptera_bonaerensis", "Balaenoptera_borealis", "Balaenoptera_edeni", "Balaenoptera_musculus", "Balaenoptera_omurai", "Balaenoptera_physalus")
+#Merging the family tree with the tree for Balaenoptera
+Replace.groups(Balaenoptera, MONOP.GROUP)
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 10.03 MYA following Meredith et al (2011)
+#A node called Rootnode_Balaenopteridae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Balaenopteridae:1);"), PHYLO,1)
+BD.gen(10.03,0.685)
+PHYLO->Balaenopteridae
+
+################################################################################################################################################################
+###########################################################Bovidae##############################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Bovidae<-read.tree(text="(((Tetracerus_quadricornis:1,Boselaphus_tragocamelus:1):1,((Pseudoryx_nghetinhensis:1,((Syncerus_caffer:1,(Bubalus_arnee:1,Bubalus_depressicornis:1):1):1,((Bos_mutus:1,Bison_bison:1):1,(((Bos_javanicus:1,Bos_gaurus:1):1,Bos_sauveli:1):1,(Bison_bonasus:1,Bos_primigenius:1):1):1):1):1):1,((Tragelaphus_derbianus:1,(((Tragelaphus_scriptus:1,(Tragelaphus_spekii:1,(Tragelaphus_eurycerus:1,Tragelaphus_imberbis:1):1):1):1,Tragelaphus_buxtoni:1):1,(Tragelaphus_oryx:1,Tragelaphus_strepsiceros:1):1):1):1,Tragelaphus_angasii:1):1):1):1,(((Nesotragus_moschatus:1,Neotragus_batesi:1):1,Aepyceros_melampus:1):1,(((Oreotragus_oreotragus:1,(Pelea_capreolus:1,(((Kobus_leche:1,Kobus_megaceros:1):1,(Kobus_kob:1,Kobus_ellipsiprymnus:1):1):1,(Redunca_redunca:1,Redunca_fulvorufula:1):1):1):1):1,((((Connochaetes_gnou:1,Connochaetes_taurinus:1):1,(Alcelaphus_buselaphus:1,((Damaliscus_pygargus:1,Damaliscus_lunatus:1):1,Beatragus_hunteri:1):1):1):1,(((Oryx_dammah:1,Oryx_gazella:1):1,Addax_nasomaculatus:1):1,(Hippotragus_niger:1,Hippotragus_equinus:1):1):1):1,(((Rupicapra_pyrenaica:1,Rupicapra_rupicapra:1):1,((((((Ammotragus_lervia:1,Arabitragus_jayakari:1):1,((Pseudois_schaeferi:1,Pseudois_nayaur:1):1,Hemitragus_jemlahicus:1):1):1,((Capra_ibex:1,((Capra_falconeri:1,Capra_aegagrus:1):1,Capra_nubiana:1):1):1,Capra_sibirica:1):1):1,(((Nilgiritragus_hylocrius:1,((Ovis_orientalis:1,Ovis_ammon:1):1,((Ovis_canadensis:1,Ovis_dalli:1):1,Ovis_nivicola:1):1):1):1,Budorcas_taxicolor:1):1,Myotragus_balearicus:1):1):1,Oreamnos_americanus:1):1,(((Ovibos_moschatus:1,Capricornis_crispus:1):1,(Capricornis_sumatraensis:1,Capricornis_swinhoei:1):1):1,Naemorhedus_goral:1):1):1):1,Pantholops_hodgsonii:1):1):1):1,(((Philantomba_monticola:1,Philantomba_maxwellii:1):1,(Cephalophus_dorsalis:1,Sylvicapra_grimmia:1):1):1,(((Raphicerus_campestris:1,(Raphicerus_sharpei:1,Raphicerus_melanotis:1):1):1,(Dorcatragus_megalotis:1,Madoqua_kirkii:1):1):1,((Saiga_tatarica:1,((Antidorcas_marsupialis:1,Litocranius_walleri:1):1,((Gazella_subgutturosa:1,(Eudorcas_thomsonii:1,Nanger_granti:1):1):1,Antilope_cervicapra:1):1):1):1,(Procapra_gutturosa:1,Ourebia_ourebi:1):1):1):1):1):1):1);")
+PHYLO<-Bovidae
+#One of the trees for the genus Bubalus from the posterior distribution
+Bubalus<-read.tree(text="(Bubalus_mindorensis:1,((Bubalus_depressicornis:1,Bubalus_quarlesi:1):1,Bubalus_arnee:1):1);")
+MONOP.GROUP<-c("Bubalus_arnee", "Bubalus_depressicornis", "Bubalus_mindorensis", "Bubalus_quarlesi")
+#Merging the family tree with the tree for Bubalus
+Replace.groups(Bubalus, MONOP.GROUP)
+#One of the trees for the genus Cephalophus from the posterior distribution
+Cephalophus<-read.tree(text="(Cephalophus_jentinki:1,((Cephalophus_zebra:1,(((Cephalophus_leucogaster:1,((Cephalophus_rufilatus:1,Cephalophus_nigrifrons:1):1,(Cephalophus_natalensis:1,Cephalophus_harveyi:1):1):1):1,((Cephalophus_callipygus:1,Cephalophus_weynsi:1):1,Cephalophus_ogilbyi:1):1):1,(Cephalophus_adersi:1,Cephalophus_niger:1):1):1):1,(Cephalophus_dorsalis:1,(Cephalophus_spadix:1,Cephalophus_silvicultor:1):1):1):1);")
+MONOP.GROUP<-c("Cephalophus_adersi", "Cephalophus_callipygus", "Cephalophus_dorsalis", "Cephalophus_harveyi", "Cephalophus_jentinki", "Cephalophus_leucogaster", "Cephalophus_natalensis", "Cephalophus_niger", "Cephalophus_nigrifrons", "Cephalophus_ogilbyi", "Cephalophus_rufilatus", "Cephalophus_silvicultor", "Cephalophus_spadix", "Cephalophus_weynsi", "Cephalophus_zebra")
+#Merging the family tree with the tree for Cephalophus
+Replace.groups(Cephalophus, MONOP.GROUP)
+#One of the trees for the genus Capra from the posterior distribution
+Capra<-read.tree(text="((Capra_sibirica:1,(((Capra_aegagrus:1,Capra_caucasica:1):1,Capra_cylindricornis:1):1,((Capra_pyrenaica:1,Capra_ibex:1):1,(Capra_nubiana:1,Capra_walie:1):1):1):1):1,Capra_falconeri:1);")
+MONOP.GROUP<-c("Capra_aegagrus", "Capra_caucasica", "Capra_cylindricornis", "Capra_falconeri", "Capra_ibex", "Capra_nubiana", "Capra_pyrenaica", "Capra_sibirica", "Capra_walie")
+#Merging the family tree with the tree for Capra
+Replace.groups(Capra, MONOP.GROUP)
+#One of the trees for the genus Gazella from the posterior distribution
+Gazella<-read.tree(text="((Gazella_bennettii:1,Gazella_subgutturosa:1):1,((Gazella_leptoceros:1,Gazella_cuvieri:1):1,((Gazella_spekei:1,(Gazella_saudiya:1,Gazella_dorcas:1):1):1,Gazella_gazella:1):1):1);")
+MONOP.GROUP<-c("Gazella_subgutturosa", "Gazella_bennettii", "Gazella_cuvieri", "Gazella_dorcas", "Gazella_gazella", "Gazella_leptoceros", "Gazella_saudiya", "Gazella_spekei")
+#Merging the family tree with the tree for Gazella
+Replace.groups(Gazella, MONOP.GROUP)
+#One of the trees for the genus Gazella from the posterior distribution
+Hippotragus<-read.tree(text="(Hippotragus_leucophaeus:1,(Hippotragus_niger:1,Hippotragus_equinus:1):1);")
+MONOP.GROUP<-c("Hippotragus_equinus", "Hippotragus_leucophaeus", "Hippotragus_niger")
+#Merging the family tree with the tree for Hippotragus
+Replace.groups(Hippotragus, MONOP.GROUP)
+#One of the trees for the genus Kobus from the posterior distribution
+Kobus<-read.tree(text="((Kobus_ellipsiprymnus:1,(Kobus_kob:1,Kobus_vardonii:1):1):1,(Kobus_megaceros:1,Kobus_leche:1):1);")
+MONOP.GROUP<-c("Kobus_ellipsiprymnus", "Kobus_kob", "Kobus_leche", "Kobus_megaceros", "Kobus_vardonii")
+#Merging the family tree with the tree for Kobus
+Replace.groups(Kobus, MONOP.GROUP)
+#One of the trees for the genus Madoqua from the posterior distribution
+Madoqua<-read.tree(text="((Madoqua_guentheri:1,Madoqua_kirkii:1):1,Madoqua_saltiana:1);")
+MONOP.GROUP<-c("Madoqua_guentheri", "Madoqua_kirkii", "Madoqua_saltiana")
+#Merging the family tree with the tree for Madoqua
+Replace.groups(Madoqua, MONOP.GROUP)
+#One of the trees for the genus Naemorhedus from the posterior distribution
+Naemorhedus<-read.tree(text="((Naemorhedus_baileyi:1,Naemorhedus_griseus:1):1,(Naemorhedus_goral:1,Naemorhedus_caudatus:1):1);")
+MONOP.GROUP<-c("Naemorhedus_baileyi", "Naemorhedus_caudatus", "Naemorhedus_goral", "Naemorhedus_griseus")
+#Merging the family tree with the tree for Madoqua
+Replace.groups(Naemorhedus, MONOP.GROUP)
+#One of the trees for the genus Nanger from the posterior distribution
+Nanger<-read.tree(text="((Nanger_soemmerringii:1,Nanger_granti:1):1,Nanger_dama:1);")
+MONOP.GROUP<-c("Nanger_dama", "Nanger_granti", "Nanger_soemmerringii")
+#Merging the family tree with the tree for Nanger
+Replace.groups(Nanger, MONOP.GROUP)
+#One of the trees for the genus Oryx from the posterior distribution
+Oryx<-read.tree(text="(Oryx_beisa:1,((Oryx_dammah:1,Oryx_leucoryx:1):1,Oryx_gazella:1):1);")
+MONOP.GROUP<-c("Oryx_beisa", "Oryx_dammah", "Oryx_gazella", "Oryx_leucoryx")
+#Merging the family tree with the tree for Oryx
+Replace.groups(Oryx, MONOP.GROUP)
+#One of the trees for the genus Procapra from the posterior distribution
+Procapra<-read.tree(text="((Procapra_przewalskii:1,Procapra_gutturosa:1):1,Procapra_picticaudata:1);")
+MONOP.GROUP<-c("Procapra_gutturosa", "Procapra_picticaudata", "Procapra_przewalskii")
+#Merging the family tree with the tree for Nanger
+Replace.groups(Procapra, MONOP.GROUP)
+#One of the trees for the genus Redunca from the posterior distribution
+Redunca<-read.tree(text="(Redunca_fulvorufula:1,(Redunca_redunca:1,Redunca_arundinum:1):1);")
+MONOP.GROUP<-c("Redunca_arundinum", "Redunca_fulvorufula", "Redunca_redunca")
+#Merging the family tree with the tree for Nanger
+Replace.groups(Redunca, MONOP.GROUP)
+
+#Place missing species of Antidorcas based on taxonomy
+Sister2("Antidorcas_marsupialis", "Antidorcas_australis", "Antidorcas_bondi")
+#Place Bubalus_palaeokerabau based on taxonomy
+SisterOrSing1(c("Bubalus_arnee", "Bubalus_depressicornis", "Bubalus_mindorensis", "Bubalus_quarlesi"), "Bubalus_palaeokerabau")
+#Place missing species of Capricornis based on taxonomy
+Rep_3_6("Capricornis_crispus", "Capricornis_sumatraensis", "Capricornis_swinhoei", c("Capricornis_milneedwardsii", "Capricornis_rubidus", "Capricornis_thar"))
+#Place missing species of Gazella based on taxonomy
+Start<-c("Gazella_bennettii", "Gazella_cuvieri", "Gazella_dorcas", "Gazella_gazella", "Gazella_leptoceros", "Gazella_saudiya", "Gazella_spekei", "Gazella_subgutturosa")
+MIS<-c("Gazella_tingitana", "Gazella_atlantica", "Gazella_bilkis")
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place Damaliscus_hypsodon as sister to Damaliscus_pygargus since the two species were previously confused
+Sister1( "Damaliscus_pygargus", "Damaliscus_hypsodon")
+#Place Damaliscus_niro based on taxonomy
+SisterOrSing1(c("Damaliscus_hypsodon", "Damaliscus_lunatus", "Damaliscus_pygargus"), "Damaliscus_niro")
+#Place Madoqua_piacentinii based on taxonomy
+SisterOrSing1( c("Madoqua_guentheri", "Madoqua_kirkii", "Madoqua_saltiana"), "Madoqua_piacentinii")
+#Place Neotragus_pygmaeus based on taxonomy
+Sister1( "Neotragus_batesi", "Neotragus_pygmaeus")
+#Place Oreamnos_harringtoni based on taxonomy
+Sister1( "Oreamnos_americanus", "Oreamnos_harringtoni")
+#Place Hemitragus_cedrensis based on taxonomy
+Sister1( "Hemitragus_jemlahicus", "Hemitragus_cedrensis")
+#Place Pelorovis_antiquus as sister to Syncerus_caffer because they are sometimes considered congeneric
+Sister1( "Syncerus_caffer", "Pelorovis_antiquus")
+#Place missing species of Eudorcas based on Nature 446, 507-512 (2007)
+TR<-read.tree(text="((Eudorcas_thomsonii:1, Eudorcas_albonotata:1):1,(Eudorcas_rufifrons:1, Eudorcas_rufina:1):1):1;")
+PHYLO<<-bind.tree(PHYLO, TR , getNode(phylo4(PHYLO),"Eudorcas_thomsonii"))
+#Place Ammodorcas_clarkei based on Nature 446, 507-512 (2007)
+SisterOrSing1(c(list(c("Antidorcas_marsupialis", "Antidorcas_australis", "Antidorcas_bondi")), "Litocranius_walleri", list(c("Antilope_cervicapra", "Nanger_dama", "Nanger_soemmerringii", "Nanger_granti",  "Eudorcas_thomsonii", "Eudorcas_rufifrons", "Eudorcas_rufina", "Eudorcas_albonotata", "Gazella_bennettii", "Gazella_cuvieri", "Gazella_dorcas", "Gazella_gazella", "Gazella_leptoceros", "Gazella_saudiya", "Gazella_spekei", "Gazella_subgutturosa", "Gazella_tingitana", "Gazella_atlantica", "Gazella_bilkis"))), "Ammodorcas_clarkei")
+#Place the extinct Spirocerus_kiakhtensis as sister to one of the extant genera of Antilopinae
+SisterOrSing1( c(list(c("Antidorcas_marsupialis", "Antidorcas_australis", "Antidorcas_bondi")), list(c("Nanger_dama", "Nanger_soemmerringii", "Nanger_granti")), list(c("Eudorcas_thomsonii", "Eudorcas_rufifrons", "Eudorcas_rufina", "Eudorcas_albonotata")),  list(c("Gazella_bennettii", "Gazella_cuvieri", "Gazella_dorcas", "Gazella_gazella", "Gazella_leptoceros", "Gazella_saudiya", "Gazella_spekei", "Gazella_subgutturosa", "Gazella_tingitana", "Gazella_atlantica", "Gazella_bilkis")),   list(c("Procapra_gutturosa", "Procapra_picticaudata", "Procapra_przewalskii")), list(c("Madoqua_guentheri", "Madoqua_kirkii", "Madoqua_piacentinii", "Madoqua_saltiana")), list(c("Neotragus_batesi", "Neotragus_pygmaeus")),  list(c("Raphicerus_campestris", "Raphicerus_melanotis", "Raphicerus_sharpei")),   "Ammodorcas_clarkei", "Antilope_cervicapra",  "Litocranius_walleri", "Saiga_tatarica", "Dorcatragus_megalotis", "Nesotragus_moschatus", "Oreotragus_oreotragus", "Ourebia_ourebi"), "Spirocerus_kiakhtensis")
+#Place the extinct genera Bootherium, Euceratherium, Soergelia and Megalovis as sisters to one of the extant genera of Caprinae
+Start<-c("Budorcas_taxicolor", "Ovibos_moschatus", "Ammotragus_lervia", "Arabitragus_jayakari", "Nilgiritragus_hylocrius", "Myotragus_balearicus", list(c("Capra_aegagrus", "Capra_caucasica", "Capra_cylindricornis", "Capra_falconeri", "Capra_ibex", "Capra_nubiana", "Capra_pyrenaica", "Capra_sibirica", "Capra_walie")), list(c("Capricornis_crispus", "Capricornis_milneedwardsii", "Capricornis_rubidus", "Capricornis_sumatraensis", "Capricornis_swinhoei", "Capricornis_thar")), list(c("Hemitragus_cedrensis", "Hemitragus_jemlahicus")), list(c("Naemorhedus_baileyi", "Naemorhedus_caudatus", "Naemorhedus_goral", "Naemorhedus_griseus")), list(c("Oreamnos_americanus", "Oreamnos_harringtoni")),  list(c("Ovis_ammon", "Ovis_canadensis", "Ovis_dalli", "Ovis_nivicola", "Ovis_orientalis")), list(c("Pseudois_nayaur", "Pseudois_schaeferi")), list(c("Rupicapra_pyrenaica", "Rupicapra_rupicapra")))
+MIS<-c("Bootherium_bombifrons", "Euceratherium_collinum", "Soergelia_minor", "Megalovis_guangxiensis")
+MIS1<-MIS[sample.int(4, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place the extinct genera Rusingoryx and Megalotragus as sisters to one of the extant genera of Alcelaphinae
+Start<-c("Beatragus_hunteri", "Alcelaphus_buselaphus", list(c("Connochaetes_gnou", "Connochaetes_taurinus")), list(c("Damaliscus_hypsodon", "Damaliscus_lunatus", "Damaliscus_pygargus", "Damaliscus_niro")))
+MIS<-c("Rusingoryx_atopocranion", "Megalotragus_priscus")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place the extinct Caprini_indet as sister to one of the extant genera of Caprini
+SisterOrSing1(c(list(c("Capra_aegagrus", "Capra_caucasica", "Capra_cylindricornis", "Capra_falconeri", "Capra_ibex", "Capra_nubiana", "Capra_pyrenaica", "Capra_sibirica", "Capra_walie")), "Ammotragus_lervia", "Arabitragus_jayakari", "Nilgiritragus_hylocrius",list(c("Hemitragus_cedrensis", "Hemitragus_jemlahicus")), list(c("Ovis_ammon", "Ovis_canadensis", "Ovis_dalli", "Ovis_nivicola", "Ovis_orientalis")), list(c("Pseudois_nayaur", "Pseudois_schaeferi"))), "Caprini_indet")
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 18.24 MYA following Meredith et al (2011)
+#A node called Rootnode_Bovidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Bovidae:1);"), PHYLO,1)
+YULE.gen(18.24)
+PHYLO->Bovidae
+
+################################################################################################################################################################
+################################################################Camelidae#######################################################################################
+################################################################################################################################################################
+#Almost all species are extinct and the tree is based on the morphological tree from Journal of Mammalian Evolution 20: 45-56 (2013)
+Camelidae<-read.tree(text="((Camelus_dromedarius:1, Camelus_ferus:1):1, ((Palaeolama_weddeli:1, (Palaeolama_major:1, Palaeolama_mirifica:1):1):1, (Camelops_hesternus:1, ((Hemiauchenia_macrocephala:1, Hemiauchenia_paradoxa:1):1, (Lama_guanicoe:1, Vicugna_vicugna:1):1):1):1):1);")
+PHYLO<-Camelidae
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 25 MYA following Meredith et al (2011)
+BD.gen(25,0.685)
+PHYLO->Camelidae
+
+################################################################################################################################################################
+###########################################################Cervidae#############################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Cervidae<-read.tree(text="(((Capreolus_capreolus:1,Hydropotes_inermis:1):1,((((Mazama_americana:1,(Odocoileus_hemionus:1,Odocoileus_virginianus:1):1):1,(Pudu_puda:1,(Mazama_gouazoubira:1,((Ozotoceros_bezoarticus:1,Hippocamelus_antisensis:1):1,Blastocerus_dichotomus:1):1):1):1):1,Rangifer_tarandus:1):1,Alces_alces:1):1):1,((Muntiacus_reevesi:1,Elaphodus_cephalophus:1):1,(((((Axis_porcinus:1,Axis_axis:1):1,Rucervus_duvaucelii:1):1,Dama_dama:1):1,((((Cervus_elaphus:1,Cervus_nippon:1):1,Przewalskium_albirostris:1):1,(Rusa_timorensis:1,Rusa_unicolor:1):1):1,Elaphurus_davidianus:1):1):1,Megaloceros_giganteus:1):1):1);")
+PHYLO<-Cervidae
+#One of the trees for the genus Axis from the posterior distribution
+Axis<-read.tree(text="(Axis_axis:1,(Axis_kuhlii:1,Axis_porcinus:1):1);")
+MONOP.GROUP<-c("Axis_axis", "Axis_porcinus", "Axis_kuhlii")
+#Merging the family tree with the tree for Axis
+Replace.groups(Axis, MONOP.GROUP)
+#One of the trees for the genus Mazama from the posterior distribution
+Mazama<-read.tree(text="(((Mazama_americana:1,(Mazama_bororo:1,Mazama_nana:1):1):1,Mazama_rufina:1):1,(Mazama_nemorivaga:1,Mazama_gouazoubira:1):1);")
+MONOP.GROUP<-c("Mazama_americana", "Mazama_gouazoubira", "Mazama_bororo", "Mazama_nana", "Mazama_nemorivaga", "Mazama_rufina")
+#Merging the family tree with the tree for Mazama
+Replace.groups(Mazama, MONOP.GROUP)
+#One of the trees for the genus Muntiacus from the posterior distribution
+Muntiacus<-read.tree(text="((((Muntiacus_feae:1,Muntiacus_crinifrons:1):1,(Muntiacus_vaginalis:1,Muntiacus_muntjak:1):1):1,(Muntiacus_vuquangensis:1,Muntiacus_putaoensis:1):1):1,Muntiacus_reevesi:1);")
+MONOP.GROUP<-c("Muntiacus_reevesi", "Muntiacus_crinifrons", "Muntiacus_feae", "Muntiacus_muntjak", "Muntiacus_putaoensis", "Muntiacus_vaginalis", "Muntiacus_vuquangensis")
+#Merging the family tree with the tree for Muntiacus
+Replace.groups(Muntiacus, MONOP.GROUP)
+#One of the trees for the genus Rucervus from the posterior distribution
+Rucervus<-read.tree(text="((Rucervus_schomburgki:1,Rucervus_duvaucelii:1):1,Rucervus_eldii:1);")
+MONOP.GROUP<-c("Rucervus_duvaucelii", "Rucervus_eldii", "Rucervus_schomburgki")
+#Merging the family tree with the tree for Rucervus
+Replace.groups(Rucervus, MONOP.GROUP)
+#One of the trees for the genus Rusa from the posterior distribution
+Rusa<-read.tree(text="(Rusa_alfredi:1,(Rusa_unicolor:1,Rusa_timorensis:1):1);")
+MONOP.GROUP<-c("Rusa_alfred", "Rusa_timorensis", "Rusa_unicolor")
+#Merging the family tree with the tree for Rusa
+Replace.groups(Rusa, MONOP.GROUP)
+
+#Place Axis_calamianensis based on taxonomy
+SisterOrSing1(c("Axis_axis", "Axis_kuhlii", "Axis_porcinus"), "Axis_calamianensis")
+#Place Dama_mesopotamica based on taxonomy
+Sister1("Dama_dama", "Dama_mesopotamica")
+#Place Hippocamelus_bisulcus based on taxonomy
+Sister1("Hippocamelus_antisensis", "Hippocamelus_bisulcus")
+#Place Pudu_mephistophiles based on taxonomy
+Sister1("Pudu_puda", "Pudu_mephistophiles")
+#Place Rusa_marianna based on taxonomy
+SisterOrSing1(c("Rusa_timorensis", "Rusa_unicolor", "Rusa_alfredi"), "Rusa_marianna")
+#Place missing species of Mazama based on Nature 446, 507-512 (2007)
+Sister2("Mazama_americana", "Mazama_pandora", "Mazama_temama")
+Start<-c(list(c("Mazama_gouazoubira", "Mazama_nemorivaga")), list(c("Mazama_americana", "Mazama_pandora", "Mazama_temama")), "Mazama_nana", "Mazama_rufina")
+MIS<-c("Mazama_bricenii", "Mazama_chunyi")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place missing species of Muntiacus based on Nature 446, 507-512 (2007)
+SisterOrSing1(c("Muntiacus_muntjak", "Muntiacus_vaginalis"),  "Muntiacus_montanus")
+Rep_2_4("Muntiacus_feae", "Muntiacus_putaoensis", c("Muntiacus_truongsonensis", "Muntiacus_rooseveltorum"))
+Start<-c(list(c("Muntiacus_muntjak", "Muntiacus_vaginalis",  "Muntiacus_montanus")), list(c("Muntiacus_feae", "Muntiacus_putaoensis", "Muntiacus_truongsonensis", "Muntiacus_rooseveltorum")), "Muntiacus_crinifrons", "Muntiacus_reevesi")
+MIS<-c("Muntiacus_atherodes", "Muntiacus_gongshanensis")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place Cervus_astylodon as sister to Cervus_nippon since Cervus_nippon is the likely ancestor of this island species based on geography
+Sister1("Cervus_nippon", "Cervus_astylodon")
+#Place Capreolus_miyakoensis as sister to Capreolus_pygargus since Capreolus_pygargus is the likely ancestor of this island species based on geography
+Sister1("Capreolus_capreolus", "Capreolus_miyakoensis")
+Sister1("Capreolus_miyakoensis", "Capreolus_pygargus")
+#Place Dicroceros_sp as sister to Muntiacus since the two genera belong to the same tribe
+SisterAnd1(c("Muntiacus_atherodes", "Muntiacus_crinifrons", "Muntiacus_feae", "Muntiacus_gongshanensis", "Muntiacus_montanus", "Muntiacus_muntjak",  "Muntiacus_putaoensis", "Muntiacus_reevesi", "Muntiacus_rooseveltorum", "Muntiacus_truongsonensis", "Muntiacus_vaginalis", "Muntiacus_vuquangensis"), "Dicroceros_sp")
+#Place unsampled species of the "giant deer"Candiacervus, Megaloceros, Megaceroides,  Praemegaceros and Sinomegaceros based on Paleontological Journal 45,  674–68 (2011)
+TR<-read.tree(text="((((Candiacervus_ropalophorus:1, Candiacervus_SpII:1, Candiacervus_cretensis:1, Candiacervus_rethymnensis:1, Candiacervus_dorothensis:1, Candiacervus_major:1):1, Praemegaceros_cazioti:1):1, Megaloceros_giganteus:1):1, ((Sinomegaceros_yabei:1, Sinomegaceros_ordosianus:1):1, Megaceroides_algericus:1):1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),"Megaloceros_giganteus"))
+#Place Navahoceros_fricki as sister to the genus Odocoileus.Odocoileus. The species has been suggested to be a synonym of an Odocoileus species
+SisterAnd1(c("Odocoileus_hemionus", "Odocoileus_virginianus"), "Navahoceros_fricki")
+#Place Agalmaceros, Antifer Morenelaphus, Sangamona and Paraceros as sisters to extant genera in Rangiferini
+Start<-c("Blastocerus_dichotomus", list(c("Hippocamelus_bisulcus", "Hydropotes_inermis")), list(c("Mazama_americana", "Mazama_bororo", "Mazama_bricenii", "Mazama_chunyi", "Mazama_gouazoubira", "Mazama_nana", "Mazama_nemorivaga", "Mazama_pandora", "Mazama_rufina", "Mazama_temama")), list(c("Odocoileus_hemionus", "Navahoceros_fricki", "Odocoileus_virginianus")), "Ozotoceros_bezoarticus", list(c("Pudu_mephistophiles", "Pudu_puda")), "Rangifer_tarandus")
+MIS<-c("Agalmaceros_blicki", "Antifer_ultra", "Morenelaphus_brachyceros", "Sangamona_fugitiva", "Paraceros_fragilis")
+MIS1<-MIS[sample.int(5, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(4, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+Sister1("Morenelaphus_brachyceros", "Morenelaphus_lujanensis")
+#Place Alces_scotti as the most basal species in the genus. It is often placed in a seperate genus and the two other species are often considered conspecific
+Sister1("Alces_alces", "Alces_scotti")
+Sister1("Alces_alces", "Alces_americanus")
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 18.24 MYA following Meredith et al (2011)
+#A node called Rootnode_Cervidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Cervidae:1);"), PHYLO,1)
+YULE.gen(18.24)
+PHYLO->Cervidae
+
+################################################################################################################################################################
+###########################################################Delphinidae##########################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Delphinidae<-read.tree(text="(((((Lagenorhynchus_obliquidens:1,Lagenorhynchus_obscurus:1):1,(((Cephalorhynchus_hectori:1,(Cephalorhynchus_eutropia:1,Cephalorhynchus_commersonii:1):1):1,Lagenorhynchus_australis:1):1,Cephalorhynchus_heavisidii:1):1):1,Lissodelphis_borealis:1):1,Lagenorhynchus_acutus:1):1,(((Orcinus_orca:1,Sotalia_fluviatilis:1):1,(((((((Tursiops_truncatus:1,Stenella_frontalis:1):1,(Stenella_coeruleoalba:1,Tursiops_aduncus:1):1):1,(Delphinus_capensis:1,Delphinus_delphis:1):1):1,((Sousa_chinensis:1,Stenella_attenuata:1):1,Stenella_longirostris:1):1):1,Lagenodelphis_hosei:1):1,((((((Globicephala_melas:1,Globicephala_macrorhynchus:1):1,Peponocephala_electra:1):1,Feresa_attenuata:1):1,Grampus_griseus:1):1,Pseudorca_crassidens:1):1,Steno_bredanensis:1):1):1,Orcaella_brevirostris:1):1):1,Lagenorhynchus_albirostris:1):1);")
+PHYLO<-Delphinidae
+#One of the trees for the genus Lagenorhynchus from the posterior distribution
+Lagenorhynchus<-read.tree(text="(((Lagenorhynchus_acutus:1,Lagenorhynchus_albirostris:1):1,(Lagenorhynchus_obscurus:1,Lagenorhynchus_obliquidens:1):1):1,(Lagenorhynchus_australis:1,Lagenorhynchus_cruciger:1):1);")
+MONOP.GROUP<-c("Lagenorhynchus_acutus", "Lagenorhynchus_albirostris", "Lagenorhynchus_australis", "Lagenorhynchus_cruciger", "Lagenorhynchus_obliquidens", "Lagenorhynchus_obscurus")
+#Merging the family tree with the tree for Lagenorhynchus
+Replace.groups(Lagenorhynchus, MONOP.GROUP)
+#One of the trees for the genus Stenella from the posterior distribution
+Stenella<-read.tree(text="(Stenella_longirostris:1,(((Stenella_coeruleoalba:1,Stenella_clymene:1):1,Stenella_frontalis:1):1,Stenella_attenuata:1):1);")
+MONOP.GROUP<-c("Stenella_attenuata", "Stenella_clymene", "Stenella_coeruleoalba", "Stenella_frontalis", "Stenella_longirostris")
+#Merging the family tree with the tree for Stenella
+Replace.groups(Stenella, MONOP.GROUP)
+
+#Place Lissodelphis_peronii based on taxonomy
+Sister1("Lissodelphis_borealis", "Lissodelphis_peronii")
+#Place Orcaella_heinsohni based on taxonomy
+Sister1("Orcaella_brevirostris", "Orcaella_heinsohni")
+#Place Sousa_teuszii based on taxonomy
+Sister1("Sousa_chinensis", "Sousa_teuszii")
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 13.09 MYA following Meredith et al (2011)
+#A node called Rootnode_Delphinidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Delphinidae:1);"), PHYLO,1)
+BD.gen(13.09,0.355)
+PHYLO->Delphinidae
+
+################################################################################################################################################################
+###########################################################Hippopotamidae#######################################################################################
+################################################################################################################################################################
+#Almost all species are extinct and no genetic analysis is performed. Choeropsis is set as sister to Hexaprotodon since they occationally are considered congenetic. Phanourios is placed within Hippopotamus since its likely mainland ancestor is Hippopotamus_amphibius
+Hippopotamidae<-read.tree(text="((Choeropsis_liberiensis:1, Hexaprotodon_sivalensis:1):1, (Phanourios_minutes:1, Hippopotamus_madagascariensis:1, Hippopotamus_lemerlei:1, Hippopotamus_amphibius:1):1);")
+PHYLO<-Hippopotamidae
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 8 MYA following Meredith et al (2011)
+BD.gen(8,0.685)
+PHYLO->Hippopotamidae
+
+################################################################################################################################################################
+################################################################Iniidae#########################################################################################
+################################################################################################################################################################
+#One of the trees of the family from the posterior distribution
+Iniidae<-read.tree(text="(Lipotes_vexillifer:1,(Inia_geoffrensis:1,Pontoporia_blainvillei:1):1);")
+PHYLO<-Iniidae
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 13.44 MYA following Meredith et al (2011)
+BD.gen(13.44,0.685)
+PHYLO->Iniidae
+
+################################################################################################################################################################
+###########################################################Monodontidae#########################################################################################
+################################################################################################################################################################
+#The relationship between the two species in the family
+Monodontidae<-read.tree(text="(Delphinapterus_leucas:1,Monodon_monoceros:1);")
+PHYLO<-Monodontidae
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 11.63 MYA following Meredith et al (2011)
+#A node called Rootnode_Monodontidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Monodontidae:1);"), PHYLO,1)
+BD.gen(11.63,0.685)
+PHYLO->Monodontidae
+
+################################################################################################################################################################
+################################################################Moschidae#######################################################################################
+################################################################################################################################################################
+#One of the trees of the family from the posterior distribution
+Moschidae<-read.tree(text="((((Moschus_leucogaster:1,Moschus_moschiferus:1):1,(Moschus_chrysogaster:1,Moschus_fuscus:1):1):1,Moschus_berezovskii:1):1,Moschus_anhuiensis:1);")
+PHYLO<-Moschidae
+
+#Place Moschus_cupreus based on Nature 446, 507-512 (2007)
+SisterOrSing1(c("Moschus_chrysogaster", "Moschus_leucogaster"), "Moschus_cupreus")
+
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 19.69 MYA following Meredith et al (2011)
+#A node called Rootnode_Moschidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Moschidae:1);"), PHYLO,1)
+BD.gen(19.69,0.685)
+PHYLO->Moschidae
+
+################################################################################################################################################################
+###########################################################Phocoenidae##########################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Phocoenidae<-read.tree(text="((Phocoenoides_dalli:1,Phocoena_phocoena:1):1,Neophocaena_phocaenoides:1);")
+PHYLO<-Phocoenidae
+#One of the trees for the genus Lagenorhynchus from the posterior distribution
+Phocoena<-read.tree(text="(((Phocoena_spinipinnis:1,Phocoena_dioptrica:1):1,Phocoena_sinus:1):1,Phocoena_phocoena:1);")
+MONOP.GROUP<-c("Phocoena_dioptrica", "Phocoena_phocoena", "Phocoena_sinus", "Phocoena_spinipinnis")
+#Merging the family tree with the tree for Phocoena
+Replace.groups(Phocoena, MONOP.GROUP)
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 13.09 MYA following Meredith et al (2011)
+#A node called Rootnode_Phocoenidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Phocoenidae:1);"), PHYLO,1)
+BD.gen(11.63,0.685)
+PHYLO->Phocoenidae
+
+################################################################################################################################################################
+###########################################################Suidae###############################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Suidae<-read.tree(text="(Babyrousa_babyrussa:1,(((Potamochoerus_porcus:1,Potamochoerus_larvatus:1):1,((Phacochoerus_aethiopicus:1,Phacochoerus_africanus:1):1,Hylochoerus_meinertzhageni:1):1):1,(Sus_scrofa:1,((Sus_barbatus:1,Sus_verrucosus:1):1,Sus_celebensis:1):1):1):1);")
+PHYLO<-Suidae
+#One of the trees for the genus Sus from the posterior distribution
+Sus<-read.tree(text="((Sus_scrofa:1,((Sus_philippensis:1,Sus_cebifrons:1):1,Sus_celebensis:1):1):1,(Sus_barbatus:1,Sus_verrucosus:1):1);")
+MONOP.GROUP<-c("Sus_barbatus", "Sus_celebensis", "Sus_scrofa", "Sus_verrucosus", "Sus_cebifrons", "Sus_philippensis")
+#Merging the family tree with the tree for Sus
+Replace.groups(Sus, MONOP.GROUP)
+
+#Place missing species of Babyrousa based on taxonomy
+Sister2("Babyrousa_babyrussa", "Babyrousa_celebensis", "Babyrousa_togeanensis")
+#Place missing species of Sus based on Nature 446, 507-512 (2007) and Hardjasasmita, Suidae in Indonesia, Scripta Geol. 85 (1987)
+Start<-c("Sus_barbatus", "Sus_cebifrons", "Sus_celebensis", "Sus_philippensis", "Sus_scrofa", "Sus_verrucosus")
+MIS<-c("Sus_oliveri", "Sus_bucculentus")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+Sister1("Sus_barbatus", "Sus_ahoenobarbus")
+Sister1("Sus_verrucosus", "Sus_brachgnathus")
+#Place Porcula_salvania as sister to Sus since they formerly were considered congeneric
+SisterAnd1(c("Sus_barbatus", "Sus_cebifrons", "Sus_philippensis",  "Sus_celebensis", "Sus_scrofa", "Sus_verrucosus", "Sus_oliveri", "Sus_bucculentus", "Sus_ahoenobarbus", "Sus_brachgnathus"),  "Porcula_salvania")
+#Place Metridiochoerus as sister to Phacochoerus which is the only other genus in the subfamily
+SisterAnd1(c("Phacochoerus_aethiopicus", "Phacochoerus_africanus"), "Metridiochoerus_compactus")
+#Place Kolpochoerus as sister to one of the genera of the tribe Potamochoerini
+SisterOrSing1(c("Hylochoerus_meinertzhageni", list(c("Potamochoerus_larvatus", "Potamochoerus_porcus"))), "Kolpochoerus_majus")
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 28.8 MYA following Meredith et al (2011)
+#A node called Rootnode_Suidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Suidae:1);"), PHYLO,1)
+BD.gen(28.8,0.685)
+PHYLO->Suidae
+
+################################################################################################################################################################
+###########################################################Tayassuidae##########################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Tayassuidae<-read.tree(text="((Catagonus_wagneri:1,Tayassu_pecari:1):1,Pecari_tajacu:1);")
+PHYLO<-Tayassuidae
+
+#Place Pecari_maximus based on taxonomy
+Sister1("Pecari_tajacu", "Pecari_maximus")
+#Place Catagonus_stenocephalus based on taxonomy
+Sister1("Catagonus_wagneri", "Catagonus_stenocephalus")
+#Place Platygonus_compressus and Mylohyus_nasutus based on Journal of Vertebrate Paleontology 27: 504-511 (2007)
+Sister1("Tayassu_pecari", "Platygonus_compressus")
+Sister1("Platygonus_compressus", "Mylohyus_nasutus")
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 28.8 MYA following Meredith et al (2011)
+#A node called Rootnode_Tayassuidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Tayassuidae:1);"), PHYLO,1)
+BD.gen(28.8,0.685)
+PHYLO->Tayassuidae
+
+################################################################################################################################################################
+###########################################################Tragulidae###########################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Tragulidae<-read.tree(text="((Moschiola_indica:1,Hyemoschus_aquaticus:1):1,(Tragulus_javanicus:1,Tragulus_napu:1):1);")
+PHYLO<-Tragulidae
+
+#Place missing species of Tragulus based on taxonomy
+Sister2("Moschiola_indica", "Moschiola_kathygre", "Moschiola_meminna")
+#Place missing species of Moschiola based on Nature 446, 507-512 (2007)
+Sister2("Tragulus_javanicus", "Tragulus_kanchil", "Tragulus_williamsoni")
+Sister2("Tragulus_napu", "Tragulus_nigricans", "Tragulus_versicolor")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 37.4 MYA following Meredith et al (2011)
+BD.gen(37.4,0.685)
+PHYLO->Tragulidae
+
+################################################################################################################################################################
+###########################################################Ziphiidae############################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Ziphiidae<-read.tree(text="((Berardius_bairdii:1,Berardius_arnuxii:1):1,((Hyperoodon_planifrons:1,Hyperoodon_ampullatus:1):1,(((Indopacetus_pacificus:1,Mesoplodon_bidens:1):1,((((Mesoplodon_carlhubbsi:1,Mesoplodon_layardii:1):1,Mesoplodon_bowdoini:1):1,Mesoplodon_mirus:1):1,((Mesoplodon_europaeus:1,(Mesoplodon_hectori:1,(Mesoplodon_perrini:1,((Mesoplodon_densirostris:1,Mesoplodon_stejnegeri:1):1,(Mesoplodon_grayi:1,Mesoplodon_peruvianus:1):1):1):1):1):1,Mesoplodon_ginkgodens:1):1):1):1,(Ziphius_cavirostris:1,Tasmacetus_shepherdi:1):1):1):1);")
+PHYLO<-Ziphiidae
+#One of the trees for the genus Sus from the posterior distribution
+Mesoplodon<-read.tree(text="((((Mesoplodon_hectori:1,(Mesoplodon_ginkgodens:1,Mesoplodon_traversii:1):1):1,((Mesoplodon_bidens:1,(Mesoplodon_carlhubbsi:1,Mesoplodon_bowdoini:1):1):1,(Mesoplodon_mirus:1,Mesoplodon_layardii:1):1):1):1,(Mesoplodon_densirostris:1,(((Mesoplodon_perrini:1,Mesoplodon_peruvianus:1):1,Mesoplodon_grayi:1):1,Mesoplodon_stejnegeri:1):1):1):1,Mesoplodon_europaeus:1);")
+MONOP.GROUP<-c("Mesoplodon_bidens", "Mesoplodon_bowdoini", "Mesoplodon_carlhubbsi", "Mesoplodon_densirostris", "Mesoplodon_europaeus", "Mesoplodon_ginkgodens", "Mesoplodon_grayi", "Mesoplodon_hectori", "Mesoplodon_layardii", "Mesoplodon_mirus", "Mesoplodon_perrini", "Mesoplodon_peruvianus", "Mesoplodon_stejnegeri", "Mesoplodon_traversii")
+#Merging the family tree with the tree for Sus
+Replace.groups(Mesoplodon, MONOP.GROUP)
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 23.12 MYA following Meredith et al (2011)
+#A node called Rootnode_Ziphiidae is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Ziphiidae:1);"), PHYLO,1)
+BD.gen(23.12,0.685)
+PHYLO->Ziphiidae
+
+################################################################################################################################################################
+###########################################################The interfamily relationship#########################################################################
+################################################################################################################################################################
+#The relationsnip between the families in the order
+Cetartiodactyla<-read.tree(text="(((((((Bovidae:0,  Cervidae:0):1.45, Moschidae:0):0.71, (Antilocapridae:0,  (Giraffa_camelopardalis:7.8,Okapia_johnstoni:7.8):11.89):0.71):19.92, Tragulidae:2.92) :17.26, ((((((((Monodontidae:0, Phocoenidae:0):1.46, Delphinidae:0):4.77, Iniidae:4.42):5.26, Ziphiidae:0):0.90, Platanista_gangetica:24.02):1.17, (Physeter_macrocephalus:19.26, (Kogia_breviceps:10.89,Kogia_sima:10.89):8.37):5.93):4.17, (((Balaenopteridae:0, Eschrichtius_robustus:10.03):3.56, Caperea_marginata:13.59):4.18, Balaenidae:0):11.59):24.36, Hippopotamidae:45.72):3.86):5.38, (Suidae:0, Tayassuidae:0):34.16):2.41, Camelidae:40.37);")
+
+#Adding the families one by one. Deleting the temporary Rootnodes
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Antilocapridae, getNode(phylo4(Cetartiodactyla),"Antilocapridae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Antilocapra")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Balaenidae, getNode(phylo4(Cetartiodactyla),"Balaenidae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Balaenidae")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Balaenopteridae, getNode(phylo4(Cetartiodactyla),"Balaenopteridae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Balaenopteridae")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Bovidae, getNode(phylo4(Cetartiodactyla),"Bovidae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Bovidae")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Cervidae, getNode(phylo4(Cetartiodactyla),"Cervidae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Cervidae")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Delphinidae, getNode(phylo4(Cetartiodactyla),"Delphinidae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Delphinidae")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Monodontidae, getNode(phylo4(Cetartiodactyla),"Monodontidae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Monodontidae")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Moschidae, getNode(phylo4(Cetartiodactyla),"Moschidae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Moschidae")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Phocoenidae, getNode(phylo4(Cetartiodactyla),"Phocoenidae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Phocoenidae")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Suidae, getNode(phylo4(Cetartiodactyla),"Suidae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Suidae")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Tayassuidae, getNode(phylo4(Cetartiodactyla),"Tayassuidae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Tayassuidae")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Ziphiidae, getNode(phylo4(Cetartiodactyla),"Ziphiidae")); Cetartiodactyla<-drop.tip(Cetartiodactyla, "Rootnode_Ziphiidae")
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Camelidae, getNode(phylo4(Cetartiodactyla),"Camelidae"))
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Hippopotamidae, getNode(phylo4(Cetartiodactyla),"Hippopotamidae"))
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Iniidae, getNode(phylo4(Cetartiodactyla),"Iniidae"))
+Cetartiodactyla<-bind.tree(Cetartiodactyla, Tragulidae, getNode(phylo4(Cetartiodactyla),"Tragulidae"))
+
+is.ultrametric(Cetartiodactyla)
+Cetartiodactyla$tip.label
+
+write.tree(Cetartiodactyla, "Cetartiodactyla.nex")

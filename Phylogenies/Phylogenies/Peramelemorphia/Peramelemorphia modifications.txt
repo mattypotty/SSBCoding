@@ -1,0 +1,33 @@
+################################################################################################################################################################
+################################################################Peramelemorphia#################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution of the order
+Peramelemorphia<-read.tree(text="(((((Peroryctes_raffrayana:1,Peroryctes_broadbenti:1):1,((((Echymipera_rufescens:1,Echymipera_kalubu:1):1,Rhynchomeles_prattorum:1):1,Echymipera_clara:1):1,(Microperoryctes_longicauda:1,Microperoryctes_papuensis:1):1):1):1,(((Isoodon_auratus:1,Isoodon_obesulus:1):1,Isoodon_macrourus:1):1,(Perameles_bougainville:1,(Perameles_nasuta:1,Perameles_gunnii:1):1):1):1):1,Macrotis_lagotis:1):1,Chaeropus_ecaudatus:1);")
+PHYLO<-Peramelemorphia
+#Place Macrotis_leucura based on taxonomy
+Sister1("Macrotis_lagotis", "Macrotis_leucura")
+#Place Perameles_eremiana based on taxonomy
+SisterOrSing1(c("Perameles_bougainville", "Perameles_gunnii", "Perameles_nasuta"), "Perameles_eremiana")
+#Place Peroryctes_SP_NOW based on taxonomy
+SisterOrSing1( c("Peroryctes_broadbenti","Peroryctes_raffrayana"), "Peroryctes_SP_NOW")
+#Place Peroryctinae_GEN_NOW as sister to one of the extant genera in the subfamily
+SisterOrSing1(c(list(c("Perameles_bougainville", "Perameles_gunnii", "Perameles_nasuta", "Perameles_eremiana")), list(c("Peroryctes_broadbenti","Peroryctes_raffrayana", "Peroryctes_SP_NOW"))), "Peroryctinae_GEN_NOW")
+#Place missing species of Microperoryctes based on taxonomy
+Rep_2_4("Microperoryctes_longicauda",  "Microperoryctes_papuensis", c("Microperoryctes_murina", "Microperoryctes_aplini"))
+#Place missing species of Echymipera based on taxonomy
+Start<-c("Echymipera_clara",  "Echymipera_kalubu", "Echymipera_rufescens")
+MIS<-c("Echymipera_davidi", "Echymipera_echinista")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+ 
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 27.99 MYA following Meredith et al (2011)
+YULE.gen(27.99)
+PHYLO->Peramelemorphia
+
+
+################################################################################################################################################################
+##########################################################Note that the order is identical to the family########################################################
+################################################################################################################################################################
+
+write.tree(Peramelemorphia, "Peramelemorphia.nex")

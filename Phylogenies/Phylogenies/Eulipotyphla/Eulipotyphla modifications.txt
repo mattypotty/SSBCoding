@@ -1,0 +1,400 @@
+################################################################################################################################################################
+##################################################################Erinaceidae###################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Erinaceidae<-read.tree(text="((((Atelerix_albiventris:1,Erinaceus_concolor:1):1,Paraechinus_aethiopicus:1):1,(Hemiechinus_auritus:1,Mesechinus_hughi:1):1):1,((Podogymnura_truei:1,Echinosorex_gymnura:1):1,((Neotetracus_sinensis:1,Neohylomys_hainanensis:1):1,Hylomys_suillus:1):1):1);")
+PHYLO<-Erinaceidae
+#One of the trees for the genus Erinaceus from the posterior distribution
+Erinaceus<-read.tree(text="(Erinaceus_concolor:1,(Erinaceus_europaeus:1,Erinaceus_amurensis:1):1);")
+#One of the trees for the genus Erinaceus from the posterior distribution
+MONOP.GROUP<-c("Erinaceus_amurensis", "Erinaceus_concolor", "Erinaceus_europaeus")
+#Merging the family tree with the tree for Erinaceus
+Replace.groups(Erinaceus, MONOP.GROUP)
+
+#Place missing species Atelerix based on Nature 446, 507-512 (2007)
+Sister1("Atelerix_albiventris", "Atelerix_frontalis")
+Sister1("Atelerix_albiventris", "Atelerix_algirus")
+Sister1("Atelerix_albiventris", "Atelerix_sclateri")
+#Place Erinaceus_roumanicus based on Nature 446, 507-512 (2007)
+Sister1("Erinaceus_concolor", "Erinaceus_roumanicus")
+#Place Hemiechinus_collaris based on taxonomy
+Sister1("Hemiechinus_auritus", "Hemiechinus_collaris")
+#Place issing species Hylomys based on taxonomy
+Sister2("Hylomys_suillus", "Hylomys_megalotis", "Hylomys_parvus")
+#Place Mesechinus_dauuricus based on taxonomy
+Sister1("Mesechinus_hughi", "Mesechinus_dauuricus")
+#Place Podogymnura_aureospinula based on taxonomy
+Sister1("Podogymnura_truei", "Podogymnura_aureospinula")
+#Place missing species Paraechinus based on Nature 446, 507-512 (2007)
+Sister1("Paraechinus_aethiopicus", "Paraechinus_hypomelas")
+Sister1("Paraechinus_aethiopicus", "Paraechinus_micropus")
+Sister1("Paraechinus_micropus", "Paraechinus_nudiventris")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 38.91 MYA following Meredith et al (2011)
+BD.gen(38.91,0.685)
+PHYLO->Erinaceidae
+
+################################################################################################################################################################
+###############################################################Nesophontidae and Solenodontidae#################################################################
+################################################################################################################################################################
+#Both families treated together. Only one genus in each family and no genetic analysis
+
+Solenodontidae<-read.tree(text="(Solenodon_cubanus:1,  (Nesophontes_edithae:1, Nesophontes_hypomicrus:1,  Nesophontes_major:1, Nesophontes_micrus:1, Nesophontes_paramicrus:1,  Nesophontes_SP_A:1, Nesophontes_SP_B:1, Nesophontes_zamicrus:1):1);")
+Solenodontidae->PHYLO
+Sister2("Solenodon_cubanus", "Solenodon_marcanoi", "Solenodon_paradoxus")
+
+#Simulate potential branch lengths wihtin the family based on a divergence time with its closest relatives of 77.31 MYA following Meredith et al (2011)
+#A node called Rootnode_Solenodontidaea is temporarily added but will be deleted when the tree is combined with the remaining families in the order
+PHYLO<-bind.tree(read.tree(text="(ROOT_1:1, Rootnode_Solenodontidae:1);"), PHYLO,1)
+BD.gen(77.31,0.685)
+PHYLO->Solenodontidae
+
+
+################################################################################################################################################################
+##################################################################Soricidae#####################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Soricidae<-read.tree(text="(((Blarinella_griselda:1,((Cryptotis_magna:1,((Cryptotis_goldmani:1,Cryptotis_parva:1):1,Cryptotis_mexicana:1):1):1,Blarina_brevicauda:1):1):1,((((Notiosorex_crawfordi:1,Megasorex_gigas:1):1,((Neomys_anomalus:1,Neomys_fodiens:1):1,((((Nectogale_elegans:1,(Chimarrogale_platycephalus:1,Chimarrogale_himalayica:1):1):1,(Episoriculus_macrurus:1,(Episoriculus_leucops:1,Episoriculus_caudatus:1):1):1):1,Soriculus_nigrescens:1):1,(Episoriculus_fumidus:1,(Chodsigoa_caovansunga:1,(Chodsigoa_parca:1,Chodsigoa_hypsibia:1):1):1):1):1):1):1,(Anourosorex_squamipes:1,Anourosorex_yamashinai:1):1):1,((Sorex_saussurei:1,((Sorex_fumeus:1,Sorex_monticolus:1):1,Sorex_cinereus:1):1):1,(Sorex_alpinus:1,((Sorex_bedfordiae:1,Sorex_excelsus:1):1,(((Sorex_samniticus:1,((Sorex_daphaenodon:1,(Sorex_coronatus:1,((Sorex_granarius:1,Sorex_satunini:1):1,(Sorex_araneus:1,Sorex_antinorii:1):1):1):1):1,((Sorex_tundrensis:1,Sorex_asper:1):1,Sorex_arcticus:1):1):1):1,(((Sorex_yukonicus:1,Sorex_minutissimus:1):1,(Sorex_minutus:1,Sorex_volnuchini:1):1):1,(Sorex_isodon:1,Sorex_caecutiens:1):1):1):1,(Sorex_raddei:1,Sorex_roboratus:1):1):1):1):1):1):1):1,(((((Myosorex_varius:1,Myosorex_cafer:1):1,Myosorex_sclateri:1):1,(Myosorex_kihaulei:1,Myosorex_geata:1):1):1,Congosorex_phillipsorum:1):1,((((Suncus_varilla:1,(Suncus_infinitesimus:1,Suncus_remyi:1):1):1,((Scutisorex_somereni:1,Sylvisorex_ollula:1):1,(Suncus_megalura:1,Ruwenzorisorex_suncoides:1):1):1):1,(Sylvisorex_lunaris:1,Sylvisorex_johnstoni:1):1):1,(Suncus_etruscus:1,(((((Crocidura_zarudnyi:1,(Crocidura_shantungensis:1,((Crocidura_suaveolens:1,Crocidura_caspica:1):1,Crocidura_aleksandrisi:1):1):1):1,(((((Crocidura_attenuata:1,((Crocidura_dsinezumi:1,Crocidura_rapax:1):1,Crocidura_tanakae:1):1):1,Crocidura_paradoxura:1):1,(Crocidura_wuchihensis:1,Crocidura_fuliginosa:1):1):1,((Crocidura_maxi:1,((((Crocidura_brunnea:1,Crocidura_orientalis:1):1,(Crocidura_lepidura:1,Crocidura_beccarii:1):1):1,(Crocidura_malayana:1,Crocidura_negligens:1):1):1,((Crocidura_nigripes:1,Crocidura_foetida:1):1,(((Crocidura_negrina:1,Crocidura_beatus:1):1,Crocidura_grayi:1):1,Crocidura_palawanensis:1):1):1):1):1,Crocidura_mindorus:1):1):1,Diplomesodon_pulchellum:1):1):1,((Crocidura_rhoditis:1,(Crocidura_levicula:1,Crocidura_musseri:1):1):1,(Crocidura_obscurior:1,((Crocidura_zimmermanni:1,(Crocidura_sicula:1,(Crocidura_canariensis:1,Crocidura_tarfayensis:1):1):1):1,Crocidura_leucodon:1):1):1):1):1,((((Crocidura_roosevelti:1,(((Crocidura_mariquensis:1,Crocidura_silacea:1):1,(Crocidura_hildegardeae:1,((((Crocidura_foxi:1,Crocidura_theresae:1):1,Crocidura_batesi:1):1,(Crocidura_buettikoferi:1,Crocidura_poensis:1):1):1,Crocidura_grandiceps:1):1):1):1,Crocidura_cyanea:1):1):1,((Crocidura_grassei:1,Crocidura_crenata:1):1,(Crocidura_fuscomurina:1,((Crocidura_crossei:1,Crocidura_jouvenetae:1):1,Crocidura_lusitania:1):1):1):1):1,((((Crocidura_nimbae:1,Paracrocidura_maxima:1):1,(Crocidura_muricauda:1,Crocidura_douceti:1):1):1,Crocidura_nanilla:1):1,(Crocidura_lamottei:1,(((Crocidura_fulvastra:1,Crocidura_viaria:1):1,(Crocidura_goliath:1,Crocidura_olivieri:1):1):1,(Crocidura_flavescens:1,Crocidura_hirta:1):1):1):1):1):1,(Crocidura_russula:1,Crocidura_pachyura:1):1):1):1,((Suncus_murinus:1,Suncus_montanus:1):1,Suncus_dayi:1):1):1):1):1):1);")
+PHYLO<-Soricidae
+#Temporarily add a taxon named B to handle placements near the root of the family tree
+TR<-read.tree(text="(A:1, B:1):1;")
+PHYLO<<-bind.tree(TR , PHYLO,  1)
+#One of the trees for the genus Blarina from the posterior distribution
+Blarina<-read.tree(text="(Blarina_hylophaga:1,(Blarina_brevicauda:1,Blarina_carolinensis:1):1);")
+#One of the trees for the genus Blarina from the posterior distribution
+MONOP.GROUP<-c("Blarina_brevicauda", "Blarina_carolinensis", "Blarina_hylophaga")
+#Merging the family tree with the tree for Blarina
+Replace.groups(Blarina, MONOP.GROUP)
+#One of the trees for the genus Chimarrogale from the posterior distribution
+Chimarrogale<-read.tree(text="((Chimarrogale_himalayica:1,Chimarrogale_platycephalus:1):1,Chimarrogale_phaeura:1);")
+#One of the trees for the genus Chimarrogale from the posterior distribution
+MONOP.GROUP<-c("Chimarrogale_himalayica", "Chimarrogale_platycephalus", "Chimarrogale_phaeura")
+#Merging the family tree with the tree for Chimarrogale
+Replace.groups(Chimarrogale, MONOP.GROUP)
+#One of the trees for the genus Crocidura from the posterior distribution
+Crocidura<-read.tree(text="(((Crocidura_pachyura:1,Crocidura_russula:1):1,(((((((Crocidura_olivieri:1,(Crocidura_viaria:1,Crocidura_fulvastra:1):1):1,Crocidura_goliath:1):1,Crocidura_flavescens:1):1,Crocidura_hirta:1):1,(Crocidura_lamottei:1,Crocidura_parvipes:1):1):1,((Crocidura_nimbae:1,(Crocidura_muricauda:1,Crocidura_douceti:1):1):1,Crocidura_nanilla:1):1):1,((((Crocidura_roosevelti:1,Crocidura_dolichura:1):1,(Crocidura_cyanea:1,((((Crocidura_foxi:1,Crocidura_theresae:1):1,((Crocidura_poensis:1,(Crocidura_nigeriae:1,Crocidura_buettikoferi:1):1):1,Crocidura_grandiceps:1):1):1,(((Crocidura_turba:1,Crocidura_batesi:1):1,(Crocidura_denti:1,Crocidura_maurisca:1):1):1,Crocidura_hildegardeae:1):1):1,(Crocidura_silacea:1,Crocidura_mariquensis:1):1):1):1):1,(Crocidura_fuscomurina:1,(Crocidura_montis:1,(Crocidura_lusitania:1,(Crocidura_crossei:1,Crocidura_jouvenetae:1):1):1):1):1):1,(Crocidura_ludia:1,(Crocidura_grassei:1,Crocidura_crenata:1):1):1):1):1):1,((((Crocidura_zarudnyi:1,(Crocidura_shantungensis:1,(Crocidura_aleksandrisi:1,((Crocidura_suaveolens:1,Crocidura_sibirica:1):1,Crocidura_caspica:1):1):1):1):1,((Crocidura_horsfieldii:1,(Crocidura_miya:1,Crocidura_hikmiya:1):1):1,(((Crocidura_paradoxura:1,(Crocidura_watasei:1,Crocidura_maxi:1):1):1,(((((Crocidura_rapax:1,Crocidura_lasiura:1):1,Crocidura_dsinezumi:1):1,Crocidura_tanakae:1):1,Crocidura_attenuata:1):1,((Crocidura_fuliginosa:1,Crocidura_wuchihensis:1):1,Crocidura_indochinensis:1):1):1):1,((((Crocidura_nigripes:1,Crocidura_foetida:1):1,(((Crocidura_negrina:1,Crocidura_beatus:1):1,Crocidura_palawanensis:1):1,(Crocidura_mindorus:1,Crocidura_grayi:1):1):1):1,(Crocidura_malayana:1,Crocidura_negligens:1):1):1,((Crocidura_lepidura:1,Crocidura_beccarii:1):1,(Crocidura_orientalis:1,Crocidura_brunnea:1):1):1):1):1):1):1,Crocidura_orii:1):1,(((Crocidura_musseri:1,((Crocidura_rhoditis:1,Crocidura_elongata:1):1,Crocidura_levicula:1):1):1,(((Crocidura_leucodon:1,Crocidura_ramona:1):1,Crocidura_zimmermanni:1):1,((Crocidura_sicula:1,(Crocidura_tarfayensis:1,Crocidura_canariensis:1):1):1,Crocidura_monax:1):1):1):1,(((Crocidura_luna:1,Crocidura_macmillani:1):1,((Crocidura_lucina:1,Crocidura_baileyi:1):1,(Crocidura_glassi:1,Crocidura_thalia:1):1):1):1,Crocidura_obscurior:1):1):1):1);")
+#One of the trees for the genus Crocidura from the posterior distribution
+MONOP.GROUP<-c("Crocidura_aleksandrisi", "Crocidura_attenuata", "Crocidura_batesi", "Crocidura_beatus", "Crocidura_beccarii", "Crocidura_brunnea", "Crocidura_buettikoferi", "Crocidura_canariensis", "Crocidura_caspica", "Crocidura_crenata", "Crocidura_crossei", "Crocidura_cyanea", "Crocidura_douceti", "Crocidura_dsinezumi", "Crocidura_flavescens", "Crocidura_foetida", "Crocidura_foxi", "Crocidura_fuliginosa", "Crocidura_fulvastra", "Crocidura_fuscomurina", "Crocidura_goliath", "Crocidura_grandiceps", "Crocidura_grassei", "Crocidura_grayi", "Crocidura_hildegardeae", "Crocidura_hirta", "Crocidura_jouvenetae", "Crocidura_lamottei", "Crocidura_lepidura", "Crocidura_leucodon", "Crocidura_levicula", "Crocidura_lusitania", "Crocidura_malayana", "Crocidura_mariquensis", "Crocidura_maxi", "Crocidura_mindorus", "Crocidura_muricauda", 
+"Crocidura_musseri", "Crocidura_nanilla", "Crocidura_negligens", "Crocidura_negrina", "Crocidura_nigripes", "Crocidura_nimbae", "Crocidura_obscurior", "Crocidura_olivieri", "Crocidura_orientalis", "Crocidra_pachyura", "Crocidura_palawanensis", "Crocidura_paradoxura", "Crocidura_poensis", "Crocidura_rapax", "Crocidura_rhoditis", "Crocidura_roosevelti", "Crocidura_russula", "Crocidura_shantungensis", "Crocidura_sicula", "Crocidura_silacea", "Crocidura_suaveolens", "Crocidura_tanakae", "Crocidura_tarfayensis", "Crocidura_theresae", "Crocidura_viaria", "Crocidura_wuchihensis", "Crocidura_zarudnyi", "Crocidura_zimmermanni")
+#Merging the family tree with the tree for Crocidura
+Replace.groups(Crocidura, MONOP.GROUP)
+#One of the trees for the genus Myosorex from the posterior distribution
+Myosorex<-read.tree(text="(((Myosorex_geata:1,Myosorex_kihaulei:1):1,Myosorex_zinki:1):1,((Myosorex_varius:1,(Myosorex_longicaudatus:1,(Myosorex_sclateri:1,Myosorex_cafer:1):1):1):1,Myosorex_blarina:1):1);")
+#One of the trees for the genus Myosorex from the posterior distribution
+MONOP.GROUP<-c("Myosorex_cafer", "Myosorex_geata", "Myosorex_kihaulei", "Myosorex_sclateri", "Myosorex_varius", "Myosorex_blarina", "Myosorex_longicaudatus", "Myosorex_zinki")
+#Merging the family tree with the tree for Myosorex
+Replace.groups(Myosorex, MONOP.GROUP)
+#One of the trees for the genus Neomys from the posterior distribution
+Neomys<-read.tree(text="((Neomys_anomalus:1,Neomys_teres:1):1,Neomys_fodiens:1);")
+#One of the trees for the genus Neomys from the posterior distribution
+MONOP.GROUP<-c("Neomys_anomalus", "Neomys_fodiens", "Neomys_teres")
+#Merging the family tree with the tree for Neomys
+Replace.groups(Neomys, MONOP.GROUP)
+#One of the trees for the genus Sorex from the posterior distribution
+Sorex<-read.tree(text="((((Sorex_trowbridgii:1,Sorex_arizonae:1):1,Sorex_saussurei:1):1,((Sorex_fumeus:1,Sorex_tenellus:1):1,(Sorex_rohweri:1,(((((((((Sorex_camtschatica:1,Sorex_pribilofensis:1):1,Sorex_portenkoi:1):1,Sorex_jacksoni:1):1,Sorex_ugyunak:1):1,(Sorex_haydeni:1,Sorex_preblei:1):1):1,(Sorex_cinereus:1,Sorex_longirostris:1):1):1,((Sorex_ornatus:1,Sorex_vagrans:1):1,((Sorex_monticolus:1,Sorex_neomexicanus:1):1,((Sorex_palustris:1,Sorex_bendirii:1):1,((Sorex_pacificus:1,Sorex_bairdi:1):1,Sorex_sonomae:1):1):1):1):1):1,Sorex_hoyi:1):1,Sorex_dispar:1):1):1):1):1,((((Sorex_raddei:1,((((((Sorex_coronatus:1,(((Sorex_antinorii:1,Sorex_satunini:1):1,Sorex_araneus:1):1,Sorex_granarius:1):1):1,Sorex_daphaenodon:1):1,(Sorex_asper:1,Sorex_tundrensis:1):1):1,Sorex_arcticus:1):1,Sorex_samniticus:1):1,Sorex_roboratus:1):1):1,((Sorex_gracillimus:1,((Sorex_caecutiens:1,Sorex_shinto:1):1,(Sorex_unguiculatus:1,Sorex_isodon:1):1):1):1,((Sorex_minutissimus:1,Sorex_yukonicus:1):1,(Sorex_volnuchini:1,Sorex_minutus:1):1):1):1):1,(Sorex_mirabilis:1,((Sorex_excelsus:1,Sorex_cylindricauda:1):1,Sorex_bedfordiae:1):1):1):1,Sorex_alpinus:1):1);")
+#One of the trees for the genus Erinaceus from the posterior distribution
+MONOP.GROUP<-c("Sorex_alpinus", "Sorex_antinorii", "Sorex_araneus", "Sorex_arcticus", "Sorex_asper", "Sorex_bedfordiae", "Sorex_caecutiens", "Sorex_cinereus", "Sorex_coronatus", "Sorex_daphaenodon", "Sorex_excelsus", "Sorex_fumeus", "Sorex_granarius", "Sorex_isodon", "Sorex_minutissimus", "Sorex_minutus", "Sorex_monticolus", "Sorex_raddei", "Sorex_roboratus", "Sorex_samniticus", "Sorex_satunini", "Sorex_saussurei", "Sorex_tundrensis", "Sorex_volnuchini", "Sorex_yukonicus", "Sorex_arizonae", "Sorex_bairdi", "Sorex_bendirii", "Sorex_camtschatica", "Sorex_cylindricauda", "Sorex_dispar", "Sorex_gracillimus", "Sorex_haydeni", "Sorex_hoyi", "Sorex_jacksoni", "Sorex_longirostris", "Sorex_mirabilis", "Sorex_neomexicanus", "Sorex_ornatus", "Sorex_pacificus", "Sorex_palustris", "Sorex_portenkoi", "Sorex_preblei", "Sorex_pribilofensis", "Sorex_rohweri", "Sorex_shinto", 
+"Sorex_sonomae", "Sorex_tenellus", "Sorex_trowbridgii", "Sorex_ugyunak", "Sorex_unguiculatus", "Sorex_vagrans")
+#Merging the family tree with the tree for Sorex
+Replace.groups(Sorex, MONOP.GROUP)
+#One of the trees for the genus Suncus from the posterior distribution
+Suncus<-read.tree(text="(((Suncus_megalura:1,(Suncus_dayi:1,((Suncus_montanus:1,Suncus_murinus:1):1,Suncus_stoliczkanus:1):1):1):1,((Suncus_etruscus:1,Suncus_madagascariensis:1):1,Suncus_malayanus:1):1):1,((Suncus_varilla:1,Suncus_lixus:1):1,(Suncus_remyi:1,Suncus_infinitesimus:1):1):1);")
+#One of the trees for the genus Erinaceus from the posterior distribution
+MONOP.GROUP<-c("Suncus_dayi", "Suncus_etruscus", "Suncus_infinitesimus", "Suncus_megalura", "Suncus_montanus", "Suncus_murinus", "Suncus_remyi", "Suncus_varilla", "Suncus_lixus", "Suncus_madagascariensis", "Suncus_malayanus", "Suncus_stoliczkanus")
+#Merging the family tree with the tree for Suncus
+Replace.groups(Suncus, MONOP.GROUP)
+#One of the trees for the genus Sylvisorex from the posterior distribution
+Sylvisorex<-read.tree(text="(((Sylvisorex_granti:1,Sylvisorex_ollula:1):1,Sylvisorex_konganensis:1):1,(Sylvisorex_lunaris:1,((Sylvisorex_vulcanorum:1,Sylvisorex_howelli:1):1,Sylvisorex_johnstoni:1):1):1);")
+#One of the trees for the genus Sylvisorex from the posterior distribution
+MONOP.GROUP<-c("Sylvisorex_johnstoni", "Sylvisorex_lunaris", "Sylvisorex_ollula", "Sylvisorex_granti", "Sylvisorex_howelli", "Sylvisorex_konganensis", "Sylvisorex_vulcanorum")
+#Merging the family tree with the tree for Sylvisorex
+Replace.groups(Sylvisorex, MONOP.GROUP)
+
+#Place missing speceis of Anourosorex based on taxonomy
+Rep_2_4("Anourosorex_squamipes", "Anourosorex_yamashinai", c("Anourosorex_assamensis", "Anourosorex_schmidi"))
+#Place missing species of Blarinella based on Nature 446, 507-512 (2007)
+Sister1("Blarinella_griselda", "Blarinella_wardi")
+Sister1("Blarinella_griselda", "Blarinella_quadraticauda")
+#Place missing speceis of Chimarrogale based on taxonomy
+Rep_3_6("Chimarrogale_himalayica", "Chimarrogale_phaeura", "Chimarrogale_platycephalus", c("Chimarrogale_hantu", "Chimarrogale_styani", "Chimarrogale_sumatrana"))
+#Place missing species of Chodsigoa based on Nature 446, 507-512 (2007)
+SisterAnd1( c("Chodsigoa_caovansunga", "Chodsigoa_hypsibia", "Chodsigoa_parca"), "Chodsigoa_sodalis")
+TR<-read.tree(text="(Chodsigoa_smithii:1, Chodsigoa_hypsibia:1, (Chodsigoa_lamula:1, Chodsigoa_parva:1):1, Chodsigoa_salenskii:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),"Chodsigoa_hypsibia"))
+#Place missing speceis of Congosorex based on taxonomy
+Sister2("Congosorex_phillipsorum", "Congosorex_polli", "Congosorex_verheyeni")
+#Place missing species of Crocidura. Limited resolution based on Nature 446, 507-512 (2007) or named species complexes or discssed conspecificity by IUCN or Wilson et al  Mammals of the world (2005) Johns Hopkins University Press
+Sister2("Crocidura_hildegardeae", "Crocidura_macowi", "Crocidura_virgata")
+Sister1("Crocidura_cyanea", "Crocidura_gracilipes")
+Sister1("Crocidura_monax", "Crocidura_littoralis")
+Sister1("Crocidura_foxi", "Crocidura_longipes")
+Sister1("Crocidura_maxi", "Crocidura_monticola")
+Sister1("Crocidura_olivieri", "Crocidura_mutesae")
+Sister1("Crocidura_fuliginosa", "Crocidura_tenuis")
+Sister1("Crocidura_attenuata", "Crocidura_trichura")
+Sister1("Crocidura_hirta", "Crocidura_xantippe")
+Sister1("Crocidura_buettikoferi", "Crocidura_attila")
+Sister1("Crocidura_turba", "Crocidura_tarella")
+Sister1("Crocidura_obscurior", "Crocidura_bottegi")
+Sister1("Crocidura_nimbae", "Crocidura_wimmeri")
+Sister1("Crocidura_fuscomurina", "Crocidura_planiceps")
+SisterOrSing1(c("Crocidura_fulvastra", "Crocidura_hirta"), "Crocidura_greenwoodi")
+Sister2("Crocidura_luna", "Crocidura_fumosa", "Crocidura_selina")
+Start<-c("Crocidura_macowi", "Crocidura_virgata", "Crocidura_gracilipes", "Crocidura_littoralis", 
+"Crocidura_longipes", "Crocidura_monticola", "Crocidura_mutesae", "Crocidura_tenuis", "Crocidura_trichura",  "Crocidura_xantippe", "Crocidura_attila", "Crocidura_tarella", "Crocidura_bottegi",  "Crocidura_wimmeri", 
+"Crocidura_planiceps", "Crocidura_greenwoodi", "Crocidura_fumosa", "Crocidura_selina", "Crocidura_aleksandrisi", "Crocidura_attenuata", "Crocidura_baileyi", "Crocidura_batesi", "Crocidura_beatus", "Crocidura_beccarii", "Crocidura_brunnea", "Crocidura_buettikoferi", "Crocidura_canariensis"
+, "Crocidura_caspica", "Crocidura_crenata", "Crocidura_crossei", "Crocidura_cyanea", "Crocidura_denti", "Crocidura_dolichura", "Crocidura_douceti", "Crocidura_dsinezumi", "Crocidura_elongata", "Crocidura_flavescens"
+, "Crocidura_foetida", "Crocidura_foxi", "Crocidura_fuliginosa", "Crocidura_fulvastra", "Crocidura_fuscomurina", "Crocidura_glassi", "Crocidura_goliath", "Crocidura_grandiceps", "Crocidura_grassei", "Crocidura_grayi"
+, "Crocidura_hikmiya", "Crocidura_hildegardeae", "Crocidura_hirta", "Crocidura_horsfieldii", "Crocidura_indochinensis", "Crocidura_jouvenetae", "Crocidura_lamottei", "Crocidura_lasiura", "Crocidura_lepidura", "Crocidura_leucodon"
+, "Crocidura_levicula", "Crocidura_lucina", "Crocidura_ludia", "Crocidura_luna", "Crocidura_lusitania", "Crocidura_macmillani", "Crocidura_malayana", "Crocidura_mariquensis", "Crocidura_maurisca", "Crocidura_maxi"
+, "Crocidura_mindorus", "Crocidura_miya", "Crocidura_monax", "Crocidura_montis", "Crocidura_muricauda", "Crocidura_musseri", "Crocidura_nanilla", "Crocidura_negligens", "Crocidura_negrina", "Crocidura_nigeriae"
+, "Crocidura_nigripes", "Crocidura_nimbae", "Crocidura_obscurior", "Crocidura_olivieri", "Crocidura_orientalis", "Crocidura_orii", "Crocidura_pachyura", "Crocidura_palawanensis", "Crocidura_paradoxura", "Crocidura_parvipes"
+, "Crocidura_poensis", "Crocidura_ramona", "Crocidura_rapax", "Crocidura_rhoditis", "Crocidura_roosevelti", "Crocidura_russula", "Crocidura_shantungensis", "Crocidura_sibirica", "Crocidura_sicula", "Crocidura_silacea"
+, "Crocidura_suaveolens", "Crocidura_tanakae", "Crocidura_tarfayensis", "Crocidura_thalia", "Crocidura_theresae", "Crocidura_turba", "Crocidura_viaria", "Crocidura_watasei", "Crocidura_wuchihensis", "Crocidura_zarudnyi"
+, "Crocidura_zimmermanni")
+MIS<-c("Crocidura_cinderella", "Crocidura_allex", "Crocidura_andamanensis", "Crocidura_ansellorum", "Crocidura_baluensis", "Crocidura_bottegoides", "Crocidura_caliginea", "Crocidura_congobelgica", "Crocidura_desperata"
+, "Crocidura_eisentrauti", "Crocidura_elgonius", "Crocidura_grandis", "Crocidura_hilliana", "Crocidura_hispida", "Crocidura_hutanis", "Crocidura_jacksoni",  "Crocidura_kivuana"
+, "Crocidura_lanosa", "Crocidura_lea", "Crocidura_macarthuri", "Crocidura_manengubae", "Crocidura_nana", "Crocidura_nicobarica", "Crocidura_nigricans", "Crocidura_nigrofusca", "Crocidura_niobe", "Crocidura_pasha"
+, "Crocidura_pergrisea", "Crocidura_phaeura", "Crocidura_picea", "Crocidura_pitmani", "Crocidura_pullata", "Crocidura_raineyi", "Crocidura_religiosa", "Crocidura_smithii", "Crocidura_somalica", "Crocidura_stenocephala", "Crocidura_susiana"
+, "Crocidura_tansaniana", "Crocidura_thomensis", "Crocidura_telfordi", "Crocidura_ultima", "Crocidura_usambarae", "Crocidura_voi", "Crocidura_vorax", "Crocidura_vosmaeri", "Crocidura_whitakeri", "Crocidura_yankariensis"
+, "Crocidura_zaphiri", "Crocidura_zimmeri")
+MIS1<-MIS[sample.int(50, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(49, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(48, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(47, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(46, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(45, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(44, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(43, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(42, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(41, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(40, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(39, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(38, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(37, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(36, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(35, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(34, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(33, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(32, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(31, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(30, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(29, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(28, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(27, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(26, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(25, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(24, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(23, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(22, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(21, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(20, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(19, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(18, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(17, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(16, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(15, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(14, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(13, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(12, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(11, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(10, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(9, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(8, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(7, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(6, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(5, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(4, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+TR<-read.tree(text="( Crocidura_pergrisea:1,Crocidura_arispa:1, Crocidura_armenica:1, Crocidura_serezkyensis:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),"Crocidura_pergrisea"))
+Sister1("Crocidura_somalica", "Crocidura_dhofarensis")
+Sister1("Crocidura_phaeura", "Crocidura_harenna")
+Sister1("Crocidura_pitmani", "Crocidura_maquassiensis")
+Sister1("Crocidura_nigricans", "Crocidura_erica")
+Sister1("Crocidura_voi", "Crocidura_fischeri")
+Sister1("Crocidura_nicobarica", "Crocidura_jenkinsi")
+Rep_3_7("Crocidura_suaveolens", "Crocidura_russula", "Crocidura_crossei", c("Crocidura_arabica",  "Crocidura_gmelini",  "Crocidura_katinka", "Crocidura_floweri"))
+Rep_2_4("Crocidura_dolichura", "Crocidura_ludia", c("Crocidura_latona", "Crocidura_polia"))
+#Place missing species of Cryptotis. Limited resolution based on Nature 446, 507-512 (2007) or named species complexes or discssed conspecificity by IUCN or Wilson et al  Mammals of the world (2005) Johns Hopkins University Press
+if  (is.monophyletic(PHYLO, c("Cryptotis_goldmani", "Cryptotis_mexicana"))==T) {PHYLO<-drop.tip(PHYLO, "Cryptotis_mexicana"); Rep_3_10("Cryptotis_goldmani", "Cryptotis_magna", "Cryptotis_parva", c("Cryptotis_goodwini", "Cryptotis_meridensis", "Cryptotis_hondurensis", "Cryptotis_nigrescens", "Cryptotis_thomasi", "Cryptotis_gracilis", "Cryptotis_squamipes")); Sister1("Cryptotis_goldmani", "Cryptotis_mexicana")} else 
+Rep_4_11_Part( "Cryptotis_goldmani", "Cryptotis_magna", "Cryptotis_parva", "Cryptotis_mexicana", c("Cryptotis_goodwini", "Cryptotis_meridensis", "Cryptotis_hondurensis", "Cryptotis_nigrescens", "Cryptotis_thomasi", "Cryptotis_gracilis", "Cryptotis_squamipes"))
+Sister2("Cryptotis_parva", "Cryptotis_orophila", "Cryptotis_tropicalis")
+TR<-read.tree(text="(Cryptotis_nigrescens:1, Cryptotis_mayensis:1, Cryptotis_mera:1, Cryptotis_merriami:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),"Cryptotis_nigrescens"))
+Sister2("Cryptotis_thomasi", "Cryptotis_equatoris", "Cryptotis_medellinia")
+Sister1("Cryptotis_gracilis", "Cryptotis_endersi")
+Sister1("Cryptotis_squamipes", "Cryptotis_montivaga")
+TR<-read.tree(text="(Cryptotis_mexicana:1, Cryptotis_nelsoni:1, Cryptotis_obscura:1, Cryptotis_peregrina:1, Cryptotis_phillipsii:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),"Cryptotis_mexicana"))
+Sister2("Cryptotis_goldmani", "Cryptotis_alticola", "Cryptotis_griseoventris")
+Start<-c("Cryptotis_goldmani", "Cryptotis_magna", "Cryptotis_parva", "Cryptotis_mexicana", "Cryptotis_alticola", "Cryptotis_endersi", "Cryptotis_equatoris", "Cryptotis_goodwini", "Cryptotis_gracilis", "Cryptotis_griseoventris", "Cryptotis_hondurensis", "Cryptotis_mayensis", "Cryptotis_medellinia", "Cryptotis_mera", "Cryptotis_meridensis", "Cryptotis_merriami", "Cryptotis_montivaga", "Cryptotis_nelsoni", "Cryptotis_nigrescens", "Cryptotis_obscura", "Cryptotis_orophila", "Cryptotis_peregrina", "Cryptotis_phillipsii", "Cryptotis_squamipes", "Cryptotis_thomasi", "Cryptotis_tropicalis")
+MIS<-c("Cryptotis_brachyonyx", "Cryptotis_peruviensis", "Cryptotis_tamensis")
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+Sister1("Cryptotis_brachyonyx", "Cryptotis_colombiana")
+#Place missing species of Myosorex based on taxonomy
+Start<-c("Myosorex_blarina", "Myosorex_cafer", "Myosorex_geata", "Myosorex_kihaulei", "Myosorex_longicaudatus", "Myosorex_sclateri", "Myosorex_varius", "Myosorex_zinki")
+MIS<-c("Myosorex_babaulti", "Myosorex_eisentrauti", "Myosorex_okuensis", "Myosorex_rumpii", "Myosorex_schalleri", "Myosorex_tenuis")
+MIS1<-MIS[sample.int(6, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(5, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(4, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place missing species of Notiosorex based on taxonomy
+TR<-read.tree(text="(Notiosorex_crawfordi:1, Notiosorex_cockrumi:1, Notiosorex_evotis:1, Notiosorex_villai:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),"Notiosorex_crawfordi"))
+#Place missing species of Paracrocidura based on taxonomy
+Sister2("Paracrocidura_maxima", "Paracrocidura_graueri", "Paracrocidura_schoutedeni")
+#Place Surdisorex as sister to Myosorex or Congosorex based on subfamily
+SisterOrSing1(c(list(c("Myosorex_babaulti", "Myosorex_blarina", "Myosorex_cafer", "Myosorex_eisentrauti", "Myosorex_geata", "Myosorex_kihaulei", "Myosorex_longicaudatus", "Myosorex_okuensis", "Myosorex_rumpii", "Myosorex_schalleri", "Myosorex_sclateri", "Myosorex_tenuis", "Myosorex_varius", "Myosorex_zinki")), list(c("Congosorex_phillipsorum", "Congosorex_polli", "Congosorex_verheyeni"))), "Surdisorex_norae")
+Sister1("Surdisorex_norae", "Surdisorex_polulus")
+#Place Nesiotites as sister to Episoriculus based on Palaeontologia Electronica 15  8A-12p (2012)
+SisterAnd1(c("Episoriculus_caudatus", "Episoriculus_fumidus", "Episoriculus_leucops"), "Nesiotites_hidalgo")
+Sister1("Nesiotites_hidalgo", "Nesiotites_similis")
+#Place Suncus_aequatorius, Suncus_fellowesgordoni and Suncus_hosei based on potential conspecificity
+Sister1("Suncus_lixus", "Suncus_aequatorius")
+Sister2("Suncus_etruscus", "Suncus_fellowesgordoni", "Suncus_hosei")
+#Place Suncus_ater, Suncus_mertensi and  Suncus_zeylanicus based on taxonomy
+Start<-c("Suncus_fellowesgordoni", "Suncus_hosei", "Suncus_aequatorius", "Suncus_dayi", "Suncus_etruscus", "Suncus_infinitesimus", "Suncus_megalura", "Suncus_montanus", "Suncus_murinus", "Suncus_remyi", "Suncus_varilla", "Suncus_lixus", "Suncus_madagascariensis", "Suncus_malayanus", "Suncus_stoliczkanus")
+MIS<-c("Suncus_ater", "Suncus_mertensi", "Suncus_zeylanicus")
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place missing species of Sylvisorex based on taxonomy and potential or formerly believed conspecificity
+Sister1("Sylvisorex_granti", "Sylvisorex_camerunensis")
+Sister1("Sylvisorex_ollula", "Sylvisorex_oriundus")
+Start<-c("Sylvisorex_johnstoni", "Sylvisorex_lunaris", "Sylvisorex_ollula", "Sylvisorex_granti", "Sylvisorex_howelli", "Sylvisorex_konganensis", "Sylvisorex_vulcanorum")
+MIS<-c("Sylvisorex_morio", "Sylvisorex_pluvialis")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+Sister1("Sylvisorex_morio", "Sylvisorex_isabellae")
+#Place Feroculus and Solisorex each as sisters to Crocidura, Diplomesodon, Paracrocidura, Ruwenzorisorex, Scutisorex, Suncus or Sylvisorex based on subfamily	
+Start<-c(list(c("Crocidura_aleksandrisi", "Crocidura_allex", "Crocidura_andamanensis", "Crocidura_ansellorum", "Crocidura_arabica", "Crocidura_arispa", "Crocidura_armenica", "Crocidura_attenuata", "Crocidura_attila", "Crocidura_baileyi"
+, "Crocidura_baluensis", "Crocidura_batesi", "Crocidura_beatus", "Crocidura_beccarii", "Crocidura_bottegi", "Crocidura_bottegoides", "Crocidura_brunnea", "Crocidura_buettikoferi", "Crocidura_caliginea", "Crocidura_canariensis"
+, "Crocidura_caspica", "Crocidura_cinderella", "Crocidura_congobelgica", "Crocidura_crenata", "Crocidura_crossei", "Crocidura_cyanea", "Crocidura_denti", "Crocidura_desperata", "Crocidura_dhofarensis", "Crocidura_dolichura"
+, "Crocidura_douceti", "Crocidura_dsinezumi", "Crocidura_eisentrauti", "Crocidura_elgonius", "Crocidura_elongata", "Crocidura_erica", "Crocidura_fischeri", "Crocidura_flavescens", "Crocidura_floweri", "Crocidura_foetida"
+, "Crocidura_foxi", "Crocidura_fuliginosa", "Crocidura_fulvastra", "Crocidura_fumosa", "Crocidura_fuscomurina", "Crocidura_glassi", "Crocidura_gmelini", "Crocidura_goliath", "Crocidura_gracilipes", "Crocidura_grandiceps"
+, "Crocidura_grandis", "Crocidura_grassei", "Crocidura_grayi", "Crocidura_greenwoodi", "Crocidura_harenna", "Crocidura_hikmiya", "Crocidura_hildegardeae", "Crocidura_hilliana", "Crocidura_hirta", "Crocidura_hispida"
+, "Crocidura_horsfieldii", "Crocidura_hutanis", "Crocidura_indochinensis", "Crocidura_jacksoni", "Crocidura_jenkinsi", "Crocidura_jouvenetae", "Crocidura_katinka", "Crocidura_kivuana", "Crocidura_lamottei", "Crocidura_lanosa"
+, "Crocidura_lasiura", "Crocidura_latona", "Crocidura_lea", "Crocidura_lepidura", "Crocidura_leucodon", "Crocidura_levicula", "Crocidura_littoralis", "Crocidura_longipes", "Crocidura_lucina", "Crocidura_ludia", "Crocidura_luna"
+, "Crocidura_lusitania", "Crocidura_macarthuri", "Crocidura_macmillani", "Crocidura_macowi", "Crocidura_malayana", "Crocidura_manengubae", "Crocidura_maquassiensis", "Crocidura_mariquensis", "Crocidura_maurisca", "Crocidura_maxi"
+, "Crocidura_mindorus", "Crocidura_miya", "Crocidura_monax", "Crocidura_monticola", "Crocidura_montis", "Crocidura_muricauda", "Crocidura_musseri", "Crocidura_mutesae", "Crocidura_nana", "Crocidura_nanilla", "Crocidura_negligens"
+, "Crocidura_negrina", "Crocidura_nicobarica", "Crocidura_nigeriae", "Crocidura_nigricans", "Crocidura_nigripes", "Crocidura_nigrofusca", "Crocidura_nimbae", "Crocidura_niobe", "Crocidura_obscurior", "Crocidura_olivieri"
+, "Crocidura_orientalis", "Crocidura_orii", "Crocidura_pachyura", "Crocidura_palawanensis", "Crocidura_paradoxura", "Crocidura_parvipes", "Crocidura_pasha", "Crocidura_pergrisea", "Crocidura_phaeura", "Crocidura_picea"
+, "Crocidura_pitmani", "Crocidura_planiceps", "Crocidura_poensis", "Crocidura_polia", "Crocidura_pullata", "Crocidura_raineyi", "Crocidura_ramona", "Crocidura_rapax", "Crocidura_religiosa", "Crocidura_rhoditis", "Crocidura_roosevelti"
+, "Crocidura_russula", "Crocidura_selina", "Crocidura_serezkyensis", "Crocidura_shantungensis", "Crocidura_sibirica", "Crocidura_sicula", "Crocidura_silacea", "Crocidura_smithii", "Crocidura_somalica", "Crocidura_stenocephala"
+, "Crocidura_suaveolens", "Crocidura_susiana", "Crocidura_tanakae", "Crocidura_tansaniana", "Crocidura_tarella", "Crocidura_tarfayensis", "Crocidura_telfordi", "Crocidura_tenuis", "Crocidura_thalia", "Crocidura_theresae", "Crocidura_thomensis"
+, "Crocidura_trichura", "Crocidura_turba", "Crocidura_ultima", "Crocidura_usambarae", "Crocidura_viaria", "Crocidura_virgata", "Crocidura_voi", "Crocidura_vorax", "Crocidura_vosmaeri", "Crocidura_watasei", "Crocidura_whitakeri"
+, "Crocidura_wimmeri", "Crocidura_wuchihensis", "Crocidura_xantippe", "Crocidura_yankariensis", "Crocidura_zaphiri", "Crocidura_zarudnyi", "Crocidura_zimmeri", "Crocidura_zimmermanni")), "Diplomesodon_pulchellum", "Ruwenzorisorex_suncoides", "Scutisorex_somereni"
+, list(c("Paracrocidura_graueri","Paracrocidura_maxima", "Paracrocidura_schoutedeni")), list(c("Suncus_aequatorius", "Suncus_ater", "Suncus_dayi", "Suncus_etruscus", "Suncus_fellowesgordoni", "Suncus_hosei", "Suncus_infinitesimus"
+, "Suncus_lixus", "Suncus_madagascariensis", "Suncus_malayanus", "Suncus_megalura", "Suncus_mertensi", "Suncus_montanus", "Suncus_murinus", "Suncus_remyi", "Suncus_stoliczkanus", "Suncus_varilla", "Suncus_zeylanicus")),
+list(c("Sylvisorex_camerunensis", "Sylvisorex_granti", "Sylvisorex_howelli", "Sylvisorex_isabellae", "Sylvisorex_johnstoni", "Sylvisorex_konganensis", "Sylvisorex_lunaris", "Sylvisorex_morio", "Sylvisorex_ollula", "Sylvisorex_oriundus", "Sylvisorex_pluvialis", "Sylvisorex_vulcanorum")))
+MIS<-c("Feroculus_feroculus", "Solisorex_pearsoni")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+#Place missing species of Sorex. Limited resolution based on Nature 446, 507-512 (2007) or named species complexes or discssed conspecificity by IUCN or Wilson et al  Mammals of the world (2005) Johns Hopkins University Press
+SisterOrSing1(c("Sorex_minutus", "Sorex_volnuchini"), "Sorex_buchariensis")
+SisterOrSing1(c("Sorex_minutissimus", list(c("Sorex_gracillimus", "Sorex_minutus", "Sorex_volnuchini", "Sorex_buchariensis"))), "Sorex_hosonoi")
+Sister1("Sorex_arcticus", "Sorex_maritimensis")
+SisterOrSing1(c("Sorex_trowbridgii", "Sorex_arizonae"), "Sorex_merriami")
+Start<-c("Sorex_cinereus", "Sorex_hoyi", "Sorex_fumeus", "Sorex_preblei", "Sorex_longirostris", "Sorex_ornatus", "Sorex_ugyunak", "Sorex_haydeni", "Sorex_dispar", "Sorex_tenellus", "Sorex_bairdi", "Sorex_portenkoi", "Sorex_jacksoni", list(c("Sorex_palustris", "Sorex_bendirii")), list(c("Sorex_monticolus", "Sorex_neomexicanus", "Sorex_vagrans", "Sorex_pacificus")))
+MIS<-c("Sorex_nanus","Sorex_leucogaster")
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+Sister1("Sorex_palustris", "Sorex_alaskanus")
+Sister1( "Sorex_antinorii", "Sorex_arunchi")
+Sister1("Sorex_caecutiens", "Sorex_cansulus")
+Sister2("Sorex_buchariensis", "Sorex_kozlovi", "Sorex_thibetanus")
+Sister2("Sorex_saussurei", "Sorex_mediopua", "Sorex_veraecrucis")
+Sister1("Sorex_isodon", "Sorex_sinalis")
+Start<-c("Sorex_sinalis", "Sorex_mediopua", "Sorex_veraecrucis", "Sorex_kozlovi", "Sorex_thibetanus", "Sorex_cansulus", "Sorex_antinorii", "Sorex_alaskanus", "Sorex_alpinus", "Sorex_arunchi", "Sorex_araneus", "Sorex_arcticus", "Sorex_asper", "Sorex_bedfordiae", "Sorex_caecutiens", "Sorex_cinereus", "Sorex_coronatus", "Sorex_daphaenodon", "Sorex_excelsus", "Sorex_fumeus", "Sorex_granarius", "Sorex_isodon", "Sorex_minutissimus", "Sorex_minutus", "Sorex_monticolus", "Sorex_raddei", "Sorex_roboratus", "Sorex_samniticus", "Sorex_satunini", "Sorex_saussurei", "Sorex_tundrensis", "Sorex_volnuchini", "Sorex_yukonicus", "Sorex_arizonae", "Sorex_bairdi", "Sorex_bendirii", "Sorex_camtschatica", "Sorex_cylindricauda", "Sorex_dispar", "Sorex_gracillimus", "Sorex_haydeni", "Sorex_hoyi", "Sorex_jacksoni", "Sorex_longirostris", "Sorex_mirabilis", "Sorex_neomexicanus", "Sorex_ornatus", "Sorex_pacificus", "Sorex_palustris"
+, "Sorex_portenkoi", "Sorex_preblei", "Sorex_pribilofensis", "Sorex_rohweri", "Sorex_shinto", "Sorex_sonomae", "Sorex_tenellus", "Sorex_trowbridgii", "Sorex_ugyunak", "Sorex_unguiculatus", "Sorex_vagrans", "Sorex_buchariensis", "Sorex_hosonoi", "Sorex_leucogaster", "Sorex_maritimensis", "Sorex_merriami", "Sorex_nanus") 
+MIS<-c("Sorex_emarginatus", "Sorex_lyelli", "Sorex_macrodon", "Sorex_milleri", "Sorex_oreopolus", "Sorex_planiceps", "Sorex_sclateri", "Sorex_stizodon", "Sorex_ventralis", "Sorex_veraepacis")
+MIS1<-MIS[sample.int(10, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(9, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(8, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(7, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(6, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(5, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(4, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(3, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+MIS1<-MIS[sample.int(2, 1)]; SisterOrSing1(Start, MIS1); MIS<-MIS[MIS%in%MIS1==F]; Start<-c(Start, MIS1)
+SisterOrSing1(Start, MIS)
+Sister1("Sorex_veraepacis", "Sorex_ixtlanensis")
+SisterOrSing1(c("Sorex_vagrans", "Sorex_oreopolus"), "Sorex_orizabae")
+#Delete temporary taxon B
+PHYLO<<-drop.tip(PHYLO, "B")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 38 MYA following Meredith et al (2011)
+BD.gen(38,0.685)
+
+PHYLO->Soricidae
+
+################################################################################################################################################################
+##################################################################Talpidae######################################################################################
+################################################################################################################################################################
+
+#One of the trees of the family from the posterior distribution
+Talpidae<-read.tree(text="(Neurotrichus_gibbsii:1,(Scaptonyx_fusicaudus:1,(((Urotrichus_talpoides:1,Dymecodon_pilirostris:1):1,(((Condylura_cristata:1,Uropsilus_gracilis:1):1,(Galemys_pyrenaicus:1,Desmana_moschata:1):1):1,(((Mogera_insularis:1,((Mogera_wogura:1,Mogera_imaizumii:1):1,Mogera_tokudae:1):1):1,((Scaptochirus_moschatus:1,Euroscaptor_klossi:1):1,Euroscaptor_mizura:1):1):1,(Talpa_europaea:1,Talpa_altaica:1):1):1):1):1,((Scalopus_aquaticus:1,Scapanus_latimanus:1):1,Parascalops_breweri:1):1):1):1);")
+PHYLO<-Talpidae
+#One of the trees for the genus Euroscaptor from the posterior distribution
+Euroscaptor<-read.tree(text="(Euroscaptor_mizura:1,(Euroscaptor_klossi:1,Euroscaptor_longirostris:1):1);")
+#One of the trees for the genus Euroscaptor from the posterior distribution
+MONOP.GROUP<-c("Euroscaptor_klossi", "Euroscaptor_mizura", "Euroscaptor_longirostris")
+#Merging the family tree with the tree for Euroscaptor
+Replace.groups(Euroscaptor, MONOP.GROUP)
+#One of the trees for the genus Scapanus from the posterior distribution
+Scapanus<-read.tree(text="((Scapanus_townsendii:1,Scapanus_latimanus:1):1,Scapanus_orarius:1);")
+#One of the trees for the genus Erinaceus from the posterior distribution
+MONOP.GROUP<-c("Scapanus_latimanus", "Scapanus_orarius", "Scapanus_townsendii")
+#Merging the family tree with the tree for Scapanus
+Replace.groups(Scapanus, MONOP.GROUP)
+#One of the trees for the genus Talpa from the posterior distribution
+Talpa<-read.tree(text="(Talpa_altaica:1,(Talpa_levantis:1,((Talpa_caucasica:1,Talpa_stankovici:1):1,((Talpa_occidentalis:1,Talpa_europaea:1):1,(Talpa_romana:1,Talpa_caeca:1):1):1):1):1);")
+#One of the trees for the genus Talpa from the posterior distribution
+MONOP.GROUP<-c("Talpa_altaica", "Talpa_europaea", "Talpa_caeca", "Talpa_caucasica", "Talpa_levantis", "Talpa_occidentalis", "Talpa_romana", "Talpa_stankovici")
+#Merging the family tree with the tree for Talpa
+Replace.groups(Talpa, MONOP.GROUP)
+
+#Place missing species of Euroscaptor based on taxonomy
+Rep_3_6("Euroscaptor_klossi", "Euroscaptor_longirostris", "Euroscaptor_mizura", c("Euroscaptor_grandis", "Euroscaptor_micrura", "Euroscaptor_parvidens"))
+#Place Talpa_davidiana based on taxonomy
+SisterOrSing1(c("Talpa_altaica", "Talpa_caeca", "Talpa_caucasica", "Talpa_europaea", "Talpa_levantis", "Talpa_occidentalis", "Talpa_romana", "Talpa_stankovici"), "Talpa_davidiana")
+#Place missing species of Uropsilus based on taxonomy
+TR<-read.tree(text="(Uropsilus_andersoni:1,Uropsilus_gracilis:1, Uropsilus_investigator:1, Uropsilus_soricipes:1):1;")
+PHYLO<<-bind.tree(PHYLO, TR ,  getNode(phylo4(PHYLO),"Uropsilus_gracilis"))
+#Place Mogera_etigo and Mogera_robusta based on uncertain species status
+Sister1("Mogera_tokudae", "Mogera_etigo")
+Sister1("Mogera_wogura", "Mogera_robusta")
+#Place Mogera_uchidai based on Nature 446, 507-512 (2007)
+SisterAnd1(c("Mogera_imaizumii", "Mogera_insularis", "Mogera_tokudae", "Mogera_wogura", "Mogera_etigo", "Mogera_robusta"), "Mogera_uchidai")
+#Place Parascaptor as sister to Euroscaptor, Mogera and Talpa based on Nature 446, 507-512 (2007)
+SisterAnd1(c("Talpa_altaica", "Talpa_caeca", "Talpa_caucasica", "Talpa_europaea", "Talpa_levantis", "Talpa_occidentalis", "Talpa_romana", "Talpa_stankovici", "Talpa_davidiana", "Mogera_imaizumii", "Mogera_insularis", "Mogera_tokudae", "Mogera_wogura", "Mogera_etigo", "Mogera_robusta", "Mogera_uchidai", "Euroscaptor_klossi", "Euroscaptor_longirostris", "Euroscaptor_mizura", "Euroscaptor_grandis", "Euroscaptor_micrura", "Euroscaptor_parvidens"), "Parascaptor_leucura")
+#Place Scapanulus as sister to Parascalops, Scalopus and Scapanus based on Nature 446, 507-512 (2007)
+SisterAnd1(c("Parascalops_breweri", "Scalopus_aquaticus", "Scapanus_latimanus", "Scapanus_orarius", "Scapanus_townsendii"), "Scapanulus_oweni")
+
+#Simulate potential branch lengths wihtin the family based on MRCA of family equal to 52 MYA following Meredith et al (2011)
+BD.gen(52,0.685)
+PHYLO->Talpidae
+
+################################################################################################################################################################
+###########################################################The interfamily relationship#########################################################################
+################################################################################################################################################################
+
+#The relationsnip between the families in the order. Families with one or two species are already added
+Eulipotyphla<-read.tree(text="(((Erinaceidae:32.76, Soricidae:33.67):3.32, Talpidae:22.99):2.32, Solenodontidae:0);")
+
+#Adding the families one by one
+Eulipotyphla<-bind.tree(Eulipotyphla, Erinaceidae, getNode(phylo4(Eulipotyphla),"Erinaceidae"))
+Eulipotyphla<-bind.tree(Eulipotyphla, Solenodontidae, getNode(phylo4(Eulipotyphla),"Solenodontidae")); Eulipotyphla<-drop.tip(Eulipotyphla, "Rootnode_Solenodontidae")
+Eulipotyphla<-bind.tree(Eulipotyphla, Soricidae, getNode(phylo4(Eulipotyphla),"Soricidae"))
+Eulipotyphla<-bind.tree(Eulipotyphla, Talpidae, getNode(phylo4(Eulipotyphla),"Talpidae"))
+
+write.tree(Eulipotyphla, "Eulipotyphla.nex")
