@@ -1,0 +1,104 @@
+Pagel's Directional Test for SSB and SDT
+--------------------
+Both Independent or Dependent
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.060762  0.022282  0.038479  0.000000
+0|1  0.025395 -0.063874  0.000000  0.038479
+1|0  0.065821  0.000000 -0.088104  0.022282
+1|1  0.000000  0.065821  0.025395 -0.091217
+
+Dependent (x & y) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.042980  0.000000  0.042980  0.000000
+0|1  0.030543 -0.177019  0.000000  0.146476
+1|0  0.013737  0.000000 -0.057676  0.043939
+1|1  0.000000  0.445948  0.000000 -0.445948
+
+Model fit:
+            log-likelihood      AIC
+independent      -424.7932 857.5864
+dependent        -406.4768 828.9535
+
+Hypothesis test result:
+  likelihood-ratio:  36.6328 
+  p-value:  2.14391e-07 
+
+Model fitting method used was fitMk 
+
+--------------------
+Dependent SSB
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.060762  0.022282  0.038479  0.000000
+0|1  0.025395 -0.063874  0.000000  0.038479
+1|0  0.065821  0.000000 -0.088104  0.022282
+1|1  0.000000  0.065821  0.025395 -0.091217
+
+Dependent (x only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.056735  0.022601  0.034133  0.000000
+0|1  0.024374 -0.130348  0.000000  0.105974
+1|0  0.032927  0.000000 -0.055528  0.022601
+1|1  0.000000  0.323773  0.024374 -0.348147
+
+Model fit:
+            log-likelihood      AIC
+independent      -424.7932 857.5864
+dependent        -414.6067 841.2133
+
+Hypothesis test result:
+  likelihood-ratio:  20.3731 
+  p-value:  3.7674e-05 
+
+Model fitting method used was fitMk 
+
+--------------------
+Dependent SDT
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.060762  0.022282  0.038479  0.000000
+0|1  0.025395 -0.063874  0.000000  0.038479
+1|0  0.065821  0.000000 -0.088104  0.022282
+1|1  0.000000  0.065821  0.025395 -0.091217
+
+Dependent (y only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.056970  0.021996  0.034974  0.000000
+0|1  0.018035 -0.053010  0.000000  0.034974
+1|0  0.061343  0.000000 -0.090551  0.029208
+1|1  0.000000  0.061343  0.059568 -0.120911
+
+Model fit:
+            log-likelihood      AIC
+independent      -424.7932 857.5864
+dependent        -423.2740 858.5480
+
+Hypothesis test result:
+  likelihood-ratio:  3.03838 
+  p-value:  0.218889 
+
+Model fitting method used was fitMk 
+
+--------------------
+AIC
+        independent       dependent SSB       dependent SDT dependent SSB & SDT 
+           857.5864            841.2133            858.5480            828.9535 
+Weights
+        independent       dependent SSB       dependent SDT dependent SSB & SDT 
+         0.00000060          0.00217211          0.00000037          0.99782691 

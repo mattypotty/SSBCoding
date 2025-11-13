@@ -1,0 +1,1 @@
+Rscript -e "library(knitr); purl('analyses.Rmd')"

@@ -1,0 +1,104 @@
+Pagel's Directional Test for SSB and SPI
+--------------------
+Both Independent or Dependent
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.046264  0.008114  0.038150  0.000000
+0|1  0.034194 -0.072344  0.000000  0.038150
+1|0  0.066256  0.000000 -0.074369  0.008114
+1|1  0.000000  0.066256  0.034194 -0.100450
+
+Dependent (x & y) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.047200  0.009997  0.037202  0.000000
+0|1  0.032698 -0.068531  0.000000  0.035834
+1|0  0.061546  0.000000 -0.066357  0.004810
+1|1  0.000000  0.072246  0.036854 -0.109099
+
+Model fit:
+            log-likelihood      AIC
+independent      -369.3709 746.7418
+dependent        -368.5662 753.1325
+
+Hypothesis test result:
+  likelihood-ratio:  1.60933 
+  p-value:  0.807115 
+
+Model fitting method used was fitMk 
+
+--------------------
+Dependent SSB
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.046264  0.008114  0.038150  0.000000
+0|1  0.034194 -0.072344  0.000000  0.038150
+1|0  0.066256  0.000000 -0.074369  0.008114
+1|1  0.000000  0.066256  0.034194 -0.100450
+
+Dependent (x only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.046161  0.008140  0.038022  0.000000
+0|1  0.034256 -0.066818  0.000000  0.032562
+1|0  0.060545  0.000000 -0.068684  0.008140
+1|1  0.000000  0.076093  0.034256 -0.110350
+
+Model fit:
+            log-likelihood      AIC
+independent      -369.3709 746.7418
+dependent        -368.9695 749.9391
+
+Hypothesis test result:
+  likelihood-ratio:  0.8027 
+  p-value:  0.669416 
+
+Model fitting method used was fitMk 
+
+--------------------
+Dependent SPI
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.046264  0.008114  0.038150  0.000000
+0|1  0.034194 -0.072344  0.000000  0.038150
+1|0  0.066256  0.000000 -0.074369  0.008114
+1|1  0.000000  0.066256  0.034194 -0.100450
+
+Dependent (y only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.047651  0.010176  0.037475  0.000000
+0|1  0.030766 -0.068241  0.000000  0.037475
+1|0  0.064772  0.000000 -0.069155  0.004383
+1|1  0.000000  0.064772  0.040531 -0.105303
+
+Model fit:
+            log-likelihood      AIC
+independent      -369.3709 746.7418
+dependent        -368.6552 749.3105
+
+Hypothesis test result:
+  likelihood-ratio:  1.43131 
+  p-value:  0.488873 
+
+Model fitting method used was fitMk 
+
+--------------------
+AIC
+        independent       dependent SSB       dependent SPI dependent SSB & SPI 
+           746.7418            749.9391            749.3105            753.1325 
+Weights
+        independent       dependent SSB       dependent SPI dependent SSB & SPI 
+         0.65791491          0.13301018          0.18213148          0.02694342 

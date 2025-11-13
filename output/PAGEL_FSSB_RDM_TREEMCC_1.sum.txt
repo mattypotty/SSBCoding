@@ -1,0 +1,104 @@
+Pagel's Directional Test for FSSB and RDM
+--------------------
+Both Independent or Dependent
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.037472  0.009990  0.027482  0.000000
+0|1  0.047961 -0.075443  0.000000  0.027482
+1|0  0.090319  0.000000 -0.100309  0.009990
+1|1  0.000000  0.090319  0.047961 -0.138280
+
+Dependent (x & y) model rate matrix:
+         0|0       0|1       1|0       1|1
+0|0 -0.02176  0.000253  0.021507  0.000000
+0|1  0.00000 -1.074451  0.000000  1.074451
+1|0  0.13228  0.000000 -0.205660  0.073380
+1|1  0.00000  1.407327  0.120598 -1.527925
+
+Model fit:
+            log-likelihood      AIC
+independent      -363.0000 734.0000
+dependent        -342.3199 700.6398
+
+Hypothesis test result:
+  likelihood-ratio:  41.3601 
+  p-value:  2.26373e-08 
+
+Model fitting method used was fitMk 
+
+--------------------
+Dependent FSSB
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.037472  0.009990  0.027482  0.000000
+0|1  0.047961 -0.075443  0.000000  0.027482
+1|0  0.090319  0.000000 -0.100309  0.009990
+1|1  0.000000  0.090319  0.047961 -0.138280
+
+Dependent (x only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.021477  0.009086  0.012391  0.000000
+0|1  0.050694 -1.376999  0.000000  1.326305
+1|0  0.080344  0.000000 -0.089430  0.009086
+1|1  0.000000  1.600144  0.050694 -1.650838
+
+Model fit:
+            log-likelihood      AIC
+independent      -363.0000 734.0000
+dependent        -347.9563 707.9125
+
+Hypothesis test result:
+  likelihood-ratio:  30.0874 
+  p-value:  2.92818e-07 
+
+Model fitting method used was fitMk 
+
+--------------------
+Dependent RDM
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.037472  0.009990  0.027482  0.000000
+0|1  0.047961 -0.075443  0.000000  0.027482
+1|0  0.090319  0.000000 -0.100309  0.009990
+1|1  0.000000  0.090319  0.047961 -0.138280
+
+Dependent (y only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.029266  0.001126  0.028141  0.000000
+0|1  0.068208 -0.096348  0.000000  0.028141
+1|0  0.100622  0.000000 -0.162979  0.062357
+1|1  0.000000  0.100622  0.042144 -0.142766
+
+Model fit:
+            log-likelihood      AIC
+independent      -363.0000 734.0000
+dependent        -354.8816 721.7632
+
+Hypothesis test result:
+  likelihood-ratio:  16.2367 
+  p-value:  0.000298013 
+
+Model fitting method used was fitMk 
+
+--------------------
+AIC
+        independent       dependent SSB       dependent RDM dependent SSB & RDM 
+           734.0000            707.9125            721.7632            700.6398 
+Weights
+        independent       dependent SSB       dependent RDM dependent SSB & RDM 
+         0.00000006          0.02567141          0.00002522          0.97430331 
