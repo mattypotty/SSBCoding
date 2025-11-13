@@ -1268,9 +1268,105 @@ Solitary Species.</p>
 <p>Note: The same Nature paper already established that social species
 are associated with ↑ SSB, so this extends that to a deeper analysis of
 solitary species.</p>
-<p>WE WILL WANT TO MAKE THESE ANALYSES SO THAT WE INCLUDE BOTH SOLITARY
-AND SOCIAL SPECIES (so we need a social/solitary column and an SOG
-column)</p>
+<hr />
+<div id="mcmcglmm-3" class="section level4">
+<h4>MCMCGLMM</h4>
+<pre class="r"><code># Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS &lt;- &quot;MCMCGLMM&quot;
+HYPOTHESIS &lt;- &quot;SOC&quot;
+SSBTYPE &lt;- &quot;SSB&quot;
+if (USEGLOBAL) {
+  set_global()
+}
+f &lt;- SSB ~ SOC + 1
+if (ANALYSIS == &quot;MCMCGLMM&quot; &amp; HYPOTHESIS == &quot;SOC&quot; &amp; SSBTYPE == &quot;SSB&quot;) {
+  do_mcmc(f)
+}</code></pre>
+<pre><code>## ESS: 12
+## 
+## Iterations = 11:100
+## Thinning interval = 1 
+## Number of chains = 1 
+## Sample size per chain = 90 
+## 
+## 1. Empirical mean and standard deviation for each variable,
+##    plus standard error of the mean:
+## 
+##                Mean     SD Naive SE Time-series SE
+## (Intercept) -0.6640 0.9010  0.09498        0.13197
+## SOCSOG      -0.1942 0.2738  0.02887        0.09728
+## SOCSOL      -0.6821 0.2045  0.02156        0.02728
+## 
+## 2. Quantiles for each variable:
+## 
+##                2.5%     25%     50%      75%   97.5%
+## (Intercept) -2.5146 -1.2830 -0.6352 -0.04601  0.9266
+## SOCSOG      -0.8086 -0.3381 -0.1706  0.01458  0.2440
+## SOCSOL      -1.0750 -0.8264 -0.6591 -0.54592 -0.3367</code></pre>
+<pre class="r"><code># Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS &lt;- &quot;MCMCGLMM&quot;
+HYPOTHESIS &lt;- &quot;SOC&quot;
+SSBTYPE &lt;- &quot;FSSB&quot;
+if (USEGLOBAL) {
+  set_global()
+}
+f &lt;- FSSB ~ SOC + 1
+if (ANALYSIS == &quot;MCMCGLMM&quot; &amp; HYPOTHESIS == &quot;SOC&quot; &amp; SSBTYPE == &quot;FSSB&quot;) {
+  do_mcmc(f)
+}</code></pre>
+<pre><code>## ESS: 4
+## 
+## Iterations = 11:100
+## Thinning interval = 1 
+## Number of chains = 1 
+## Sample size per chain = 90 
+## 
+## 1. Empirical mean and standard deviation for each variable,
+##    plus standard error of the mean:
+## 
+##                Mean     SD Naive SE Time-series SE
+## (Intercept) -0.9022 0.9344  0.09849         0.2403
+## SOCSOG      -0.2292 0.3668  0.03866         0.1476
+## SOCSOL      -0.8919 0.3774  0.03979         0.1475
+## 
+## 2. Quantiles for each variable:
+## 
+##                2.5%     25%     50%     75%    97.5%
+## (Intercept) -2.3323 -1.4580 -0.9741 -0.4689  1.00593
+## SOCSOG      -0.8013 -0.5493 -0.2607 -0.0418  0.53191
+## SOCSOL      -1.4626 -1.2180 -0.8905 -0.6382 -0.08181</code></pre>
+<pre class="r"><code># Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS &lt;- &quot;MCMCGLMM&quot;
+HYPOTHESIS &lt;- &quot;SOC&quot;
+SSBTYPE &lt;- &quot;MSSB&quot;
+if (USEGLOBAL) {
+  set_global()
+}
+f &lt;- MSSB ~ SOC + 1
+if (ANALYSIS == &quot;MCMCGLMM&quot; &amp; HYPOTHESIS == &quot;SOC&quot; &amp; SSBTYPE == &quot;MSSB&quot;) {
+  do_mcmc(f)
+}</code></pre>
+<pre><code>## ESS: 5
+## 
+## Iterations = 11:100
+## Thinning interval = 1 
+## Number of chains = 1 
+## Sample size per chain = 90 
+## 
+## 1. Empirical mean and standard deviation for each variable,
+##    plus standard error of the mean:
+## 
+##                Mean     SD Naive SE Time-series SE
+## (Intercept) -0.2225 0.8694  0.09164         0.1506
+## SOCSOG      -0.6844 0.5401  0.05693         0.2398
+## SOCSOL      -1.5052 0.4367  0.04603         0.1596
+## 
+## 2. Quantiles for each variable:
+## 
+##               2.5%    25%     50%     75%   97.5%
+## (Intercept) -2.031 -0.703 -0.1306  0.3984  1.0661
+## SOCSOG      -1.583 -1.102 -0.7516 -0.3920  0.4084
+## SOCSOL      -2.264 -1.799 -1.5324 -1.2233 -0.5974</code></pre>
 <!--
 ####################################
 ####################################
@@ -1278,6 +1374,7 @@ CONFUSION & MALADAPTATION HYPOTHESES
 ####################################
 ####################################
 -->
+</div>
 </div>
 </div>
 <div id="confusion-maladaptation" class="section level2">
@@ -1291,7 +1388,7 @@ and are therefore less likely to exhibit SSB.</p>
 <p>↑ in factor associated with ↓ in SSB: Radically Dimorphic
 Morphology</p>
 <hr />
-<div id="mcmcglmm-3" class="section level4">
+<div id="mcmcglmm-4" class="section level4">
 <h4>MCMCGLMM</h4>
 <pre class="r"><code># Runs MCMCglmm for all our Confusion variables. Individual binary variables each get their own suite of pagels below.
 ANALYSIS &lt;- &quot;MCMCGLMM&quot;
@@ -1446,7 +1543,7 @@ reaching adulthood.</p>
 <p>↑ in factor associated with ↑ in SSB: Male Age of Maturity, Female
 Age of Maturity.</p>
 <hr />
-<div id="mcmcglmm-4" class="section level4">
+<div id="mcmcglmm-5" class="section level4">
 <h4>MCMCGLMM</h4>
 <pre class="r"><code># Runs MCMCglmm for all our Maturity variables.
 ANALYSIS &lt;- &quot;MCMCGLMM&quot;
@@ -1555,7 +1652,7 @@ and will therefore be associated with reduced species success.</p>
 Extinction Rate.</p>
 <p>↑ in SSB associated with ↓ in factor: Diversification.</p>
 <hr />
-<div id="mcmcglmm-5" class="section level4">
+<div id="mcmcglmm-6" class="section level4">
 <h4>MCMCGLMM</h4>
 <pre class="r"><code># Runs MCMCglmm for all our IUCN variables.
 ANALYSIS &lt;- &quot;MCMCGLMM&quot;
@@ -1837,7 +1934,7 @@ if (RERUN) {
   aic.w(aic)
 }</code></pre>
 </div>
-<div id="mcmcglmm-6" class="section level3">
+<div id="mcmcglmm-7" class="section level3">
 <h3>MCMCglmm</h3>
 <p>This analysis determines how a collection of independent variables
 contribute to a dependent variable (in this case, SSB). It creates a

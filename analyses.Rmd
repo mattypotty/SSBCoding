@@ -212,10 +212,18 @@ print(data_file$Mating.Group.Structures.Key[data_file$Mating.Group.Structures.Ke
 
 data_full <- data.frame(data_file[,-which(colnames(data_file)=="Column.Name.Key" | colnames(data_file)=="Mating.Group.Structures.Key")]) # Removing keys from dataset
 
+SOC <- rep(NA,nrow(data_full))
+for (i in 1:nrow(data_full)) {
+  if (data_full$GL[i] == "N") {SOC[i] <- "SOL"}
+  if (data_full$GL[i] == "Y") {SOC[i] <- "GL"}
+  if (data_full$SOG[i] == "Y") {SOC[i] <- "SOG"}
+}
+data_full$SOC <- SOC
+
 quantitative <- c("GP","BM","AFM","MR","PC","FWA","FAM","MAM") # quantitative columns
 binary <- c("RDM","TSP","NB","SDT","GL","SPI","NAC","GIM","GFE","MMC","BG","DHE","DCA","DPMI","DIN","DFR","DGR","DCE","DMOC","SOG","FSSB","MSSB","SSB") # binary columns
 yn <- c("RDM","TSP","NB","SDT","GL","SPI","NAC","GIM","GFE","MMC","BG","DHE","DCA","DPMI","DIN","DFR","DGR","DCE","DMOC","SOG") # binary columns with y/n
-multiple <- c("MGS","IUCN","Modifiers") # categorical columns with multiple options
+multiple <- c("MGS","IUCN","Modifiers", "SOC") # categorical columns with multiple options
 categorical <- c(binary,multiple) # all categorical columns
 
 for (i in 1:ncol(data_full)) { # looping through all the columns to format each one correctly
@@ -646,7 +654,45 @@ Tested covariates:
 
 Note: The same Nature paper already established that social species are associated with ↑ SSB, so this extends that to a deeper analysis of solitary species.
 
-WE WILL WANT TO MAKE THESE ANALYSES SO THAT WE INCLUDE BOTH SOLITARY AND SOCIAL SPECIES (so we need a social/solitary column and an SOG column)
+---
+
+#### MCMCGLMM
+
+```{r SOC_mcmcglmm, echo=TRUE}
+#Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "SOC"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+f <- SSB ~ SOC + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SOC" & SSBTYPE == "SSB") {do_mcmc(f)}
+```
+
+```{r SOC_mcmcglmm_show, eval=TRUE, results="SHOW"}
+file_contents <- readLines("output/MCMCGLMM_SSB_SOC_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+```
+
+```{r SOCf_mcmcglmm, echo=TRUE}
+#Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "SOC"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+f <- FSSB ~ SOC + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SOC" & SSBTYPE == "FSSB") {do_mcmc(f)}
+```
+
+```{r SOCf_mcmcglmm_show, eval=TRUE, results="SHOW"}
+file_contents <- readLines("output/MCMCGLMM_FSSB_SOC_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+```
+
+```{r SOCm_mcmcglmm, echo=TRUE}
+#Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "SOC"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+f <- MSSB ~ SOC + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SOC" & SSBTYPE == "MSSB") {do_mcmc(f)}
+```
+
+```{r SOCm_mcmcglmm_show, eval=TRUE, results="SHOW"}
+file_contents <- readLines("output/MCMCGLMM_MSSB_SOC_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+```
 
 <!--
 ####################################
