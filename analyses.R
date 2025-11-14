@@ -30,7 +30,8 @@ library(diversitree) # Used for SSE analyses
 library(MCMCglmm) # Used for MCMCglmm analyses
 library(coda) # Used for analyzing MCMC output
 library(MCMCvis) # Used for analyzing MCMC output
-#library(phylolm) (this one is glitched rn, not installing properly)
+library(mcmcr) # Used for analyzing MCMC output
+library(styler) # For knitting
 
 
 ## ----directories, eval=TRUE---------------------------------------------------
@@ -41,1051 +42,649 @@ setwd(this.path::here()) # Sets the working directory to the place where this fi
 
 
 ## ----analysis_settings, eval=TRUE---------------------------------------------
-# We might want to run multiple analyses of the same type
-# We will assign each of these an index called NUMBER
-# Our R script can read this as input
-if (!exists("NUMBER")) {NUMBER <- 1} # Allows us to run multiple analyses of the same type
+# We will use ALL CAPS for our analysis settings
+# This way, we can look at a variable and know it is a setting
 
-set.seed(4) # For analyses requiring random numbers, we might want the same output every time
-RERUN <- FALSE # We don't want to automatically rerun lengthy analyses, so we manually turn this to TRUE when we want to run one
+# We'll use the variable USEGLOBAL to indicate whether we want to use inputs from shell script
+if (!exists("USEGLOBAL")) {USEGLOBAL <- FALSE}
+set_global <- function() {
+  if (exists(".NUMBER")) {NUMBER <- .NUMBER}
+  if (exists(".ANALYSIS")) {ANALYSIS <- .ANALYSIS}
+  if (exists(".SSBTYPE")) {SSBTYPE <- .SSBTYPE}
+  if (exists(".HYPOTHESIS")) {HYPOTHESIS <- .HYPOTHESIS}
+  if (exists(".VARIABLE")) {VARIABLE <- .VARIABLE}
+  if (exists(".USERANDOM")) {USERANDOM <- .USERANDOM}
+}
+
+if (USEGLOBAL) {set_global()}
+
+if (!exists("NUMBER")) {NUMBER <- 1} # Allows us to run multiple analyses of the same type, each with a different number
+set.seed(NUMBER) # For analyses requiring random numbers, we might want the same output every time
+
+if (!exists("USERANDOM")) {USERANDOM <- FALSE} # Whether we use a random tree from the set instead of the MCC tree
+# OPTIONS: FALSE, TRUE
+
+if (!exists("ANALYSIS")) {ANALYSIS <- "NONE"}
+# OPTIONS: "NONE", "MCCTREE", "SPECMATS", "MCMCGLMM", "PAGEL"
+
+if (!exists("SSBTYPE")) {SSBTYPE <- "NONE"}
+# OPTIONS: "NONE", "SSB", "FSSB", "MSSB"
+
+if (!exists("HYPOTHESIS")) {HYPOTHESIS <- "NONE"}
+# OPTIONS: "NONE", "MI", "MGS", "SDT", "RDM", "AM", "IUCN"
+
+if (!exists("VARIABLE")) {VARIABLE <- "NONE"}
+# OPTIONS: "NONE", "NAC", "SPI", "TSP", "SDT", "RDM"
+
+# MCMC Settings
+NITT <- 100000 # 100,000
+BURNIN <- 10000 # 10,000
+THIN <- 100 # 100
+prior <- list(G=list(G1=list(V=1,nu=0.02)),
+              R=list(V=1,nu=0.02))
 
 
-## ----dataset, eval=TRUE, results=TRUE-----------------------------------------
+## ----do_mcmc, echo=TRUE, eval=TRUE--------------------------------------------
+do_mcmc <- function(f) {
+  # File names
+  analysis_name <- paste0(ANALYSIS,"_",SSBTYPE,"_",HYPOTHESIS,"_",tree_number,"_",NUMBER)
+  out_file <- paste0("output/",analysis_name,".log.csv")
+  summary_file <- paste0("output/",analysis_name,".sum.txt")
+  
+  #Read in data
+  columns <- c("Species",all.vars(f))
+  data_subset <- data[,columns]
+  # Removes incomplete cases
+  data_subset <- data_subset[complete.cases(data_subset),]
+  
+  # Running MCMCglmm
+  MCMCanalysis <- MCMCglmm::MCMCglmm(f,
+                  random = ~Species,
+                  family = "categorical",
+                  ginverse = list(Species=inv.phylo),
+                  prior = prior,
+                  data = data_subset,
+                  nitt = NITT,
+                  burnin = BURNIN,
+                  thin = THIN,
+                  verbose = TRUE)
+  
+  write.csv(MCMCanalysis$Sol,out_file,row.names=FALSE,quote=FALSE)
+  out <- capture.output(cat(paste0("ESS: ",ess(MCMCanalysis$Sol),"\n")),
+                        print(summary(MCMCanalysis$Sol)))
+  write(out,summary_file)
+}
+
+
+## ----do_pagel, echo=TRUE, eval=TRUE-------------------------------------------
+do_pagel <- function() {
+  # File names
+  analysis_name <- paste0(ANALYSIS,"_",SSBTYPE,"_",VARIABLE,"_",tree_number,"_",NUMBER)
+  summary_file <- paste0("output/",analysis_name,".sum.txt")
+  
+  #Read in data
+  columns <- c("Species",SSBTYPE,VARIABLE)
+  data_subset <- data[,columns]
+  # Removes incomplete cases
+  data_subset <- data_subset[complete.cases(data_subset),]
+  phy_subset <- ape::keep.tip(phy, data_subset$Species)
+  
+  #Assign species names
+  SSB <- setNames(data_subset[[SSBTYPE]],data_subset$Species)
+  VAR <- setNames(data_subset[[VARIABLE]],data_subset$Species)
+  
+  write(paste0("Pagel's Directional Test for ",SSBTYPE," and ",VARIABLE),summary_file)
+  write("--------------------",summary_file,append=TRUE)
+
+  # Fit models where SSB and NAC are totally independent or dependent
+  fit_SSB_VAR <- phytools::fitPagel(phy_subset,SSB,VAR)
+  out1 <- capture.output(print(fit_SSB_VAR))
+  write(paste0("Both Independent or Dependent"),summary_file,append=TRUE)
+  write(out1,summary_file,append=TRUE)
+  write("--------------------",summary_file,append=TRUE)
+  
+  # Fit model where SSB depends on NAC
+  fit_SSB <- phytools::fitPagel(phy_subset,SSB,VAR,dep.var="x")
+  out2 <- capture.output(print(fit_SSB))
+  write(paste0("Dependent ",SSBTYPE),summary_file,append=TRUE)
+  write(out2,summary_file,append=TRUE)
+  write("--------------------",summary_file,append=TRUE)
+  
+  # Fit model where NAC depends on SSB
+  fit_VAR <- phytools::fitPagel(phy_subset,SSB,VAR,dep.var="y")
+  out3 <- capture.output(print(fit_VAR))
+  write(paste0("Dependent ",VARIABLE),summary_file,append=TRUE)
+  write(out3,summary_file,append=TRUE)
+  write("--------------------",summary_file,append=TRUE)
+  
+  # Comparing the goodness of all 4 models using AIC
+  aic <- setNames(c(fit_SSB_VAR$independent.AIC,
+                    fit_SSB$dependent.AIC,
+                    fit_VAR$dependent.AIC,
+                    fit_SSB_VAR$dependent.AIC),
+                  c("independent","dependent SSB",paste0("dependent ",VARIABLE),paste0("dependent SSB & ",VARIABLE)))
+  out4 <- capture.output(print(aic))
+  out5 <- capture.output(print(aic.w(aic)))
+  write(paste0("AIC"),summary_file,append=TRUE)
+  write(out4,summary_file,append=TRUE)
+  write(paste0("Weights"),summary_file,append=TRUE)
+  write(out5,summary_file,append=TRUE)
+}
+
+
+## ----dataset, eval=TRUE, results="SHOW"---------------------------------------
 # This code chunk reads in our data files
-# Note that we want to run this code (eval=TRUE) and show the output (results=TRUE), but we don't need to see it
+# Note that we want to run this code (eval=TRUE) and show the output (results="SHOW"), but we don't need to see it
 
 data_file <- read.csv("data_20251020.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
 print(data_file$Column.Name.Key[data_file$Column.Name.Key != ""]) # Prints the column name key
 print(data_file$Mating.Group.Structures.Key[data_file$Mating.Group.Structures.Key != ""]) # prints the group mating structures key
 
-data <- data.frame(data_file[,-which(colnames(data_file)=="Column.Name.Key" | colnames(data_file)=="Mating.Group.Structures.Key")]) # Removing keys from dataset
+data_full <- data.frame(data_file[,-which(colnames(data_file)=="Column.Name.Key" | colnames(data_file)=="Mating.Group.Structures.Key")]) # Removing keys from dataset
+
+SOC <- rep(NA,nrow(data_full))
+for (i in 1:nrow(data_full)) {
+  if (data_full$GL[i] == "N") {SOC[i] <- "SOL"}
+  if (data_full$GL[i] == "Y") {SOC[i] <- "GL"}
+  if (data_full$SOG[i] == "Y") {SOC[i] <- "SOG"}
+}
+data_full$SOC <- SOC
 
 quantitative <- c("GP","BM","AFM","MR","PC","FWA","FAM","MAM") # quantitative columns
 binary <- c("RDM","TSP","NB","SDT","GL","SPI","NAC","GIM","GFE","MMC","BG","DHE","DCA","DPMI","DIN","DFR","DGR","DCE","DMOC","SOG","FSSB","MSSB","SSB") # binary columns
 yn <- c("RDM","TSP","NB","SDT","GL","SPI","NAC","GIM","GFE","MMC","BG","DHE","DCA","DPMI","DIN","DFR","DGR","DCE","DMOC","SOG") # binary columns with y/n
-multiple <- c("MGS","IUCN","Modifiers") # categorical columns with multiple options
+multiple <- c("MGS","IUCN","Modifiers", "SOC") # categorical columns with multiple options
 categorical <- c(binary,multiple) # all categorical columns
 
-for (i in 1:ncol(data)) { # looping through all the columns to format each one correctly
-  col <- colnames(data)[i] # getting the name of the column we're working on
-  data[[col]] <- gsub("#N/A","",data[[col]]) # replacing any of the "#N/A" generated by excel with ""
-  data[[col]] <- gsub("^$",NA,data[[col]]) # replacing the blank "" with NA
-  if (col %in% quantitative) {data[[col]] <- as.numeric(data[[col]])} # formatting quantitative columns as numeric
-  if (col %in% yn) {data[[col]] <- gsub("Y","1",data[[col]]); data[[col]] <- gsub("N","0",data[[col]])} # swapping y/n for 1/0
-  if (col %in% categorical) {data[[col]] <- as.factor(data[[col]])} # formatting all categorical columns as factors
+for (i in 1:ncol(data_full)) { # looping through all the columns to format each one correctly
+  col <- colnames(data_full)[i] # getting the name of the column we're working on
+  data_full[[col]] <- gsub("#N/A","",data_full[[col]]) # replacing any of the "#N/A" generated by excel with ""
+  data_full[[col]] <- gsub("^$",NA,data_full[[col]]) # replacing the blank "" with NA
+  if (col %in% quantitative) {data_full[[col]] <- as.numeric(data_full[[col]])} # formatting quantitative columns as numeric
+  if (col %in% yn) {data_full[[col]] <- gsub("Y","1",data_full[[col]]); data_full[[col]] <- gsub("N","0",data_full[[col]])} # swapping y/n for 1/0
+  if (col %in% categorical) {data_full[[col]] <- as.factor(data_full[[col]])} # formatting all categorical columns as factors
 }
 
-print(data)
+#print(data_full)
 
 
 ## ----make_tree, echo=TRUE-----------------------------------------------------
 # This code chunk reads our giant list of trees and combines them to make one "best" tree
 # We want to see this code (echo=TRUE), but we don't want to run it every time we do our analyses (it takes a while)
-# We have to manually type RERUN <- TRUE to get this to run
-
-if (RERUN) {
-  #trees <- ape::read.tree("Complete_phylogeny.nex") # Reads all 1000 trees from a nexus file, and saves to "trees" variable (uses "ape" package)
+ANALYSIS <- "MCMCTREE"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "MCCTREE") {
   trees <- ape::read.nexus("new_phylogeny.nex")
-  phy <- phangorn::maxCladeCred(trees) # Generates a maximum clade credibility (best) tree from the 1000 trees
-  cat(paste0("Is Ultrametric? ", ape::is.ultrametric(phy)))
-  cat(paste0("Is Bifurcating? ", castor::is_bifurcating(phy)))
-  n_taxa <- length(phy$tip.label) # Gets the number of species from looking at the tip labels
-  phy$node.label <- c((n_taxa + 1):(n_taxa + phy$Nnode))
-  ape::write.tree(phy,"new_mcc_tree.txt") # Saves this tree to a file called "mcc_tree.txt"
-  
-  RERUN <- FALSE
+  phy_mcc <- phangorn::maxCladeCred(trees) # Generates a maximum clade credibility (best) tree from the 1000 trees
+  cat(paste0("Is Ultrametric? ", ape::is.ultrametric(phy_mcc)))
+  cat(paste0("Is Bifurcating? ", castor::is_bifurcating(phy_mcc)))
+  n_taxa <- length(phy_mcc$tip.label) # Gets the number of species from looking at the tip labels
+  phy_mcc$node.label <- c((n_taxa + 1):(n_taxa + phy_mcc$Nnode)) # Gives number labels to nodes
+  ape::write.tree(phy_mcc,"new_mcc_tree.txt") # Saves this tree to a file called "mcc_tree.txt"
 }
 
 
-## ----tree, eval=TRUE----------------------------------------------------------
-# This code chunk reads in our MCC tree (one best tree)
-# This version of the tree has some names replaced with better names from our dataset
+## ----read_tree, eval=TRUE-----------------------------------------------------
+# This code chunk reads in the full set of trees
+# It also reads in our MCC tree (one best tree)
 
-phy <- ape::read.tree("mcc_tree_for_us.txt") # Reads our MCC tree from a file
+phy_mcc <- ape::read.tree("new_mcc_tree.txt") # Reads our MCC tree from a file
+n_taxa <- length(phy_mcc$tip.label)
+n_node <- phy_mcc$Nnode
+
+phy_all <- ape::read.nexus("new_phylogeny.nex") # Reads our posterior sample of trees from a file
+# Giving number labels to nodes in all 1000 phylogenies
+for (i in 1:length(phy_all)) {
+  phy_all[[i]]$node_label <- c((n_taxa + 1):(n_taxa + n_node))
+}
 
 
-## ----specmats, eval=TRUE, results=TRUE----------------------------------------
+## ----get_mismatches-----------------------------------------------------------
+# This code checks for all the species that are in the data but not in the tree
+ANALYSIS <- "SPECMATS"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "SPECMATS") {
+  LON <- data_full$Species # Reduces species from my data to LON ("List of Names")
+  check <- LON[which(!(LON %in% phy_mcc$tip.label))] # Lists species which are in mine that are not in theirs (species to check)
+  print(paste0("Species to check: ",paste(check,collapse=", ")),quote=F) # Prints out the list of species that need to be checked
+}
+
+
+## ----phylogeny, eval=TRUE-----------------------------------------------------
+# This code chunk chooses a phylogeny to use with our current analysis
+# There are two options: use the MCC tree, or use a random tree
+
+phy_full <- phy_mcc # This is the default behavior
+tree_number <- "TREEMCC"
+# If we want a random tree instead, we do this
+if (USERANDOM == TRUE) {
+  num <- sample(1:1000,1)
+  phy_full <- phy_all[[num]]
+  tree_number <- paste0("TREE",num)
+}
+
+
+## ----specmats, eval=TRUE, results="SHOW"--------------------------------------
 # This code chunk makes sure our species data and our phylogeny have the same taxa in them
+# We will use this smaller tree (phy) for most of our analyses
 
-LON <- data$Species # Reduces species from my data to LON ("List of Names")
-check <- LON[which(!(LON %in% phy$tip.label))] # Lists species which are in mine that are not in theirs (species to check)
-print(paste0("Species to check: ",paste(check,collapse=", ")),quote=F) # Prints out the list of species that need to be checked
-
-SPECMATS <- LON[which((LON %in% phy$tip.label))] # Creates a variable SPECMATS for all the species of mine which match those in the full trees
-phy <- ape::keep.tip(phy, SPECMATS) # Creates a new tree reducing phy to just SPECMATS, can then plot this with plot.phylo(SPECMATSTREE)
-phy <- force.ultrametric(phy,message=FALSE) # Makes sure all tips are exactly at the present (ultrametric)
+LON <- data_full$Species # Reduces species from my data to LON ("List of Names")
+SPECMATS <- LON[which((LON %in% phy_full$tip.label))] # Creates a variable SPECMATS for all the species of mine which match those in the full trees
+phy <- ape::keep.tip(phy_full, SPECMATS) # Creates a new tree reducing phy to just SPECMATS, can then plot this with plot.phylo(SPECMATSTREE)
 print(paste0("Total species: ",length(phy$tip.label)),quote=F) # Prints out the number of species in the tree
 
-data <- data[which((LON %in% phy$tip.label)),] # Creates dataset of SPECMATS (rows that match with the tree).
+# Read tree and verify ultrametric, form matrix for evolution time
+inv.phylo <- inverseA(phy, "TIPS")$Ainv
+
+# THIS SHOULD NOT BE REQUIRED ONCE ALL OF THE NAMES MATCH!!!
+data <- data_full[which((LON %in% phy$tip.label)),] # Creates dataset of SPECMATS (rows that match with the tree).
 
 
-## ----plot_tree, eval=TRUE, results=TRUE, fig.align="center", fig.width=12, fig.height=12----
+## ----plot_tree, eval=TRUE, results="SHOW", fig.align="center", fig.width=12, fig.height=12----
 phytools::plotTree(phy, type="fan", fsize=.5, asp=1) # This plots the tree that we are using (with only matching taxa) as a circle phylogeny
 
 
-## ----MI_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE--------------------------
+## ----MI_mcmcglmm, echo=TRUE---------------------------------------------------
 #Runs MCMCglmm for all our Maternal investment variables. Individual binary variables each get their own suite of pagels below.
-if (RERUN) {
-  #Read in data
-  data_subset <- data[,c("Species","NAC","PC","SPI","GP","FWA","MR","TSP","SSB","FSSB","MSSB")]
-  # Removes incomplete cases
-  data_subset <- data_subset[complete.cases(data_subset),]
-  #print(data_subset) #Remove first hashtag to print data
-  
-  # Read tree and verify ultrametric, form matrix for evolution time
-  inv.phylo <- inverseA(phy, "TIPS")$Ainv
-  
-  # Make priors
-  prior <- list(G=list(G1=list(V=1,nu=0.02)),
-                R=list(V=1,nu=0.02))
-  
-  # Running MCMCglmm
-  MI_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~NAC+PC+SPI+GP+FWA+MR+TSP+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  MIf_MCMCanalysis <- MCMCglmm::MCMCglmm(FSSB~NAC+PC+SPI+GP+FWA+MR+TSP+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  MIm_MCMCanalysis <- MCMCglmm::MCMCglmm(MSSB~NAC+PC+SPI+GP+FWA+MR+TSP+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  print(summary(MI_MCMCanalysis$Sol))
-  print(summary(MIf_MCMCanalysis$Sol))
-  print(summary(MIm_MCMCanalysis$Sol))
-}
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "MI"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+f <- SSB ~ NAC + PC + SPI + GP + FWA + MR + TSP + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MI" & SSBTYPE == "SSB") {do_mcmc(f)}
 
 
-## ----NAC_pagel, eval=TRUE, echo=TRUE, results=TRUE----------------------------
-if (RERUN) {
-  #Assign species names
-  SSB <- setNames(data$SSB,data$Species)
-  NAC <- setNames(data$NAC,data$Species)
-  
-   # Fit models where SSB and NAC are totally independent or dependent
-  fit_SSB_NAC <- phytools::fitPagel(phy,SSB,NAC)
-  fit_SSB_NAC
-  plot(fit_SSB_NAC,lwd.by.rate=TRUE)
-  
-  # Fit model where SSB depends on NAC
-  fit_SSB <- phytools::fitPagel(phy,SSB,NAC,dep.var="x")
-  fit_SSB
-  plot(fit_SSB,lwd.by.rate=TRUE)
-  
-  # Fit model where NAC depends on SSB
-  fit_NAC <- phytools::fitPagel(phy,SSB,NAC,dep.var="y")
-  fit_NAC
-  plot(fit_NAC,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_SSB_NAC$independent.AIC,
-                    fit_SSB$dependent.AIC,
-                    fit_NAC$dependent.AIC,
-                    fit_SSB_NAC$dependent.AIC),
-                  c("independent","dependent SSB","dependent NAC","dependent SSB & NAC"))
-  aic
-  aic.w(aic)
-}
+## ----MI_mcmcglmm_show, eval=TRUE, results="SHOW"------------------------------
+file_contents <- readLines("output/MCMCGLMM_SSB_MI_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
 
 
-## ----NACf_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  FSSB <- setNames(data$FSSB,data$Species)
-  NAC <- setNames(data$NAC,data$Species)
-  
-   # Fit models where FSSB and NAC are totally independent or dependent
-  fit_FSSB_NAC <- phytools::fitPagel(phy,FSSB,NAC)
-  fit_FSSB_NAC
-  plot(fit_FSSB_NAC,lwd.by.rate=TRUE)
-  
-  # Fit model where FSSB depends on NAC
-  fit_FSSB <- phytools::fitPagel(phy,FSSB,NAC,dep.var="x")
-  fit_FSSB
-  plot(fit_FSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where NAC depends on SSB
-  fit_NAC <- phytools::fitPagel(phy,FSSB,NAC,dep.var="y")
-  fit_NAC
-  plot(fit_NAC,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_FSSB_NAC$independent.AIC,
-                    fit_FSSB$dependent.AIC,
-                    fit_NAC$dependent.AIC,
-                    fit_FSSB_NAC$dependent.AIC),
-                  c("independent","dependent FSSB","dependent NAC","dependent FSSB & NAC"))
-  aic
-  aic.w(aic)
-}
+## ----MIf_mcmcglmm, echo=TRUE--------------------------------------------------
+#Runs MCMCglmm for all our Maternal investment variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "MI"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+f <- FSSB ~ NAC + PC + SPI + GP + FWA + MR + TSP + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MI" & SSBTYPE == "FSSB") {do_mcmc(f)}
 
 
-## ----NACm_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  MSSB <- setNames(data$MSSB,data$Species)
-  NAC <- setNames(data$NAC,data$Species)
-  
-   # Fit models where MSSB and NAC are totally independent or dependent
-  fit_MSSB_NAC <- phytools::fitPagel(phy,MSSB,NAC)
-  fit_MSSB_NAC
-  plot(fit_MSSB_NAC,lwd.by.rate=TRUE)
-  
-  # Fit model where MSSB depends on NAC
-  fit_MSSB <- phytools::fitPagel(phy,MSSB,NAC,dep.var="x")
-  fit_MSSB
-  plot(fit_MSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where NAC depends on MSSB
-  fit_NAC <- phytools::fitPagel(phy,MSSB,NAC,dep.var="y")
-  fit_NAC
-  plot(fit_NAC,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_MSSB_NAC$independent.AIC,
-                    fit_MSSB$dependent.AIC,
-                    fit_NAC$dependent.AIC,
-                    fit_MSSB_NAC$dependent.AIC),
-                  c("independent","dependent MSSB","dependent NAC","dependent MSSB & NAC"))
-  aic
-  aic.w(aic)
-}
+## ----MIf_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
+file_contents <- readLines("output/MCMCGLMM_FSSB_MI_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
 
 
-## ----SPI_pagel, eval=TRUE, echo=TRUE, results=TRUE----------------------------
-if (RERUN) {
-  #Assign species names
-  SSB <- setNames(data$SSB,data$Species)
-  SPI <- setNames(data$SPI,data$Species)
-  
-   # Fit models where SSB and SPI are totally independent or dependent
-  fit_SSB_SPI <- phytools::fitPagel(phy,SSB,SPI)
-  fit_SSB_SPI
-  plot(fit_SSB_SPI,lwd.by.rate=TRUE)
-  
-  # Fit model where SSB depends on SPI
-  fit_SSB <- phytools::fitPagel(phy,SSB,SPI,dep.var="x")
-  fit_SSB
-  plot(fit_SSB,lwd.by.rate=TRUE)
-  
-  # Fit model where SPI depends on SSB
-  fit_SPI <- phytools::fitPagel(phy,SSB,SPI,dep.var="y")
-  fit_SPI
-  plot(fit_SPI,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_SSB_SPI$independent.AIC,
-                    fit_SSB$dependent.AIC,
-                    fit_SPI$dependent.AIC,
-                    fit_SSB_SPI$dependent.AIC),
-                  c("independent","dependent SSB","dependent SPI","dependent SSB & SPI"))
-  aic
-  aic.w(aic)
-}
+## ----MIm_mcmcglmm, echo=TRUE--------------------------------------------------
+#Runs MCMCglmm for all our Maternal investment variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "MI"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+f <- MSSB ~ NAC + PC + SPI + GP + FWA + MR + TSP + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MI" & SSBTYPE == "MSSB") {do_mcmc(f)}
 
 
-## ----SPIf_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  FSSB <- setNames(data$FSSB,data$Species)
-  SPI <- setNames(data$SPI,data$Species)
-  
-   # Fit models where FSSB and SPI are totally independent or dependent
-  fit_FSSB_SPI <- phytools::fitPagel(phy,FSSB,SPI)
-  fit_FSSB_SPI
-  plot(fit_FSSB_SPI,lwd.by.rate=TRUE)
-  
-  # Fit model where FSSB depends on SPI
-  fit_FSSB <- phytools::fitPagel(phy,FSSB,SPI,dep.var="x")
-  fit_FSSB
-  plot(fit_FSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where SPI depends on SSB
-  fit_SPI <- phytools::fitPagel(phy,FSSB,SPI,dep.var="y")
-  fit_SPI
-  plot(fit_SPI,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_FSSB_SPI$independent.AIC,
-                    fit_FSSB$dependent.AIC,
-                    fit_SPI$dependent.AIC,
-                    fit_FSSB_SPI$dependent.AIC),
-                  c("independent","dependent FSSB","dependent SPI","dependent FSSB & SPI"))
-  aic
-  aic.w(aic)
-}
+## ----MIm_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
+file_contents <- readLines("output/MCMCGLMM_MSSB_MI_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
 
 
-## ----SPIm_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  MSSB <- setNames(data$MSSB,data$Species)
-  SPI <- setNames(data$SPI,data$Species)
-  
-   # Fit models where MSSB and SPI are totally independent or dependent
-  fit_MSSB_SPI <- phytools::fitPagel(phy,MSSB,SPI)
-  fit_MSSB_SPI
-  plot(fit_MSSB_SPI,lwd.by.rate=TRUE)
-  
-  # Fit model where MSSB depends on SPI
-  fit_MSSB <- phytools::fitPagel(phy,MSSB,SPI,dep.var="x")
-  fit_MSSB
-  plot(fit_MSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where SPI depends on MSSB
-  fit_SPI <- phytools::fitPagel(phy,MSSB,SPI,dep.var="y")
-  fit_SPI
-  plot(fit_SPI,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_MSSB_SPI$independent.AIC,
-                    fit_MSSB$dependent.AIC,
-                    fit_SPI$dependent.AIC,
-                    fit_MSSB_SPI$dependent.AIC),
-                  c("independent","dependent MSSB","dependent SPI","dependent MSSB & SPI"))
-  aic
-  aic.w(aic)
-}
+## ----NAC_pagel, echo=TRUE-----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "NAC"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "NAC" & SSBTYPE == "SSB") {do_pagel()}
 
 
-## ----TSP_pagel, eval=TRUE, echo=TRUE, results=TRUE----------------------------
-if (RERUN) {
-  #Assign species names
-  SSB <- setNames(data$SSB,data$Species)
-  TSP <- setNames(data$TSP,data$Species)
-  
-   # Fit models where SSB and TSP are totally independent or dependent
-  fit_SSB_TSP <- phytools::fitPagel(phy,SSB,TSP)
-  fit_SSB_TSP
-  plot(fit_SSB_TSP,lwd.by.rate=TRUE)
-  
-  # Fit model where SSB depends on TSP
-  fit_SSB <- phytools::fitPagel(phy,SSB,TSP,dep.var="x")
-  fit_SSB
-  plot(fit_SSB,lwd.by.rate=TRUE)
-  
-  # Fit model where TSP depends on SSB
-  fit_TSP <- phytools::fitPagel(phy,SSB,TSP,dep.var="y")
-  fit_TSP
-  plot(fit_TSP,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_SSB_TSP$independent.AIC,
-                    fit_SSB$dependent.AIC,
-                    fit_TSP$dependent.AIC,
-                    fit_SSB_TSP$dependent.AIC),
-                  c("independent","dependent SSB","dependent TSP","dependent SSB & TSP"))
-  aic
-  aic.w(aic)
-}
+## ----NAC_pagel_show, eval=TRUE, results="SHOW"--------------------------------
+file_contents <- readLines("output/PAGEL_SSB_NAC_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
-## ----TSPf_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  FSSB <- setNames(data$FSSB,data$Species)
-  TSP <- setNames(data$TSP,data$Species)
-  
-   # Fit models where FSSB and TSP are totally independent or dependent
-  fit_FSSB_TSP <- phytools::fitPagel(phy,FSSB,TSP)
-  fit_FSSB_TSP
-  plot(fit_FSSB_TSP,lwd.by.rate=TRUE)
-  
-  # Fit model where FSSB depends on TSP
-  fit_FSSB <- phytools::fitPagel(phy,FSSB,TSP,dep.var="x")
-  fit_FSSB
-  plot(fit_FSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where TSP depends on SSB
-  fit_TSP <- phytools::fitPagel(phy,FSSB,TSP,dep.var="y")
-  fit_TSP
-  plot(fit_TSP,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_FSSB_TSP$independent.AIC,
-                    fit_FSSB$dependent.AIC,
-                    fit_TSP$dependent.AIC,
-                    fit_FSSB_TSP$dependent.AIC),
-                  c("independent","dependent FSSB","dependent TSP","dependent FSSB & TSP"))
-  aic
-  aic.w(aic)
-}
+## ----NACf_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "NAC"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "NAC" & SSBTYPE == "FSSB") {do_pagel()}
 
 
-## ----TSPm_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  MSSB <- setNames(data$MSSB,data$Species)
-  TSP <- setNames(data$TSP,data$Species)
-  
-   # Fit models where MSSB and TSP are totally independent or dependent
-  fit_MSSB_TSP <- phytools::fitPagel(phy,MSSB,TSP)
-  fit_MSSB_TSP
-  plot(fit_MSSB_TSP,lwd.by.rate=TRUE)
-  
-  # Fit model where MSSB depends on TSP
-  fit_MSSB <- phytools::fitPagel(phy,MSSB,TSP,dep.var="x")
-  fit_MSSB
-  plot(fit_MSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where TSP depends on MSSB
-  fit_TSP <- phytools::fitPagel(phy,MSSB,TSP,dep.var="y")
-  fit_TSP
-  plot(fit_TSP,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_MSSB_TSP$independent.AIC,
-                    fit_MSSB$dependent.AIC,
-                    fit_TSP$dependent.AIC,
-                    fit_MSSB_TSP$dependent.AIC),
-                  c("independent","dependent MSSB","dependent TSP","dependent MSSB & TSP"))
-  aic
-  aic.w(aic)
-}
+## ----NACf_pagel_show, eval=TRUE, results="SHOW"-------------------------------
+file_contents <- readLines("output/PAGEL_FSSB_NAC_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
-## ----MGS_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE-------------------------
- if (RERUN) {
-  #Read in data
-  data_subset <- data[,c("Species","MGS","SSB","FSSB","MSSB")] 
-  #Remove incomplete cases
-  data_subset <- data_subset[complete.cases(data_subset),]
-  #print(data_subset) #Remove first hashtag to print data
-  
-  # Read tree and verify ultrametric, form matrix for evolution time
-  inv.phylo <- inverseA(phy, "TIPS")$Ainv
-  
-  # Make priors
-  prior <- list(G=list(G1=list(V=1,nu=0.02)), 
-                R=list(V=1,nu=0.02))
-  
-  # Running MCMCglmms
-  MGS_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~MGS+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  MGSf_MCMCanalysis <- MCMCglmm::MCMCglmm(FSSB~MGS+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  MGSm_MCMCanalysis <- MCMCglmm::MCMCglmm(MSSB~MGS+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  print(summary(MGS_MCMCanalysis$Sol))
-  print(summary(MGSf_MCMCanalysis$Sol))
-  print(summary(MGSm_MCMCanalysis$Sol))
-}
+## ----NACm_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "NAC"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "NAC" & SSBTYPE == "MSSB") {do_pagel()}
 
 
-## ----SDT_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE-------------------------
- if (RERUN) {
-  #Read in data
-  data_subset <- data[,c("Species","SDT","SSB","FSSB","MSSB")] 
-  #Remove incomplete cases
-  data_subset <- data_subset[complete.cases(data_subset),]
-  #print(data_subset) #Remove first hashtag to print data
-  
-  # Read tree and verify ultrametric, form matrix for evolution time
-  inv.phylo <- inverseA(phy, "TIPS")$Ainv
-  
-  # Make priors
-  prior <- list(G=list(G1=list(V=1,nu=0.02)), 
-                R=list(V=1,nu=0.02))
-  
-  # Running MCMCglmms
-  SDT_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~SDT+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  SDTf_MCMCanalysis <- MCMCglmm::MCMCglmm(FSSB~SDT+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  SDTm_MCMCanalysis <- MCMCglmm::MCMCglmm(MSSB~SDT+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  print(summary(SDT_MCMCanalysis$Sol))
-  print(summary(SDTf_MCMCanalysis$Sol))
-  print(summary(SDTm_MCMCanalysis$Sol))
-}
+## ----NACm_pagel_show, eval=TRUE, results="SHOW"-------------------------------
+file_contents <- readLines("output/PAGEL_MSSB_NAC_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
-## ----SDT_pagel, eval=TRUE, echo=TRUE, results=TRUE----------------------------
-if (RERUN) {
-  #Assign species names
-  SSB <- setNames(data$SSB,data$Species)
-  SDT <- setNames(data$SDT,data$Species)
-  
-   # Fit models where SSB and SDT are totally independent or dependent
-  fit_SSB_SDT <- phytools::fitPagel(phy,SSB,SDT)
-  fit_SSB_SDT
-  plot(fit_SSB_SDT,lwd.by.rate=TRUE)
-  
-  # Fit model where SSB depends on SDT
-  fit_SSB <- phytools::fitPagel(phy,SSB,SDT,dep.var="x")
-  fit_SSB
-  plot(fit_SSB,lwd.by.rate=TRUE)
-  
-  # Fit model where SDT depends on SSB
-  fit_SDT <- phytools::fitPagel(phy,SSB,SDT,dep.var="y")
-  fit_SDT
-  plot(fit_SDT,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_SSB_SDT$independent.AIC,
-                    fit_SSB$dependent.AIC,
-                    fit_SDT$dependent.AIC,
-                    fit_SSB_SDT$dependent.AIC),
-                  c("independent","dependent SSB","dependent SDT","dependent SSB & SDT"))
-  aic
-  aic.w(aic)
-}
+## ----SPI_pagel, echo=TRUE-----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "SPI"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "SPI" & SSBTYPE == "SSB") {do_pagel()}
 
 
-## ----SDTf_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  FSSB <- setNames(data$FSSB,data$Species)
-  SDT <- setNames(data$SDT,data$Species)
-  
-   # Fit models where FSSB and SDT are totally independent or dependent
-  fit_FSSB_SDT <- phytools::fitPagel(phy,FSSB,SDT)
-  fit_FSSB_SDT
-  plot(fit_FSSB_SDT,lwd.by.rate=TRUE)
-  
-  # Fit model where FSSB depends on SDT
-  fit_FSSB <- phytools::fitPagel(phy,FSSB,SDT,dep.var="x")
-  fit_FSSB
-  plot(fit_FSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where SDT depends on SSB
-  fit_SDT <- phytools::fitPagel(phy,FSSB,SDT,dep.var="y")
-  fit_SDT
-  plot(fit_SDT,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_FSSB_SDT$independent.AIC,
-                    fit_FSSB$dependent.AIC,
-                    fit_SDT$dependent.AIC,
-                    fit_FSSB_SDT$dependent.AIC),
-                  c("independent","dependent FSSB","dependent SDT","dependent FSSB & SDT"))
-  aic
-  aic.w(aic)
-}
+## ----SPI_pagel_show, eval=TRUE, results="SHOW"--------------------------------
+file_contents <- readLines("output/PAGEL_SSB_SPI_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
-## ----SDTm_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  MSSB <- setNames(data$MSSB,data$Species)
-  SDT <- setNames(data$SDT,data$Species)
-  
-   # Fit models where MSSB and SDT are totally independent or dependent
-  fit_MSSB_SDT <- phytools::fitPagel(phy,MSSB,SDT)
-  fit_MSSB_SDT
-  plot(fit_MSSB_SDT,lwd.by.rate=TRUE)
-  
-  # Fit model where MSSB depends on SDT
-  fit_MSSB <- phytools::fitPagel(phy,MSSB,SDT,dep.var="x")
-  fit_MSSB
-  plot(fit_MSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where SDT depends on MSSB
-  fit_SDT <- phytools::fitPagel(phy,MSSB,SDT,dep.var="y")
-  fit_SDT
-  plot(fit_SDT,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_MSSB_SDT$independent.AIC,
-                    fit_MSSB$dependent.AIC,
-                    fit_SDT$dependent.AIC,
-                    fit_MSSB_SDT$dependent.AIC),
-                  c("independent","dependent MSSB","dependent SDT","dependent MSSB & SDT"))
-  aic
-  aic.w(aic)
-}
+## ----SPIf_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "SPI"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "SPI" & SSBTYPE == "FSSB") {do_pagel()}
 
 
-## ----SOG_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE-------------------------
- if (RERUN) {
-  #Read in data
-  data_subset <- data[,c("Species","SOG","SSB","FSSB","MSSB")] 
-  #Remove incomplete cases
-  data_subset <- data_subset[complete.cases(data_subset),]
-  #print(data_subset) #Remove first hashtag to print data
-  
-  # Read tree and verify ultrametric, form matrix for evolution time
-  inv.phylo <- inverseA(phy, "TIPS")$Ainv
-  
-  # Make priors
-  prior <- list(G=list(G1=list(V=1,nu=0.02)), 
-                R=list(V=1,nu=0.02))
-  
-  # Running MCMCglmms
-  SOG_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~SOG+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  SOGf_MCMCanalysis <- MCMCglmm::MCMCglmm(FSSB~SOG+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  SOGm_MCMCanalysis <- MCMCglmm::MCMCglmm(MSSB~SOG+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  print(summary(SOG_MCMCanalysis$Sol))
-  print(summary(SOGf_MCMCanalysis$Sol))
-  print(summary(SOGm_MCMCanalysis$Sol))
-}
+## ----SPIf_pagel_show, eval=TRUE, results="SHOW"-------------------------------
+file_contents <- readLines("output/PAGEL_FSSB_SPI_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
-## ----SOG_pagel, eval=TRUE, echo=TRUE, results=TRUE----------------------------
-if (RERUN) {
-  #Assign species names
-  SSB <- setNames(data$SSB,data$Species)
-  SOG <- setNames(data$SOG,data$Species)
-  
-   # Fit models where SSB and SOG are totally independent or dependent
-  fit_SSB_SOG <- phytools::fitPagel(phy,SSB,SOG)
-  fit_SSB_SOG
-  plot(fit_SSB_SOG,lwd.by.rate=TRUE)
-  
-  # Fit model where SSB depends on SOG
-  fit_SSB <- phytools::fitPagel(phy,SSB,SOG,dep.var="x")
-  fit_SSB
-  plot(fit_SSB,lwd.by.rate=TRUE)
-  
-  # Fit model where SOG depends on SSB
-  fit_SOG <- phytools::fitPagel(phy,SSB,SOG,dep.var="y")
-  fit_SOG
-  plot(fit_SOG,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_SSB_SOG$independent.AIC,
-                    fit_SSB$dependent.AIC,
-                    fit_SOG$dependent.AIC,
-                    fit_SSB_SOG$dependent.AIC),
-                  c("independent","dependent SSB","dependent SOG","dependent SSB & SOG"))
-  aic
-  aic.w(aic)
-}
+## ----SPIm_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "SPI"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "SPI" & SSBTYPE == "MSSB") {do_pagel()}
 
 
-## ----SOGf_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  FSSB <- setNames(data$FSSB,data$Species)
-  SOG <- setNames(data$SOG,data$Species)
-  
-   # Fit models where FSSB and SOG are totally independent or dependent
-  fit_FSSB_SOG <- phytools::fitPagel(phy,FSSB,SOG)
-  fit_FSSB_SOG
-  plot(fit_FSSB_SOG,lwd.by.rate=TRUE)
-  
-  # Fit model where FSSB depends on SOG
-  fit_FSSB <- phytools::fitPagel(phy,FSSB,SOG,dep.var="x")
-  fit_FSSB
-  plot(fit_FSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where SOG depends on SSB
-  fit_SOG <- phytools::fitPagel(phy,FSSB,SOG,dep.var="y")
-  fit_SOG
-  plot(fit_SOG,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_FSSB_SOG$independent.AIC,
-                    fit_FSSB$dependent.AIC,
-                    fit_SOG$dependent.AIC,
-                    fit_FSSB_SOG$dependent.AIC),
-                  c("independent","dependent FSSB","dependent SOG","dependent FSSB & SOG"))
-  aic
-  aic.w(aic)
-}
+## ----SPIm_pagel_show, eval=TRUE, results="SHOW"-------------------------------
+file_contents <- readLines("output/PAGEL_MSSB_SPI_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
-## ----SOGm_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  MSSB <- setNames(data$MSSB,data$Species)
-  SOG <- setNames(data$SOG,data$Species)
-  
-   # Fit models where MSSB and SOG are totally independent or dependent
-  fit_MSSB_SOG <- phytools::fitPagel(phy,MSSB,SOG)
-  fit_MSSB_SOG
-  plot(fit_MSSB_SOG,lwd.by.rate=TRUE)
-  
-  # Fit model where MSSB depends on SOG
-  fit_MSSB <- phytools::fitPagel(phy,MSSB,SOG,dep.var="x")
-  fit_MSSB
-  plot(fit_MSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where SOG depends on MSSB
-  fit_SOG <- phytools::fitPagel(phy,MSSB,SOG,dep.var="y")
-  fit_SOG
-  plot(fit_SOG,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_MSSB_SOG$independent.AIC,
-                    fit_MSSB$dependent.AIC,
-                    fit_SOG$dependent.AIC,
-                    fit_MSSB_SOG$dependent.AIC),
-                  c("independent","dependent MSSB","dependent SOG","dependent MSSB & SOG"))
-  aic
-  aic.w(aic)
-}
+## ----TSP_pagel, echo=TRUE-----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "TSP"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "TSP" & SSBTYPE == "SSB") {do_pagel()}
 
 
-## ----RDM_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE-------------------------
- if (RERUN) {
-  #Read in data
-  data_subset <- data[,c("Species","RDM","SSB","FSSB","MSSB")] 
-  #Remove incomplete cases
-  data_subset <- data_subset[complete.cases(data_subset),]
-  #print(data_subset) #Remove first hashtag to print data
-  
-  # Read tree and verify ultrametric, form matrix for evolution time
-  inv.phylo <- inverseA(phy, "TIPS")$Ainv
-  
-  # Make priors
-  prior <- list(G=list(G1=list(V=1,nu=0.02)), 
-                R=list(V=1,nu=0.02))
-  
-  # Running MCMCglmms
-  RDM_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~RDM+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  RDMf_MCMCanalysis <- MCMCglmm::MCMCglmm(FSSB~RDM+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  RDMm_MCMCanalysis <- MCMCglmm::MCMCglmm(MSSB~RDM+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  print(summary(RDM_MCMCanalysis$Sol))
-  print(summary(RDMf_MCMCanalysis$Sol))
-  print(summary(RDMm_MCMCanalysis$Sol))
-}
+## ----TSP_pagel_show, eval=TRUE, results="SHOW"--------------------------------
+file_contents <- readLines("output/PAGEL_SSB_TSP_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
-## ----RDM_pagel, eval=TRUE, echo=TRUE, results=TRUE----------------------------
-if (RERUN) {
-  #Assign species names
-  SSB <- setNames(data$SSB,data$Species)
-  RDM <- setNames(data$RDM,data$Species)
-  
-   # Fit models where SSB and RDM are totally independent or dependent
-  fit_SSB_RDM <- phytools::fitPagel(phy,SSB,RDM)
-  fit_SSB_RDM
-  plot(fit_SSB_RDM,lwd.by.rate=TRUE)
-  
-  # Fit model where SSB depends on RDM
-  fit_SSB <- phytools::fitPagel(phy,SSB,RDM,dep.var="x")
-  fit_SSB
-  plot(fit_SSB,lwd.by.rate=TRUE)
-  
-  # Fit model where RDM depends on SSB
-  fit_RDM <- phytools::fitPagel(phy,SSB,RDM,dep.var="y")
-  fit_RDM
-  plot(fit_RDM,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_SSB_RDM$independent.AIC,
-                    fit_SSB$dependent.AIC,
-                    fit_RDM$dependent.AIC,
-                    fit_SSB_RDM$dependent.AIC),
-                  c("independent","dependent SSB","dependent RDM","dependent SSB & RDM"))
-  aic
-  aic.w(aic)
-}
+## ----TSPf_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "TSP"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "TSP" & SSBTYPE == "FSSB") {do_pagel()}
 
 
-## ----RDMf_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  FSSB <- setNames(data$FSSB,data$Species)
-  RDM <- setNames(data$RDM,data$Species)
-  
-   # Fit models where FSSB and RDM are totally independent or dependent
-  fit_FSSB_RDM <- phytools::fitPagel(phy,FSSB,RDM)
-  fit_FSSB_RDM
-  plot(fit_FSSB_RDM,lwd.by.rate=TRUE)
-  
-  # Fit model where FSSB depends on RDM
-  fit_FSSB <- phytools::fitPagel(phy,FSSB,RDM,dep.var="x")
-  fit_FSSB
-  plot(fit_FSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where RDM depends on SSB
-  fit_RDM <- phytools::fitPagel(phy,FSSB,RDM,dep.var="y")
-  fit_RDM
-  plot(fit_RDM,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_FSSB_RDM$independent.AIC,
-                    fit_FSSB$dependent.AIC,
-                    fit_RDM$dependent.AIC,
-                    fit_FSSB_RDM$dependent.AIC),
-                  c("independent","dependent FSSB","dependent RDM","dependent FSSB & RDM"))
-  aic
-  aic.w(aic)
-}
+## ----TSPf_pagel_show, eval=TRUE, results="SHOW"-------------------------------
+file_contents <- readLines("output/PAGEL_FSSB_TSP_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
-## ----RDMm_pagel, eval=TRUE, echo=TRUE, results=TRUE---------------------------
-if (RERUN) {
-  #Assign species names
-  MSSB <- setNames(data$MSSB,data$Species)
-  RDM <- setNames(data$RDM,data$Species)
-  
-   # Fit models where MSSB and RDM are totally independent or dependent
-  fit_MSSB_RDM <- phytools::fitPagel(phy,MSSB,RDM)
-  fit_MSSB_RDM
-  plot(fit_MSSB_RDM,lwd.by.rate=TRUE)
-  
-  # Fit model where MSSB depends on RDM
-  fit_MSSB <- phytools::fitPagel(phy,MSSB,RDM,dep.var="x")
-  fit_MSSB
-  plot(fit_MSSB,lwd.by.rate=TRUE)
-  
-  # Fit model where RDM depends on MSSB
-  fit_RDM <- phytools::fitPagel(phy,MSSB,RDM,dep.var="y")
-  fit_RDM
-  plot(fit_RDM,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_MSSB_RDM$independent.AIC,
-                    fit_MSSB$dependent.AIC,
-                    fit_RDM$dependent.AIC,
-                    fit_MSSB_RDM$dependent.AIC),
-                  c("independent","dependent MSSB","dependent RDM","dependent MSSB & RDM"))
-  aic
-  aic.w(aic)
-}
+## ----TSPm_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "TSP"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "TSP" & SSBTYPE == "MSSB") {do_pagel()}
 
 
-## ----AM_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE--------------------------
- if (RERUN) {
-  #Read in data
-  data_subset <- data[,c("Species","FAM", "MAM","SSB","FSSB","MSSB")] 
-  #Remove incomplete cases
-  data_subset <- data_subset[complete.cases(data_subset),]
-  #print(data_subset) #Remove first hashtag to print data
-  
-  # Read tree and verify ultrametric, form matrix for evolution time
-  inv.phylo <- inverseA(phy, "TIPS")$Ainv
-  
-  # Make priors
-  prior <- list(G=list(G1=list(V=1,nu=0.02)), 
-                R=list(V=1,nu=0.02))
-  
-  # Running MCMCglmms
-  AM_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~FAM+MAM+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  AMf_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~FAM+MAM+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  AMm_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~FAM+MAM+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  print(summary(AM_MCMCanalysis$Sol))
-  print(summary(AMf_MCMCanalysis$Sol))
-  print(summary(AMm_MCMCanalysis$Sol))
-}
+## ----TSPm_pagel_show, eval=TRUE, results="SHOW"-------------------------------
+file_contents <- readLines("output/PAGEL_MSSB_TSP_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
-## ----IUCN_mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE------------------------
- if (RERUN) {
-  #Read in data
-  data_subset <- data[,c("Species","IUCN","SSB","FSSB","MSSB")] 
-  #Remove incomplete cases
-  data_subset <- data_subset[complete.cases(data_subset),]
-  #print(data_subset) #Remove first hashtag to print data
-  
-  # Read tree and verify ultrametric, form matrix for evolution time
-  inv.phylo <- inverseA(phy, "TIPS")$Ainv
-  
-  # Make priors
-  prior <- list(G=list(G1=list(V=1,nu=0.02)), 
-                R=list(V=1,nu=0.02))
-  
-  # Running MCMCglmms
-  IUCN_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~IUCN+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  IUCNf_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~IUCN+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  IUCNm_MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~IUCN+1,
-                  random = ~Species,
-                  family = "categorical",
-                  ginverse = list(Species=inv.phylo),
-                  prior = prior,
-                  data = data_subset,
-                  nitt = 1000,
-                  burnin = 100,
-                  thin = 1,
-                  verbose = FALSE)
-  
-  print(summary(IUCN_MCMCanalysis$Sol))
-  print(summary(IUCNf_MCMCanalysis$Sol))
-  print(summary(IUCNm_MCMCanalysis$Sol))
-}
+## ----MGS_mcmcglmm, echo=TRUE--------------------------------------------------
+#Runs MCMCglmm for all our Sociality variables.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "MGS"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+f <- SSB ~ MGS + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MGS" & SSBTYPE == "SSB") {do_mcmc(f)}
 
 
-## ----correlations, eval=TRUE, echo=TRUE, results="hold"-----------------------
+## ----MGS_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
+file_contents <- readLines("output/MCMCGLMM_SSB_MGS_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----MGSf_mcmcglmm, echo=TRUE-------------------------------------------------
+#Runs MCMCglmm for all our Sociality variables.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "MGS"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+f <- FSSB ~ MGS + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MGS" & SSBTYPE == "FSSB") {do_mcmc(f)}
+
+
+## ----MGSf_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
+file_contents <- readLines("output/MCMCGLMM_FSSB_MGS_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----MGSm_mcmcglmm, echo=TRUE-------------------------------------------------
+#Runs MCMCglmm for all our Sociality variables.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "MGS"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+f <- MSSB ~ MGS + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MGS" & SSBTYPE == "MSSB") {do_mcmc(f)}
+
+
+## ----MGSm_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
+file_contents <- readLines("output/MCMCGLMM_MSSB_MGS_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----SDT_mcmcglmm, echo=TRUE--------------------------------------------------
+#Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "SDT"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+f <- SSB ~ SDT + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SDT" & SSBTYPE == "SSB") {do_mcmc(f)}
+
+
+## ----SDT_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
+file_contents <- readLines("output/MCMCGLMM_SSB_SDT_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----SDTf_mcmcglmm, echo=TRUE-------------------------------------------------
+#Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "SDT"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+f <- FSSB ~ SDT + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SDT" & SSBTYPE == "FSSB") {do_mcmc(f)}
+
+
+## ----SDTf_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
+file_contents <- readLines("output/MCMCGLMM_FSSB_SDT_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----SDTm_mcmcglmm, echo=TRUE-------------------------------------------------
+#Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "SDT"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+f <- MSSB ~ SDT + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SDT" & SSBTYPE == "MSSB") {do_mcmc(f)}
+
+
+## ----SDTm_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
+file_contents <- readLines("output/MCMCGLMM_MSSB_SDT_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----SDT_pagel, echo=TRUE-----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "SDT"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "SDT" & SSBTYPE == "SSB") {do_pagel()}
+
+
+## ----SDT_pagel_show, eval=TRUE, results="SHOW"--------------------------------
+file_contents <- readLines("output/PAGEL_SSB_SDT_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
+
+
+## ----SDTf_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "SDT"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "SDT" & SSBTYPE == "FSSB") {do_pagel()}
+
+
+## ----SDTf_pagel_show, eval=TRUE, results="SHOW"-------------------------------
+file_contents <- readLines("output/PAGEL_FSSB_SDT_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
+
+
+## ----SDTm_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "SDT"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "SDT" & SSBTYPE == "MSSB") {do_pagel()}
+
+
+## ----SDTm_pagel_show, eval=TRUE, results="SHOW"-------------------------------
+file_contents <- readLines("output/PAGEL_MSSB_SDT_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
+
+
+## ----SOC_mcmcglmm, echo=TRUE--------------------------------------------------
+#Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "SOC"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+f <- SSB ~ SOC + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SOC" & SSBTYPE == "SSB") {do_mcmc(f)}
+
+
+## ----SOC_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
+file_contents <- readLines("output/MCMCGLMM_SSB_SOC_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----SOCf_mcmcglmm, echo=TRUE-------------------------------------------------
+#Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "SOC"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+f <- FSSB ~ SOC + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SOC" & SSBTYPE == "FSSB") {do_mcmc(f)}
+
+
+## ----SOCf_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
+file_contents <- readLines("output/MCMCGLMM_FSSB_SOC_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----SOCm_mcmcglmm, echo=TRUE-------------------------------------------------
+#Runs MCMCglmm for all our Territoriality variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "SOC"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+f <- MSSB ~ SOC + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SOC" & SSBTYPE == "MSSB") {do_mcmc(f)}
+
+
+## ----SOCm_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
+file_contents <- readLines("output/MCMCGLMM_MSSB_SOC_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----RDM_mcmcglmm, echo=TRUE--------------------------------------------------
+#Runs MCMCglmm for all our Confusion variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "RDM"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+f <- SSB ~ RDM + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "RDM" & SSBTYPE == "SSB") {do_mcmc(f)}
+
+
+## ----RDM_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
+file_contents <- readLines("output/MCMCGLMM_SSB_RDM_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----RDMf_mcmcglmm, echo=TRUE-------------------------------------------------
+#Runs MCMCglmm for all our Confusion variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "RDM"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+f <- FSSB ~ RDM + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "RDM" & SSBTYPE == "FSSB") {do_mcmc(f)}
+
+
+## ----RDMf_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
+file_contents <- readLines("output/MCMCGLMM_FSSB_RDM_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----RDMm_mcmcglmm, echo=TRUE-------------------------------------------------
+#Runs MCMCglmm for all our Confusion variables. Individual binary variables each get their own suite of pagels below.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "RDM"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+f <- MSSB ~ RDM + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "RDM" & SSBTYPE == "MSSB") {do_mcmc(f)}
+
+
+## ----RDMm_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
+file_contents <- readLines("output/MCMCGLMM_MSSB_RDM_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----RDM_pagel, echo=TRUE-----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "RDM"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "RDM" & SSBTYPE == "SSB") {do_pagel()}
+
+
+## ----RDM_pagel_show, eval=TRUE, results="SHOW"--------------------------------
+file_contents <- readLines("output/PAGEL_SSB_RDM_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
+
+
+## ----RDMf_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "RDM"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "RDM" & SSBTYPE == "FSSB") {do_pagel()}
+
+
+## ----RDMf_pagel_show, eval=TRUE, results="SHOW"-------------------------------
+file_contents <- readLines("output/PAGEL_FSSB_RDM_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
+
+
+## ----RDMm_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "RDM"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "RDM" & SSBTYPE == "MSSB") {do_pagel()}
+
+
+## ----RDMm_pagel_show, eval=TRUE, results="SHOW"-------------------------------
+file_contents <- readLines("output/PAGEL_MSSB_RDM_TREEMCC_1.sum.txt")
+cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
+
+
+## ----AM_mcmcglmm, echo=TRUE---------------------------------------------------
+#Runs MCMCglmm for all our Maturity variables.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "AM"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+f <- SSB ~ FAM + MAM + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "AM" & SSBTYPE == "SSB") {do_mcmc(f)}
+
+
+## ----AM_mcmcglmm_show, eval=TRUE, results="SHOW"------------------------------
+file_contents <- readLines("output/MCMCGLMM_SSB_AM_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----AMf_mcmcglmm, echo=TRUE--------------------------------------------------
+#Runs MCMCglmm for all our Maturity variables.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "AM"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+f <- FSSB ~ FAM + MAM + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "AM" & SSBTYPE == "FSSB") {do_mcmc(f)}
+
+
+## ----AMf_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
+file_contents <- readLines("output/MCMCGLMM_FSSB_AM_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----AMm_mcmcglmm, echo=TRUE--------------------------------------------------
+#Runs MCMCglmm for all our Maturity variables.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "AM"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+f <- MSSB ~ FAM + MAM + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "AM" & SSBTYPE == "MSSB") {do_mcmc(f)}
+
+
+## ----AMm_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
+file_contents <- readLines("output/MCMCGLMM_MSSB_AM_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----IUCN_mcmcglmm, echo=TRUE-------------------------------------------------
+#Runs MCMCglmm for all our IUCN variables.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "IUCN"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+f <- SSB ~ IUCN + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "IUCN" & SSBTYPE == "SSB") {do_mcmc(f)}
+
+
+## ----IUCN_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
+file_contents <- readLines("output/MCMCGLMM_SSB_IUCN_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----IUCNf_mcmcglmm, echo=TRUE------------------------------------------------
+#Runs MCMCglmm for all our IUCN variables.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "IUCN"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+f <- FSSB ~ IUCN + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "IUCN" & SSBTYPE == "FSSB") {do_mcmc(f)}
+
+
+## ----IUCNf_mcmcglmm_show, eval=TRUE, results="SHOW"---------------------------
+file_contents <- readLines("output/MCMCGLMM_FSSB_IUCN_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----IUCNm_mcmcglmm, echo=TRUE------------------------------------------------
+#Runs MCMCglmm for all our IUCN variables.
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "IUCN"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+f <- MSSB ~ IUCN + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "IUCN" & SSBTYPE == "MSSB") {do_mcmc(f)}
+
+
+## ----IUCNm_mcmcglmm_show, eval=TRUE, results="SHOW"---------------------------
+file_contents <- readLines("output/MCMCGLMM_MSSB_IUCN_TREEMCC_1.sum.txt")
+cat(file_contents, sep = "\n")
+
+
+## ----correlations, echo=TRUE--------------------------------------------------
 # This code chunk assesses how each independent variable correlates with SSB
 # It prints out each statistical test, and also creates a file called "correlations.csv" that documents them
 # Here we use results="hold" to tell R markdown to put all the output in one section
@@ -1124,7 +723,7 @@ colnames(tests) <- c("name","p","keep") # Naming the columns for our dataframe w
 write.csv(tests,"correlations.csv",quote=FALSE,sep=",",row.names=FALSE,col.names=TRUE) # Saving our statistical tests to a file
 
 
-## ----signal, eval=TRUE, echo=TRUE, results="hold"-----------------------------
+## ----signal, echo=TRUE--------------------------------------------------------
 # This code chunk conducts a test for phylogenetic signal (d) using the "caper" package
 # d=1 indicates complete randomness of trait (no phylogenetic signal), all rest have phylogenetic signal
 # d=0 trait follows Brownian, d positive under 1 more different than Brownian, d negative more similar than Brownian
@@ -1135,7 +734,7 @@ caper::phylo.d(data, phy, Species, MSSB) #same analysis for male SSB. Positive D
 caper::phylo.d(data, phy, Species, TSP) # Tests for phylogenetic signal in typically single progeny, shows Brownian structure
 
 
-## ----ard, eval=TRUE, echo=TRUE, results=TRUE----------------------------------
+## ----ard, echo=TRUE-----------------------------------------------------------
 # This code chunk does an ancestral character estimation (ACE) for SSB using the "ape" package
 # It also determines the rates of transition between different characters / sets of characters
 # We use a CTMC to determine relationship between different variable in a matrix
@@ -1167,7 +766,7 @@ dataAFSSB_TSP <- ape::ace(data$FSSB_TSP, phy, type = "discrete", model = dataAFS
 print(dataAFSSB_TSP)
 
 
-## ----pagel, eval=TRUE, echo=TRUE, results=TRUE--------------------------------
+## ----pagel, echo=TRUE---------------------------------------------------------
 # This code chunk does pagel's directional test
 # Pagel's directional test: http://www.phytools.org/Cordoba2017/ex/9/Pagel94-method.html
 # These take a long time to run, so don't be worried if results don't print immediately
@@ -1199,7 +798,7 @@ if (RERUN) {
 }
 
 
-## ----mcmcglmm, eval=TRUE, echo=TRUE, results=TRUE-----------------------------
+## ----mcmcglmm, echo=TRUE------------------------------------------------------
 # This code chunk runs an MCMCglmm analysis
 
 if (RERUN) {
@@ -1257,7 +856,7 @@ if (RERUN) {
 }
 
 
-## ----sse_show, eval=TRUE, results=TRUE----------------------------------------
+## ----sse_show, echo=TRUE------------------------------------------------------
 MCMCresults <- read.csv("bisse.tsv",sep="\t") # Retrieving our MCMC results from the bisse.csv file
 MCMCsummary <- MCMCvis::MCMCsummary(coda::mcmc(MCMCresults),excl=c("i","p"),Rhat=FALSE,round=4) # Turning into MCMC object and summarizing output (excluding iteration and probability)
 print(MCMCsummary)

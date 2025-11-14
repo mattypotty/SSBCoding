@@ -85,6 +85,9 @@ if (USEGLOBAL) {set_global()}
 if (!exists("NUMBER")) {NUMBER <- 1} # Allows us to run multiple analyses of the same type, each with a different number
 set.seed(NUMBER) # For analyses requiring random numbers, we might want the same output every time
 
+if (!exists("USERANDOM")) {USERANDOM <- FALSE} # Whether we use a random tree from the set instead of the MCC tree
+# OPTIONS: FALSE, TRUE
+
 if (!exists("ANALYSIS")) {ANALYSIS <- "NONE"}
 # OPTIONS: "NONE", "MCCTREE", "SPECMATS", "MCMCGLMM", "PAGEL"
 
@@ -97,13 +100,10 @@ if (!exists("HYPOTHESIS")) {HYPOTHESIS <- "NONE"}
 if (!exists("VARIABLE")) {VARIABLE <- "NONE"}
 # OPTIONS: "NONE", "NAC", "SPI", "TSP", "SDT", "RDM"
 
-if (!exists("USERANDOM")) {USERANDOM <- FALSE} # Whether we use a random tree from the set instead of the MCC tree
-# OPTIONS: FALSE, TRUE
-
 # MCMC Settings
-NITT <- 100 # 100,000
-BURNIN <- 10 # 10,000
-THIN <- 1 # 100
+NITT <- 100000 # 100,000
+BURNIN <- 10000 # 10,000
+THIN <- 100 # 100
 prior <- list(G=list(G1=list(V=1,nu=0.02)),
               R=list(V=1,nu=0.02))
 ```
@@ -133,7 +133,7 @@ do_mcmc <- function(f) {
                   nitt = NITT,
                   burnin = BURNIN,
                   thin = THIN,
-                  verbose = FALSE)
+                  verbose = TRUE)
   
   write.csv(MCMCanalysis$Sol,out_file,row.names=FALSE,quote=FALSE)
   out <- capture.output(cat(paste0("ESS: ",ess(MCMCanalysis$Sol),"\n")),
