@@ -202,6 +202,12 @@ do_pagel <- function() {
 
 DESCRIPTION OF DATASET HERE
 
+Data Cleaning:
+
+The species list used in this analysis was updated to fit with Phylacine 1.2 from Gómez et al.’s subset 4 and 1 for the character trait and diversification-extinction analyses, respectively. Discrepancies between the two data sets were evaluated using the American Society of Mammalogists’ Mammal Diversity Database, with the most up to date taxonomy being applied (Supplemental table for name changes to 1700). During those discrepancies, if Phylacine 1.2’s taxonomy did not reflect that of the Mammal Diversity Database, note of it was added to the R analysis so that it could be automatically changed during phylogeny reading, but still maintained as the most accurate form in our dataset (Supplemental table for dataset to phylogeny changes). In cases of species that had been duplicated or are now included under other taxa, if SSB was present for said duplicate or inclusion, it was listed as present for the final dataset. 
+
+NLV = No Longer Valid. Includes all species removed from analysis. 
+
 ```{r dataset, eval=TRUE, results="SHOW"}
 # This code chunk reads in our data files
 # Note that we want to run this code (eval=TRUE) and show the output (results="SHOW"), but we don't need to see it
@@ -646,7 +652,7 @@ cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 ```
 
 ### Hypothesis 3: 
-Solitary species that demonstrate occasional grouping are more likely to have same-sex interactions than purely solitary species, and are thus more likely to exhibit SSB.
+Solitary species that demonstrate occasional grouping are more likely to have same-sex interactions than purely solitary species, and are thus more likely to exhibit SSB. Monogamous pairs and small family units are not considered groups on their own.
 
 Tested covariates:
 
