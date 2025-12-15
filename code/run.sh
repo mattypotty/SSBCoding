@@ -12,7 +12,7 @@ END=$( date '+%F_%H:%M:%S' )
 echo $END
 
 T=$(printf '\t')
-echo "$INF$T$START$T$END" >> /storage1/fs1/michael.landis/Active/SSBcoding/joblogs/run_log.txt
+echo "$INF$T$START$T$END" >> /storage1/fs1/michael.landis/Active/SSBCoding/joblogs/run_log.txt
 
 # OPTIONS:
 # NUMBER                    > 001 : 010
