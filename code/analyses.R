@@ -38,15 +38,27 @@ library(styler) # For knitting
 # This code chunk sets the working directory for the analyses and creates some file paths for saving output
 # This can be done by hand too:
 # clicking session > setting working directory > to source file location
-setwd(this.path::here()) # Sets the working directory to the place where this file is located (using the "this.path" package)
+setwd(this.path::here(..=1)) # Sets the working directory to the main SSB folder (using the "this.path" package)
 
 
 ## ----analysis_settings, eval=TRUE---------------------------------------------
 # We will use ALL CAPS for our analysis settings
 # This way, we can look at a variable and know it is a setting
 
+USEGLOBAL <- FALSE
+
+args <- commandArgs(trailingOnly = TRUE)
+if (!identical(args,character(0))) {
+  USEGLOBAL <- TRUE
+  .NUMBER <- args[1]
+  .USERANDOM <- args[2]
+  .ANALYSIS <- args[3]
+  .SSBTYPE <- args[4]
+  .HYPOTHESIS <- args[5]
+  .VARIABLE <- args[6]
+}
+
 # We'll use the variable USEGLOBAL to indicate whether we want to use inputs from shell script
-if (!exists("USEGLOBAL")) {USEGLOBAL <- FALSE}
 set_global <- function() {
   if (exists(".NUMBER")) {NUMBER <- .NUMBER}
   if (exists(".ANALYSIS")) {ANALYSIS <- .ANALYSIS}
@@ -176,11 +188,23 @@ do_pagel <- function() {
 # This code chunk reads in our data files
 # Note that we want to run this code (eval=TRUE) and show the output (results="SHOW"), but we don't need to see it
 
-data_file <- read.csv("data_20251020.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
+data_file <- read.csv("data/FINALdata_20251124.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
 print(data_file$Column.Name.Key[data_file$Column.Name.Key != ""]) # Prints the column name key
 print(data_file$Mating.Group.Structures.Key[data_file$Mating.Group.Structures.Key != ""]) # prints the group mating structures key
 
 data_full <- data.frame(data_file[,-which(colnames(data_file)=="Column.Name.Key" | colnames(data_file)=="Mating.Group.Structures.Key")]) # Removing keys from dataset
+
+# Fixing any problems with the dataset
+data_full$Species[which(data_full$Species=="Otaria flavescens")] <- "Otaria_flavescens"
+
+# Removing species which are not in the tree
+phylogeny_changes <- read.csv("data/Dataset_to_Phylogeny_Changes.csv", header = TRUE, sep = ",")[,1:2]
+for (i in 1:nrow(phylogeny_changes)) {
+  if (phylogeny_changes$Name.used.for.Phylacine[i] == "NLV") {
+    name <- phylogeny_changes$X1700.Species.Name[i]
+    data_full <- data_full[data_full$Species != name,]
+  }
+}
 
 SOC <- rep(NA,nrow(data_full))
 for (i in 1:nrow(data_full)) {
@@ -213,13 +237,13 @@ for (i in 1:ncol(data_full)) { # looping through all the columns to format each 
 # We want to see this code (echo=TRUE), but we don't want to run it every time we do our analyses (it takes a while)
 ANALYSIS <- "MCMCTREE"; if (USEGLOBAL) {set_global()}
 if (ANALYSIS == "MCCTREE") {
-  trees <- ape::read.nexus("new_phylogeny.nex")
+  trees <- ape::read.nexus("data/phylogeny.nex")
   phy_mcc <- phangorn::maxCladeCred(trees) # Generates a maximum clade credibility (best) tree from the 1000 trees
   cat(paste0("Is Ultrametric? ", ape::is.ultrametric(phy_mcc)))
   cat(paste0("Is Bifurcating? ", castor::is_bifurcating(phy_mcc)))
   n_taxa <- length(phy_mcc$tip.label) # Gets the number of species from looking at the tip labels
   phy_mcc$node.label <- c((n_taxa + 1):(n_taxa + phy_mcc$Nnode)) # Gives number labels to nodes
-  ape::write.tree(phy_mcc,"new_mcc_tree.txt") # Saves this tree to a file called "mcc_tree.txt"
+  ape::write.tree(phy_mcc,"data/mcc_tree.txt") # Saves this tree to a file called "mcc_tree.txt"
 }
 
 
@@ -227,24 +251,14 @@ if (ANALYSIS == "MCCTREE") {
 # This code chunk reads in the full set of trees
 # It also reads in our MCC tree (one best tree)
 
-phy_mcc <- ape::read.tree("new_mcc_tree.txt") # Reads our MCC tree from a file
+phy_mcc <- ape::read.tree("data/mcc_tree.txt") # Reads our MCC tree from a file
 n_taxa <- length(phy_mcc$tip.label)
 n_node <- phy_mcc$Nnode
 
-phy_all <- ape::read.nexus("new_phylogeny.nex") # Reads our posterior sample of trees from a file
+phy_all <- ape::read.nexus("data/phylogeny.nex") # Reads our posterior sample of trees from a file
 # Giving number labels to nodes in all 1000 phylogenies
 for (i in 1:length(phy_all)) {
   phy_all[[i]]$node_label <- c((n_taxa + 1):(n_taxa + n_node))
-}
-
-
-## ----get_mismatches-----------------------------------------------------------
-# This code checks for all the species that are in the data but not in the tree
-ANALYSIS <- "SPECMATS"; if (USEGLOBAL) {set_global()}
-if (ANALYSIS == "SPECMATS") {
-  LON <- data_full$Species # Reduces species from my data to LON ("List of Names")
-  check <- LON[which(!(LON %in% phy_mcc$tip.label))] # Lists species which are in mine that are not in theirs (species to check)
-  print(paste0("Species to check: ",paste(check,collapse=", ")),quote=F) # Prints out the list of species that need to be checked
 }
 
 
@@ -259,6 +273,27 @@ if (USERANDOM == TRUE) {
   num <- sample(1:1000,1)
   phy_full <- phy_all[[num]]
   tree_number <- paste0("TREE",num)
+}
+
+# Renaming or removing Phylacine species that do not match our dataset
+phylogeny_changes <- read.csv("data/Dataset_to_Phylogeny_Changes.csv", header = TRUE, sep = ",")[,1:2]
+for (i in 1:nrow(phylogeny_changes)) {
+  if (phylogeny_changes$Name.used.for.Phylacine[i] != "NLV") {
+    new_name <- phylogeny_changes$X1700.Species.Name[i]
+    old_name <- phylogeny_changes$Name.used.for.Phylacine[i]
+    phy_idx <- which(phy_full$tip.label==old_name)
+    phy_full$tip.label[phy_idx] <- new_name
+  }
+}
+
+
+## ----get_mismatches-----------------------------------------------------------
+# This code checks for all the species that are in the data but not in the tree
+ANALYSIS <- "SPECMATS"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "SPECMATS") {
+  LON <- data_full$Species # Reduces species from my data to LON ("List of Names")
+  check <- LON[which(!(LON %in% phy_full$tip.label))] # Lists species which are in mine that are not in theirs (species to check)
+  print(paste0("Species to check: ",paste(check,collapse=", ")),quote=F) # Prints out the list of species that need to be checked
 }
 
 
