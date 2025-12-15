@@ -19,6 +19,7 @@ knitr::opts_chunk$set(eval=FALSE,echo=FALSE,results=FALSE,message=FALSE,warning=
 # All of the packages for this project are accessible on CRAN, a repository run by the R dev team
 # This code chunk is for loading different packages so we can access their functions
 # Note that we want to run this code (eval=TRUE) but we don't need to show it in our document
+print("Loading packages...",quote=F)
 
 library(this.path) # This package lets us get the filepath of the script we are running
 library(ape) # Used for handling trees
@@ -38,16 +39,21 @@ library(styler) # For knitting
 # This code chunk sets the working directory for the analyses and creates some file paths for saving output
 # This can be done by hand too:
 # clicking session > setting working directory > to source file location
-setwd(this.path::here(..=1)) # Sets the working directory to the main SSB folder (using the "this.path" package)
+
+setwd(this.path::here()) # Sets the working directory to the main SSB folder (using the "this.path" package)
+print(paste0("Working directory: ",getwd()),quote=F)
 
 
 ## ----analysis_settings, eval=TRUE---------------------------------------------
 # We will use ALL CAPS for our analysis settings
 # This way, we can look at a variable and know it is a setting
+print("Setting up analysis...",quote=F)
 
 USEGLOBAL <- FALSE
 
 args <- commandArgs(trailingOnly = TRUE)
+print("Input arguments:",quote=F)
+print(args)
 if (!identical(args,character(0))) {
   USEGLOBAL <- TRUE
   .NUMBER <- args[1]
@@ -100,8 +106,9 @@ prior <- list(G=list(G1=list(V=1,nu=0.02)),
 do_mcmc <- function(f) {
   # File names
   analysis_name <- paste0(ANALYSIS,"_",SSBTYPE,"_",HYPOTHESIS,"_",tree_number,"_",NUMBER)
-  out_file <- paste0("output/",analysis_name,".log.csv")
-  summary_file <- paste0("output/",analysis_name,".sum.txt")
+  print(paste0("Performing analysis: ",analysis_name),quote=F)
+  out_file <- paste0("../output/",analysis_name,".log.csv")
+  summary_file <- paste0("../output/",analysis_name,".sum.txt")
   
   #Read in data
   columns <- c("Species",all.vars(f))
@@ -132,7 +139,8 @@ do_mcmc <- function(f) {
 do_pagel <- function() {
   # File names
   analysis_name <- paste0(ANALYSIS,"_",SSBTYPE,"_",VARIABLE,"_",tree_number,"_",NUMBER)
-  summary_file <- paste0("output/",analysis_name,".sum.txt")
+  print(paste0("Performing analysis: ",analysis_name),quote=F)
+  summary_file <- paste0("../output/",analysis_name,".sum.txt")
   
   #Read in data
   columns <- c("Species",SSBTYPE,VARIABLE)
@@ -187,10 +195,11 @@ do_pagel <- function() {
 ## ----dataset, eval=TRUE, results="SHOW"---------------------------------------
 # This code chunk reads in our data files
 # Note that we want to run this code (eval=TRUE) and show the output (results="SHOW"), but we don't need to see it
+print("Reading in data...",quote=F)
 
-data_file <- read.csv("data/FINALdata_20251124.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
-print(data_file$Column.Name.Key[data_file$Column.Name.Key != ""]) # Prints the column name key
-print(data_file$Mating.Group.Structures.Key[data_file$Mating.Group.Structures.Key != ""]) # prints the group mating structures key
+data_file <- read.csv("../data/FINALdata_20251124.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
+#print(data_file$Column.Name.Key[data_file$Column.Name.Key != ""]) # Prints the column name key
+#print(data_file$Mating.Group.Structures.Key[data_file$Mating.Group.Structures.Key != ""]) # prints the group mating structures key
 
 data_full <- data.frame(data_file[,-which(colnames(data_file)=="Column.Name.Key" | colnames(data_file)=="Mating.Group.Structures.Key")]) # Removing keys from dataset
 
@@ -198,7 +207,7 @@ data_full <- data.frame(data_file[,-which(colnames(data_file)=="Column.Name.Key"
 data_full$Species[which(data_full$Species=="Otaria flavescens")] <- "Otaria_flavescens"
 
 # Removing species which are not in the tree
-phylogeny_changes <- read.csv("data/Dataset_to_Phylogeny_Changes.csv", header = TRUE, sep = ",")[,1:2]
+phylogeny_changes <- read.csv("../data/Dataset_to_Phylogeny_Changes.csv", header = TRUE, sep = ",")[,1:2]
 for (i in 1:nrow(phylogeny_changes)) {
   if (phylogeny_changes$Name.used.for.Phylacine[i] == "NLV") {
     name <- phylogeny_changes$X1700.Species.Name[i]
@@ -229,21 +238,20 @@ for (i in 1:ncol(data_full)) { # looping through all the columns to format each 
   if (col %in% categorical) {data_full[[col]] <- as.factor(data_full[[col]])} # formatting all categorical columns as factors
 }
 
-#print(data_full)
-
 
 ## ----make_tree, echo=TRUE-----------------------------------------------------
 # This code chunk reads our giant list of trees and combines them to make one "best" tree
 # We want to see this code (echo=TRUE), but we don't want to run it every time we do our analyses (it takes a while)
 ANALYSIS <- "MCMCTREE"; if (USEGLOBAL) {set_global()}
 if (ANALYSIS == "MCCTREE") {
-  trees <- ape::read.nexus("data/phylogeny.nex")
+  print("Generating MCC tree...",quote=F)
+  trees <- ape::read.nexus("../data/phylogeny.nex")
   phy_mcc <- phangorn::maxCladeCred(trees) # Generates a maximum clade credibility (best) tree from the 1000 trees
   cat(paste0("Is Ultrametric? ", ape::is.ultrametric(phy_mcc)))
   cat(paste0("Is Bifurcating? ", castor::is_bifurcating(phy_mcc)))
   n_taxa <- length(phy_mcc$tip.label) # Gets the number of species from looking at the tip labels
   phy_mcc$node.label <- c((n_taxa + 1):(n_taxa + phy_mcc$Nnode)) # Gives number labels to nodes
-  ape::write.tree(phy_mcc,"data/mcc_tree.txt") # Saves this tree to a file called "mcc_tree.txt"
+  ape::write.tree(phy_mcc,"../data/mcc_tree.txt") # Saves this tree to a file called "mcc_tree.txt"
 }
 
 
@@ -251,11 +259,12 @@ if (ANALYSIS == "MCCTREE") {
 # This code chunk reads in the full set of trees
 # It also reads in our MCC tree (one best tree)
 
-phy_mcc <- ape::read.tree("data/mcc_tree.txt") # Reads our MCC tree from a file
+print("Reading trees...",quote=F)
+phy_mcc <- ape::read.tree("../data/mcc_tree.txt") # Reads our MCC tree from a file
 n_taxa <- length(phy_mcc$tip.label)
 n_node <- phy_mcc$Nnode
 
-phy_all <- ape::read.nexus("data/phylogeny.nex") # Reads our posterior sample of trees from a file
+phy_all <- ape::read.nexus("../data/phylogeny.nex") # Reads our posterior sample of trees from a file
 # Giving number labels to nodes in all 1000 phylogenies
 for (i in 1:length(phy_all)) {
   phy_all[[i]]$node_label <- c((n_taxa + 1):(n_taxa + n_node))
@@ -266,6 +275,7 @@ for (i in 1:length(phy_all)) {
 # This code chunk chooses a phylogeny to use with our current analysis
 # There are two options: use the MCC tree, or use a random tree
 
+print("Choosing tree...",quote=F)
 phy_full <- phy_mcc # This is the default behavior
 tree_number <- "TREEMCC"
 # If we want a random tree instead, we do this
@@ -276,7 +286,7 @@ if (USERANDOM == TRUE) {
 }
 
 # Renaming or removing Phylacine species that do not match our dataset
-phylogeny_changes <- read.csv("data/Dataset_to_Phylogeny_Changes.csv", header = TRUE, sep = ",")[,1:2]
+phylogeny_changes <- read.csv("../data/Dataset_to_Phylogeny_Changes.csv", header = TRUE, sep = ",")[,1:2]
 for (i in 1:nrow(phylogeny_changes)) {
   if (phylogeny_changes$Name.used.for.Phylacine[i] != "NLV") {
     new_name <- phylogeny_changes$X1700.Species.Name[i]
@@ -285,10 +295,12 @@ for (i in 1:nrow(phylogeny_changes)) {
     phy_full$tip.label[phy_idx] <- new_name
   }
 }
+print(paste0("Chosen tree: ",tree_number),quote=F)
 
 
 ## ----get_mismatches-----------------------------------------------------------
 # This code checks for all the species that are in the data but not in the tree
+print("Checking for mismatched species...",quote=F)
 ANALYSIS <- "SPECMATS"; if (USEGLOBAL) {set_global()}
 if (ANALYSIS == "SPECMATS") {
   LON <- data_full$Species # Reduces species from my data to LON ("List of Names")
@@ -301,6 +313,7 @@ if (ANALYSIS == "SPECMATS") {
 # This code chunk makes sure our species data and our phylogeny have the same taxa in them
 # We will use this smaller tree (phy) for most of our analyses
 
+print("Getting tree subset...",quote=F)
 LON <- data_full$Species # Reduces species from my data to LON ("List of Names")
 SPECMATS <- LON[which((LON %in% phy_full$tip.label))] # Creates a variable SPECMATS for all the species of mine which match those in the full trees
 phy <- ape::keep.tip(phy_full, SPECMATS) # Creates a new tree reducing phy to just SPECMATS, can then plot this with plot.phylo(SPECMATSTREE)
