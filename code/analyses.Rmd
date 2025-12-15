@@ -80,12 +80,12 @@ print("Input arguments:",quote=F)
 print(args)
 if (!identical(args,character(0))) {
   USEGLOBAL <- TRUE
-  .NUMBER <- args[1]
-  .USERANDOM <- args[2]
-  .ANALYSIS <- args[3]
-  .SSBTYPE <- args[4]
-  .HYPOTHESIS <- args[5]
-  .VARIABLE <- args[6]
+  .NUMBER <<- args[1]
+  .USERANDOM <<- args[2]
+  .ANALYSIS <<- args[3]
+  .SSBTYPE <<- args[4]
+  .HYPOTHESIS <<- args[5]
+  .VARIABLE <<- args[6]
 }
 
 # We'll use the variable USEGLOBAL to indicate whether we want to use inputs from shell script
