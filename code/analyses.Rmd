@@ -121,8 +121,8 @@ if (!exists("VARIABLE")) {VARIABLE <- "NONE"}
 # OPTIONS: "NONE", "NAC", "SPI", "TSP", "SDT", "RDM"
 
 # MCMC Settings
-NITT <- 100000 # 100,000
-BURNIN <- 10000 # 10,000
+NITT <- 1000000 # 1,000,000
+BURNIN <- 100000 # 100,000
 THIN <- 100 # 100
 prior <- list(G=list(G1=list(V=1,nu=0.02)),
               R=list(V=1,nu=0.02))
