@@ -1,8 +1,14 @@
-RUN_LIST=$(seq -w 001 001)
+NUMBER_LIST=$(seq -w 001 001)
+SSBTYPE_LIST=("SSB" "FSSB" "MSSB")
+HYPOTHESIS_LIST=("MI" "MGS" "SDT" "RDM" "AM" "IUCN")
+VARIABLE_LIST=("NAC" "SPI" "TSP" "SDT" "RDM")
 
-for i in ${RUN_LIST[@]}
+for NUMBER in ${NUMBER_LIST[@]}
 do
-	source run_job.sh ${i} "FALSE" "NONE" "NONE" "NONE" "NONE"
+	for SSBTYPE in ${SSBTYPE_LIST[@]}
+	do
+		source run_job.sh ${NUMBER} "FALSE" "MCMCGLMM" ${SSBTYPE} "MI" "NONE"
+	done
 done
 
 # OPTIONS:
