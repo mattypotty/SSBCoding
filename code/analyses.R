@@ -78,7 +78,7 @@ set_global <- function() {
 
 if (USEGLOBAL) {set_global()}
 
-if (!exists("NUMBER")) {NUMBER <- 1} # Allows us to run multiple analyses of the same type, each with a different number
+if (!exists("NUMBER")) {NUMBER <- 001} # Allows us to run multiple analyses of the same type, each with a different number
 set.seed(NUMBER) # For analyses requiring random numbers, we might want the same output every time
 
 if (!exists("USERANDOM")) {USERANDOM <- FALSE} # Whether we use a random tree from the set instead of the MCC tree
@@ -339,9 +339,6 @@ f <- SSB ~ NAC + PC + SPI + GP + FWA + MR + TSP + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MI" & SSBTYPE == "SSB") {do_mcmc(f)}
 
 
-## ----MI_mcmcglmm_show, eval=TRUE, results="SHOW"------------------------------
-file_contents <- readLines("output/MCMCGLMM_SSB_MI_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----MIf_mcmcglmm, echo=TRUE--------------------------------------------------
@@ -351,9 +348,6 @@ f <- FSSB ~ NAC + PC + SPI + GP + FWA + MR + TSP + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MI" & SSBTYPE == "FSSB") {do_mcmc(f)}
 
 
-## ----MIf_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
-file_contents <- readLines("output/MCMCGLMM_FSSB_MI_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----MIm_mcmcglmm, echo=TRUE--------------------------------------------------
@@ -363,9 +357,6 @@ f <- MSSB ~ NAC + PC + SPI + GP + FWA + MR + TSP + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MI" & SSBTYPE == "MSSB") {do_mcmc(f)}
 
 
-## ----MIm_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
-file_contents <- readLines("output/MCMCGLMM_MSSB_MI_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----NAC_pagel, echo=TRUE-----------------------------------------------------
@@ -373,9 +364,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "NAC"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_gl
 if (ANALYSIS == "PAGEL" & VARIABLE == "NAC" & SSBTYPE == "SSB") {do_pagel()}
 
 
-## ----NAC_pagel_show, eval=TRUE, results="SHOW"--------------------------------
-file_contents <- readLines("output/PAGEL_SSB_NAC_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----NACf_pagel, echo=TRUE----------------------------------------------------
@@ -383,9 +371,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "NAC"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_g
 if (ANALYSIS == "PAGEL" & VARIABLE == "NAC" & SSBTYPE == "FSSB") {do_pagel()}
 
 
-## ----NACf_pagel_show, eval=TRUE, results="SHOW"-------------------------------
-file_contents <- readLines("output/PAGEL_FSSB_NAC_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----NACm_pagel, echo=TRUE----------------------------------------------------
@@ -393,9 +378,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "NAC"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_g
 if (ANALYSIS == "PAGEL" & VARIABLE == "NAC" & SSBTYPE == "MSSB") {do_pagel()}
 
 
-## ----NACm_pagel_show, eval=TRUE, results="SHOW"-------------------------------
-file_contents <- readLines("output/PAGEL_MSSB_NAC_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----SPI_pagel, echo=TRUE-----------------------------------------------------
@@ -403,9 +385,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "SPI"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_gl
 if (ANALYSIS == "PAGEL" & VARIABLE == "SPI" & SSBTYPE == "SSB") {do_pagel()}
 
 
-## ----SPI_pagel_show, eval=TRUE, results="SHOW"--------------------------------
-file_contents <- readLines("output/PAGEL_SSB_SPI_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----SPIf_pagel, echo=TRUE----------------------------------------------------
@@ -413,9 +392,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "SPI"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_g
 if (ANALYSIS == "PAGEL" & VARIABLE == "SPI" & SSBTYPE == "FSSB") {do_pagel()}
 
 
-## ----SPIf_pagel_show, eval=TRUE, results="SHOW"-------------------------------
-file_contents <- readLines("output/PAGEL_FSSB_SPI_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----SPIm_pagel, echo=TRUE----------------------------------------------------
@@ -423,9 +399,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "SPI"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_g
 if (ANALYSIS == "PAGEL" & VARIABLE == "SPI" & SSBTYPE == "MSSB") {do_pagel()}
 
 
-## ----SPIm_pagel_show, eval=TRUE, results="SHOW"-------------------------------
-file_contents <- readLines("output/PAGEL_MSSB_SPI_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----TSP_pagel, echo=TRUE-----------------------------------------------------
@@ -433,9 +406,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "TSP"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_gl
 if (ANALYSIS == "PAGEL" & VARIABLE == "TSP" & SSBTYPE == "SSB") {do_pagel()}
 
 
-## ----TSP_pagel_show, eval=TRUE, results="SHOW"--------------------------------
-file_contents <- readLines("output/PAGEL_SSB_TSP_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----TSPf_pagel, echo=TRUE----------------------------------------------------
@@ -443,9 +413,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "TSP"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_g
 if (ANALYSIS == "PAGEL" & VARIABLE == "TSP" & SSBTYPE == "FSSB") {do_pagel()}
 
 
-## ----TSPf_pagel_show, eval=TRUE, results="SHOW"-------------------------------
-file_contents <- readLines("output/PAGEL_FSSB_TSP_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----TSPm_pagel, echo=TRUE----------------------------------------------------
@@ -453,9 +420,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "TSP"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_g
 if (ANALYSIS == "PAGEL" & VARIABLE == "TSP" & SSBTYPE == "MSSB") {do_pagel()}
 
 
-## ----TSPm_pagel_show, eval=TRUE, results="SHOW"-------------------------------
-file_contents <- readLines("output/PAGEL_MSSB_TSP_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----MGS_mcmcglmm, echo=TRUE--------------------------------------------------
@@ -465,9 +429,6 @@ f <- SSB ~ MGS + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MGS" & SSBTYPE == "SSB") {do_mcmc(f)}
 
 
-## ----MGS_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
-file_contents <- readLines("output/MCMCGLMM_SSB_MGS_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----MGSf_mcmcglmm, echo=TRUE-------------------------------------------------
@@ -477,9 +438,6 @@ f <- FSSB ~ MGS + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MGS" & SSBTYPE == "FSSB") {do_mcmc(f)}
 
 
-## ----MGSf_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
-file_contents <- readLines("output/MCMCGLMM_FSSB_MGS_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----MGSm_mcmcglmm, echo=TRUE-------------------------------------------------
@@ -489,9 +447,6 @@ f <- MSSB ~ MGS + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MGS" & SSBTYPE == "MSSB") {do_mcmc(f)}
 
 
-## ----MGSm_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
-file_contents <- readLines("output/MCMCGLMM_MSSB_MGS_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----SDT_mcmcglmm, echo=TRUE--------------------------------------------------
@@ -501,9 +456,6 @@ f <- SSB ~ SDT + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SDT" & SSBTYPE == "SSB") {do_mcmc(f)}
 
 
-## ----SDT_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
-file_contents <- readLines("output/MCMCGLMM_SSB_SDT_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----SDTf_mcmcglmm, echo=TRUE-------------------------------------------------
@@ -513,9 +465,6 @@ f <- FSSB ~ SDT + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SDT" & SSBTYPE == "FSSB") {do_mcmc(f)}
 
 
-## ----SDTf_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
-file_contents <- readLines("output/MCMCGLMM_FSSB_SDT_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----SDTm_mcmcglmm, echo=TRUE-------------------------------------------------
@@ -525,9 +474,6 @@ f <- MSSB ~ SDT + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SDT" & SSBTYPE == "MSSB") {do_mcmc(f)}
 
 
-## ----SDTm_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
-file_contents <- readLines("output/MCMCGLMM_MSSB_SDT_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----SDT_pagel, echo=TRUE-----------------------------------------------------
@@ -535,9 +481,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "SDT"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_gl
 if (ANALYSIS == "PAGEL" & VARIABLE == "SDT" & SSBTYPE == "SSB") {do_pagel()}
 
 
-## ----SDT_pagel_show, eval=TRUE, results="SHOW"--------------------------------
-file_contents <- readLines("output/PAGEL_SSB_SDT_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----SDTf_pagel, echo=TRUE----------------------------------------------------
@@ -545,9 +488,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "SDT"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_g
 if (ANALYSIS == "PAGEL" & VARIABLE == "SDT" & SSBTYPE == "FSSB") {do_pagel()}
 
 
-## ----SDTf_pagel_show, eval=TRUE, results="SHOW"-------------------------------
-file_contents <- readLines("output/PAGEL_FSSB_SDT_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----SDTm_pagel, echo=TRUE----------------------------------------------------
@@ -555,9 +495,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "SDT"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_g
 if (ANALYSIS == "PAGEL" & VARIABLE == "SDT" & SSBTYPE == "MSSB") {do_pagel()}
 
 
-## ----SDTm_pagel_show, eval=TRUE, results="SHOW"-------------------------------
-file_contents <- readLines("output/PAGEL_MSSB_SDT_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----SOC_mcmcglmm, echo=TRUE--------------------------------------------------
@@ -567,9 +504,6 @@ f <- SSB ~ SOC + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SOC" & SSBTYPE == "SSB") {do_mcmc(f)}
 
 
-## ----SOC_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
-file_contents <- readLines("output/MCMCGLMM_SSB_SOC_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----SOCf_mcmcglmm, echo=TRUE-------------------------------------------------
@@ -579,9 +513,6 @@ f <- FSSB ~ SOC + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SOC" & SSBTYPE == "FSSB") {do_mcmc(f)}
 
 
-## ----SOCf_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
-file_contents <- readLines("output/MCMCGLMM_FSSB_SOC_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----SOCm_mcmcglmm, echo=TRUE-------------------------------------------------
@@ -591,9 +522,6 @@ f <- MSSB ~ SOC + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "SOC" & SSBTYPE == "MSSB") {do_mcmc(f)}
 
 
-## ----SOCm_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
-file_contents <- readLines("output/MCMCGLMM_MSSB_SOC_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----RDM_mcmcglmm, echo=TRUE--------------------------------------------------
@@ -603,9 +531,6 @@ f <- SSB ~ RDM + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "RDM" & SSBTYPE == "SSB") {do_mcmc(f)}
 
 
-## ----RDM_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
-file_contents <- readLines("output/MCMCGLMM_SSB_RDM_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----RDMf_mcmcglmm, echo=TRUE-------------------------------------------------
@@ -615,9 +540,6 @@ f <- FSSB ~ RDM + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "RDM" & SSBTYPE == "FSSB") {do_mcmc(f)}
 
 
-## ----RDMf_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
-file_contents <- readLines("output/MCMCGLMM_FSSB_RDM_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----RDMm_mcmcglmm, echo=TRUE-------------------------------------------------
@@ -627,9 +549,6 @@ f <- MSSB ~ RDM + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "RDM" & SSBTYPE == "MSSB") {do_mcmc(f)}
 
 
-## ----RDMm_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
-file_contents <- readLines("output/MCMCGLMM_MSSB_RDM_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----RDM_pagel, echo=TRUE-----------------------------------------------------
@@ -637,9 +556,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "RDM"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_gl
 if (ANALYSIS == "PAGEL" & VARIABLE == "RDM" & SSBTYPE == "SSB") {do_pagel()}
 
 
-## ----RDM_pagel_show, eval=TRUE, results="SHOW"--------------------------------
-file_contents <- readLines("output/PAGEL_SSB_RDM_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----RDMf_pagel, echo=TRUE----------------------------------------------------
@@ -647,9 +563,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "RDM"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_g
 if (ANALYSIS == "PAGEL" & VARIABLE == "RDM" & SSBTYPE == "FSSB") {do_pagel()}
 
 
-## ----RDMf_pagel_show, eval=TRUE, results="SHOW"-------------------------------
-file_contents <- readLines("output/PAGEL_FSSB_RDM_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----RDMm_pagel, echo=TRUE----------------------------------------------------
@@ -657,9 +570,6 @@ ANALYSIS <- "PAGEL"; VARIABLE <- "RDM"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_g
 if (ANALYSIS == "PAGEL" & VARIABLE == "RDM" & SSBTYPE == "MSSB") {do_pagel()}
 
 
-## ----RDMm_pagel_show, eval=TRUE, results="SHOW"-------------------------------
-file_contents <- readLines("output/PAGEL_MSSB_RDM_TREEMCC_1.sum.txt")
-cat(file_contents[(length(file_contents)-5):length(file_contents)], sep = "\n")
 
 
 ## ----AM_mcmcglmm, echo=TRUE---------------------------------------------------
@@ -669,9 +579,6 @@ f <- SSB ~ FAM + MAM + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "AM" & SSBTYPE == "SSB") {do_mcmc(f)}
 
 
-## ----AM_mcmcglmm_show, eval=TRUE, results="SHOW"------------------------------
-file_contents <- readLines("output/MCMCGLMM_SSB_AM_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----AMf_mcmcglmm, echo=TRUE--------------------------------------------------
@@ -681,9 +588,6 @@ f <- FSSB ~ FAM + MAM + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "AM" & SSBTYPE == "FSSB") {do_mcmc(f)}
 
 
-## ----AMf_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
-file_contents <- readLines("output/MCMCGLMM_FSSB_AM_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----AMm_mcmcglmm, echo=TRUE--------------------------------------------------
@@ -693,9 +597,6 @@ f <- MSSB ~ FAM + MAM + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "AM" & SSBTYPE == "MSSB") {do_mcmc(f)}
 
 
-## ----AMm_mcmcglmm_show, eval=TRUE, results="SHOW"-----------------------------
-file_contents <- readLines("output/MCMCGLMM_MSSB_AM_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----IUCN_mcmcglmm, echo=TRUE-------------------------------------------------
@@ -705,9 +606,6 @@ f <- SSB ~ IUCN + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "IUCN" & SSBTYPE == "SSB") {do_mcmc(f)}
 
 
-## ----IUCN_mcmcglmm_show, eval=TRUE, results="SHOW"----------------------------
-file_contents <- readLines("output/MCMCGLMM_SSB_IUCN_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----IUCNf_mcmcglmm, echo=TRUE------------------------------------------------
@@ -717,9 +615,6 @@ f <- FSSB ~ IUCN + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "IUCN" & SSBTYPE == "FSSB") {do_mcmc(f)}
 
 
-## ----IUCNf_mcmcglmm_show, eval=TRUE, results="SHOW"---------------------------
-file_contents <- readLines("output/MCMCGLMM_FSSB_IUCN_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
 
 
 ## ----IUCNm_mcmcglmm, echo=TRUE------------------------------------------------
@@ -727,187 +622,4 @@ cat(file_contents, sep = "\n")
 ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "IUCN"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
 f <- MSSB ~ IUCN + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "IUCN" & SSBTYPE == "MSSB") {do_mcmc(f)}
-
-
-## ----IUCNm_mcmcglmm_show, eval=TRUE, results="SHOW"---------------------------
-file_contents <- readLines("output/MCMCGLMM_MSSB_IUCN_TREEMCC_1.sum.txt")
-cat(file_contents, sep = "\n")
-
-
-## ----correlations, echo=TRUE--------------------------------------------------
-# This code chunk assesses how each independent variable correlates with SSB
-# It prints out each statistical test, and also creates a file called "correlations.csv" that documents them
-# Here we use results="hold" to tell R markdown to put all the output in one section
-
-SSB <- data$SSB
-
-tests <- data.frame(matrix(NA,ncol=3,nrow=0)) # This matrix will hold the results of our statistical tests for correlations
-for (name in colnames(data)) { # We want to look at all the independent variables and check whether they are correlated with SSB
-  if (name %in% categorical) { # Checking if this is a categorical variable
-    ind <- data[[name]] # Getting the data from the column
-    test <- suppressWarnings(chisq.test(x=SSB,y=ind)$p.value) # Performing a chi-square test of significance and getting the p-value from it
-    if (test <= 0.05) { # Checks if the p-value is significant - if yes, do the next thing
-      row <- c(name=name,p=test,keep="Y") # Recording "Y" in the "keep" column if the test shows significance
-    } else { # If the p-value was not significant, do this instead
-      row <- c(name=name,p=test,keep="N") # Recording "N" in the "keep" column if the test does not show significance
-    }
-    tests <- rbind(tests,row) # Adding the results of this test (for this variable) to the list of tests for all variables
-    cat(paste0("\nVariable: ",gsub("."," ",row[1],fixed=TRUE)," | p = ",round(as.numeric(row[2]),4)," | Significant: ",row[3]),"\n") # Printing the statistical test being performed
-    print(suppressWarnings(chisq.test(x=SSB,y=ind)$observed)) # Printing the details of this statistical test
-  }
-  if (name %in% quantitative) { # Checking if this is a quantitative variable
-    ind <- data[[name]] # Getting the data from the column
-    test <- suppressWarnings(t.test(ind ~ SSB, data=cbind(SSB,ind),na.rm=TRUE)$p.value) # Performing a t-test of significance and getting the p-value from it
-    if (test <= 0.05) { # Checks if the p-value is significant - if yes, do the next thing
-      row <- c(name=name,p=test,keep="Y") # Recording "Y" in the "keep" column if the test shows significance
-    } else { # If the p-value was not significant, do this instead
-      row <- c(name=name,p=test,keep="N") # Recording "N" in the "keep" column if the test does not show significance
-    }
-    tests <- rbind(tests,row) # Adding the results of this test (for this variable) to the list of tests for all variables
-    cat(paste0("\nVariable: ",gsub("."," ",row[1],fixed=TRUE)," | p = ",round(as.numeric(row[2]),4)," | Significant: ",row[3]),"\n") # Printing the statistical test being performed
-    print(suppressWarnings(t.test(ind ~ SSB, data=cbind(SSB,ind),na.rm=TRUE)$estimate)) # Printing the details of this statistical test
-  }
-}
-
-colnames(tests) <- c("name","p","keep") # Naming the columns for our dataframe with all the statistical test results
-write.csv(tests,"correlations.csv",quote=FALSE,sep=",",row.names=FALSE,col.names=TRUE) # Saving our statistical tests to a file
-
-
-## ----signal, echo=TRUE--------------------------------------------------------
-# This code chunk conducts a test for phylogenetic signal (d) using the "caper" package
-# d=1 indicates complete randomness of trait (no phylogenetic signal), all rest have phylogenetic signal
-# d=0 trait follows Brownian, d positive under 1 more different than Brownian, d negative more similar than Brownian
-
-caper::phylo.d(data, phy, Species, SSB) # Tests for phylogenetic signal in SSB, shows more differentiation than expected under Brownian structure
-caper::phylo.d(data, phy, Species, FSSB) #same analysis for female SSB. Positive D shows more differentiation between species than expected.
-caper::phylo.d(data, phy, Species, MSSB) #same analysis for male SSB. Positive D shows more differentiation between species than expected.
-caper::phylo.d(data, phy, Species, TSP) # Tests for phylogenetic signal in typically single progeny, shows Brownian structure
-
-
-## ----ard, echo=TRUE-----------------------------------------------------------
-# This code chunk does an ancestral character estimation (ACE) for SSB using the "ape" package
-# It also determines the rates of transition between different characters / sets of characters
-# We use a CTMC to determine relationship between different variable in a matrix
-
-dataAFSSBmtrx <- matrix(c(0, 1, 2, 0),2) # Forms matrix for future use by AFSSB
-dataAFSSB <- ape::ace(data$SSB,phy, type = "discrete", model = dataAFSSBmtrx) # Reconstructed ancestral states of SSB
-
-for (i in 1:nrow(data)) { # Create for loop for finding four states of dual relation between FSSB and TSP
-  dataifFSSB <- data$SSB[i]
-  dataifTSP <- data$TSP[i]
-  if (dataifFSSB == 0) {
-    if (dataifTSP == 0) {
-      state <- 1 # no FSSB, no TSP
-    } else {
-      state <- 2 # no FSSB, yes TSP
-    }
-  }else {
-  if (dataifTSP == 0) {
-      state <- 3 # yes FSSB, no TSP
-    } else {
-      state <- 4 # yes FSSB, yes TSP
-    }
-  }
-  data$FSSB_TSP[i] <- state # Takes new state info and adds it as a row to data named FSSB_TSP
-}
-
-dataAFSSB_TSPmtrx <- matrix(c(0, 1, 2, 0, 3, 0, 0, 4, 5, 0, 0, 6, 0, 7, 8, 0),4, byrow=TRUE) # Forms matrix for use in FSSB_TSP rate estimates, manually adjusted 0 terms for things we determine impossible
-dataAFSSB_TSP <- ape::ace(data$FSSB_TSP, phy, type = "discrete", model = dataAFSSB_TSPmtrx) # Generates rate matrix for AFSSB_TSP
-print(dataAFSSB_TSP)
-
-
-## ----pagel, echo=TRUE---------------------------------------------------------
-# This code chunk does pagel's directional test
-# Pagel's directional test: http://www.phytools.org/Cordoba2017/ex/9/Pagel94-method.html
-# These take a long time to run, so don't be worried if results don't print immediately
-
-if (RERUN) {
-  FSSB <- setNames(data$FSSB,data$Species) # Naming our FSSB values with species names
-  TSP <- setNames(data$TSP,data$Species) # Naming our TSP values with species names
-  
-  fit_FSSB_TSP <- phytools::fitPagel(phy,FSSB,TSP) # Fitting models where FSSB and TSP are totally independent or dependent
-  fit_FSSB_TSP
-  plot(fit_FSSB_TSP,lwd.by.rate=TRUE)
-  
-  fit_FSSB <- phytools::fitPagel(phy,FSSB,TSP,dep.var="x") # Fitting models where FSSB depends on TSP
-  fit_FSSB
-  plot(fit_FSSB,lwd.by.rate=TRUE)
-  
-  fit_TSP <- phytools::fitPagel(phy,FSSB,TSP,dep.var="y") # Fitting models where TSP depends on FSSB
-  fit_TSP
-  plot(fit_TSP,lwd.by.rate=TRUE)
-  
-  # Comparing the goodness of all 4 models using AIC
-  aic <- setNames(c(fit_FSSB_TSP$independent.AIC,
-                    fit_FSSB$dependent.AIC,
-                    fit_TSP$dependent.AIC,
-                    fit_FSSB_TSP$dependent.AIC),
-                  c("independent","dependent FSSB","dependent TSP","dependent FSSB & TSP"))
-  aic
-  aic.w(aic)
-}
-
-
-## ----mcmcglmm, echo=TRUE------------------------------------------------------
-# This code chunk runs an MCMCglmm analysis
-
-if (RERUN) {
-  data_subset <- data[,c("Species","TSP","SSB","FSSB","MSSB")]
-  data_subset <- data_subset[complete.cases(data_subset),] # Removes incomplete cases (NAs)
-  print(data_subset) # Prints that data
-  
-  # Reads a tree and makes sure all tips are exactly at the present (ultrametric)
-  # Then creates a matrix for how much time species pairs have spent evolving together vs separately
-  inv.phylo <- inverseA(phy, "TIPS")$Ainv
-  
-  # Makes these things called priors, which are prior assumptions on variance distribution for the following model
-  prior <- list(G=list(G1=list(V=1,nu=0.02)), # This is the prior on random effects, i.e. Species identity -- small nu means mostly flat
-                R=list(V=1,nu=0.02))          # This is the prior on your response variable, i.e. SSB -- small nu means mostly flat
-  
-  # Runs MCMCglmm fancy linear regression analysis
-  MCMCanalysis <- MCMCglmm::MCMCglmm(SSB~TSP+1, # Formula for analysis: SSB is related to TSP, PC, and some intercept
-                  random = ~Species, # Random effect -- species identity is a confounding factor in the analysis
-                  family = "categorical", # Our response variable is categorical
-                  ginverse = list(Species=inv.phylo), # These are our phylogenetic relationships, which cause covariance structure
-                  prior = prior, # Telling the MCMC what our priors are
-                  data = data_subset, # Telling the MCMC what our data is
-                  nitt = 1000, # The number of iterations, i.e. samples, should do more for a real analysis
-                  burnin = 100, # How long the MCMC spends "optimizing" before real samples
-                  thin = 1, # How often to print output (every 1)
-                  verbose = FALSE) # Don't write out too much stuff
-  
-  print(summary(MCMCanalysis$Sol))
-}
-
-
-## ----sse, echo=TRUE-----------------------------------------------------------
-# This code chunk runs a bisse analysis on just the taxa included in our dataset
-# We don't want this to run every time we knit -- only when we manually want to run it
-# To prevent us from running accidentally, we have RERUN <- FALSE at the start of the script
-# We have to manually type RERUN <- TRUE for this to run
-# We will save the MCMC to a file and have a separate code chunk to print a summary
-
-if (RERUN) {
-  states <- as.numeric(as.character(data$SSB)) # We need to make our SSB into a number instead of a factor for this analysis
-  names(states) <- data$Species # diversitree requires us to name our states with species names
-  lik <- diversitree::make.bisse(phy, states) # This is our bisse model, with our tree and tip states
-  pars <- c(0.1, 0.1, 0.01, 0.01, 0.01, 0.01) # lambda 0 and 1 (speciation), mu 0 and 1 (extinction), q 01 and 10 (transition) initial values
-  n_iter <- 100 # The number of MCMC iterations, i.e. samples (will use more for a real analysis)
-  burnin <- 20 # The number of burnin iterations, i.e. how long we spend "optimizing" before real samples
-  
-  # Our MCMC analysis
-  # Our tuning parameter (for MCMC proposals) is 0.1
-  # We want to print to screen every 10 iterations
-  MCMCanalysis <- diversitree::mcmc(lik, pars, nsteps=n_iter, w=0.1, print.every=10)
-  MCMCresults <- MCMCanalysis[burnin:n_iter,] # Removing burnin iterations
-  write.table(MCMCresults,"bisse.tsv",quote=FALSE,sep="\t",row.names=FALSE,col.names=TRUE) # Saving our MCMC output to a file
-  
-  RERUN <- FALSE
-}
-
-
-## ----sse_show, echo=TRUE------------------------------------------------------
-MCMCresults <- read.csv("bisse.tsv",sep="\t") # Retrieving our MCMC results from the bisse.csv file
-MCMCsummary <- MCMCvis::MCMCsummary(coda::mcmc(MCMCresults),excl=c("i","p"),Rhat=FALSE,round=4) # Turning into MCMC object and summarizing output (excluding iteration and probability)
-print(MCMCsummary)
 
