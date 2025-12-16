@@ -68,14 +68,12 @@ if (length(args) != 0) {
 
 # We'll use the variable USEGLOBAL to indicate whether we want to use inputs from shell script
 set_global <- function() {
-  if (exists(".NUMBER")) {NUMBER <- .NUMBER}
-  if (exists(".ANALYSIS")) {ANALYSIS <- .ANALYSIS}
-  if (exists(".SSBTYPE")) {SSBTYPE <- .SSBTYPE}
-  if (exists(".HYPOTHESIS")) {HYPOTHESIS <- .HYPOTHESIS}
-  if (exists(".VARIABLE")) {VARIABLE <- .VARIABLE}
-  if (exists(".USERANDOM")) {USERANDOM <- .USERANDOM}
-  print("Analysis settings:",quote=F)
-  print(paste0("NUMBER: ", NUMBER, " ANALYSIS: ", ANALYSIS, " SSBTYPE: ", SSBTYPE, " HYPOTHESIS: ", HYPOTHESIS, " VARIABLE: ", VARIABLE, " USERANDOM: ", USERANDOM),quote=F)
+  if (exists(".NUMBER")) {NUMBER <<- .NUMBER}
+  if (exists(".ANALYSIS")) {ANALYSIS <<- .ANALYSIS}
+  if (exists(".SSBTYPE")) {SSBTYPE <<- .SSBTYPE}
+  if (exists(".HYPOTHESIS")) {HYPOTHESIS <<- .HYPOTHESIS}
+  if (exists(".VARIABLE")) {VARIABLE <<- .VARIABLE}
+  if (exists(".USERANDOM")) {USERANDOM <<- .USERANDOM}
 }
 
 if (USEGLOBAL) {set_global()}
