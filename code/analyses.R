@@ -55,14 +55,8 @@ args <- commandArgs(trailingOnly = TRUE)
 print("Input arguments:",quote=F)
 print(args)
 
-.NUMBER <- NA
-.USERANDOM <- NA
-.ANALYSIS <- NA
-.SSBTYPE <- NA
-.HYPOTHESIS <- NA
-.VARIABLE <- NA
-
-if (!identical(args,character(0))) {
+if (length(args) != 0) {
+  print("Using input arguments to set up analysis...",quote=F)
   USEGLOBAL <- TRUE
   .NUMBER <- args[1]
   .USERANDOM <- args[2]
@@ -80,6 +74,8 @@ set_global <- function() {
   if (exists(".HYPOTHESIS")) {HYPOTHESIS <- .HYPOTHESIS}
   if (exists(".VARIABLE")) {VARIABLE <- .VARIABLE}
   if (exists(".USERANDOM")) {USERANDOM <- .USERANDOM}
+  print("Analysis settings:",quote=F)
+  print(paste0("NUMBER: ", NUMBER, " ANALYSIS: ", ANALYSIS, " SSBTYPE: ", SSBTYPE, " HYPOTHESIS: ", HYPOTHESIS, " VARIABLE: ", VARIABLE, " USERANDOM: ", USERANDOM),quote=F)
 }
 
 if (USEGLOBAL) {set_global()}
