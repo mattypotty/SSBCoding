@@ -20,7 +20,7 @@
 seed(1)
 loadPlugin("TensorPhylo","/tensorphylo/build/installer/lib")
 
-dataset = "Primates"
+if (!exists("dataset")) dataset = "Primates"
 tree_filepath = "SSE_Clades/formatted/" + dataset + ".txt"
 data_filepath = "SSE_Clades/formatted/" + dataset + ".csv"
 nex_filepath  = "SSE_Clades/formatted/" + dataset + ".nex"
@@ -197,7 +197,8 @@ timetree ~ dnGLHBDSP( originAge = root,
                       pi        = rate_category_prior,
                       condition = "time",
                       taxa      = taxa,
-                      nStates   = 4)
+                      nStates   = 4,
+                      nproc     = 4)
 
 ### clamp the model with the "observed" tree
 timetree.clamp( phy )

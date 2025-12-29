@@ -1,46 +1,10 @@
-NUMBER_LIST=$(seq -w 001 010)
-SSBTYPE_LIST=("SSB" "FSSB" "MSSB")
-HYPOTHESIS_LIST=("MI" "MGS" "SDT" "SOC" "RDM" "AM" "IUCN")
-VARIABLE_LIST=("NAC" "SPI" "TSP" "SDT" "RDM")
+#DATASET_LIST=("Afrotheria" "Artiodactyla_Aquatic" "Artiodactyla_Terrestrial" "Basal_Euarchontoglires" "Carnivora_Caniformia" "Carnivora_Feliformia" "Chiroptera_Pteropodiformes" "Chiroptera_Vespertilioniformes" "Eulipotyphla" "Lagomorpha" "Marsupalia" "Panperissodactyla" "Primates" "Rodentia_Hystricomorpha" "Rodentia_Sciuromorpha" "Rodentia_Supramyomorpha_Myomorphi" "Rodentia_Supramyomorpha_non-Myomorphi" "Xenarthra")
+DATASET_LIST=("Primates")
 
-USERANDOM="FALSE"
-
-for NUMBER in ${NUMBER_LIST[@]}
+for DATASET in ${DATASET_LIST[@]}
 do
-	for SSBTYPE in ${SSBTYPE_LIST[@]}
-	do
-		for HYPOTHESIS in ${HYPOTHESIS_LIST[@]}
-		do
-			source run_job.sh ${NUMBER} ${USERANDOM} "MCMCGLMM" ${SSBTYPE} ${HYPOTHESIS} "NONE"
-		done
-		for VARIABLE in ${VARIABLE_LIST[@]}
-		do
-			source run_job.sh ${NUMBER} ${USERANDOM} "PAGEL" ${SSBTYPE} "NONE" ${VARIABLE}
-		done
-	done
-done
-
-USERANDOM="TRUE"
-
-for NUMBER in ${NUMBER_LIST[@]}
-do
-	for SSBTYPE in ${SSBTYPE_LIST[@]}
-	do
-		for HYPOTHESIS in ${HYPOTHESIS_LIST[@]}
-		do
-			source run_job.sh ${NUMBER} ${USERANDOM} "MCMCGLMM" ${SSBTYPE} ${HYPOTHESIS} "NONE"
-		done
-		for VARIABLE in ${VARIABLE_LIST[@]}
-		do
-			source run_job.sh ${NUMBER} ${USERANDOM} "PAGEL" ${SSBTYPE} "NONE" ${VARIABLE}
-		done
-	done
+source run_job_SSE.sh ${DATASET}
 done
 
 # OPTIONS:
-# NUMBER                    > 001 : 010
-# USERANDOM                 > "TRUE", "FALSE"
-# ANALYSIS                  > "NONE", "MCCTREE", "SPECMATS", "MCMCGLMM", "PAGEL"
-# SSBTYPE                   > "NONE", "SSB", "FSSB", "MSSB"
-# HYPOTHESIS (for MCMCglmm) > "NONE", "MI", "MGS", "SDT", "SOC", "RDM", "AM", "IUCN"
-# VARIABLE (for Pagel)      > "None", "NAC", "SPI", "TSP", "SDT", "RDM"
+# DATASET > Afrotheria Artiodactyla_Aquatic Artiodactyla_Terrestrial Basal_Euarchontoglires Carnivora_Caniformia Carnivora_Feliformia Chiroptera_Pteropodiformes Chiroptera_Vespertilioniformes Eulipotyphla Lagomorpha Marsupalia Panperissodactyla Primates Rodentia_Hystricomorpha Rodentia_Sciuromorpha Rodentia_Supramyomorpha_Myomorphi Rodentia_Supramyomorpha_non-Myomorphi Xenarthra
