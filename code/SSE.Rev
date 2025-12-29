@@ -1,0 +1,261 @@
+################################################################################
+#
+# RevBayes Analysis: Bayesian inference of diversification rates under a
+#                    character-dependent birth-death model.
+#                    Here each transition rate between observed states is
+#                    drawn from an independent exponentially distributed
+#                    rate. The transition rates between hidden states are
+#                    all equal and drawn from another exponentially
+#                    distributed rate.
+#
+#
+# authors: Sebastian Hoehna, Will Freyman
+#
+################################################################################
+
+#######################
+# Reading in the Data #
+#######################
+
+seed(1)
+loadPlugin("TensorPhylo","/tensorphylo/build/installer/lib")
+
+dataset = "Primates"
+tree_filepath = "SSE_Clades/formatted/" + dataset + ".txt"
+data_filepath = "SSE_Clades/formatted/" + dataset + ".csv"
+nex_filepath  = "SSE_Clades/formatted/" + dataset + ".nex"
+
+# Read in the phylogeny
+phy         <- readTrees(tree_filepath)[1]
+taxa        <- phy.taxa()
+num_taxa    <- phy.ntips()
+tree_length <- phy.treeLength()
+print("Finished reading phylogeny")
+print("Tree contains " + num_taxa + " taxa")
+
+# Read in the character data
+data <- readCharacterDataDelimited(data_filepath,
+                                   type="NaturalNumbers",
+                                   stateLabels=1,
+                                   delimiter=",")
+writeNexus(nex_filepath,data)
+sed_string <- "sed -i 's/NaturalNumbers/Standard symbols=\"01\"/g' " + nex_filepath
+system(sed_string)
+data <- readDiscreteCharacterData(nex_filepath)
+
+num_states   = 2
+num_hidden   = 2
+num_rates    = num_states * num_hidden
+data_exp    <- data.expandCharacters(num_hidden)
+print("Finished reading character data")
+data_exp
+
+# Create some vector for the moves and monitors of this analysis
+moves    = VectorMoves()
+monitors = VectorMonitors()
+
+####################
+# Create the rates #
+####################
+
+### Specify a prior on the speciation and extinction rates
+rate_mean <- (num_taxa-2) / tree_length
+
+### First, we create the hidden speciation rates
+# We fix the (log) mean of the hidden speciation rate to 1.0, so that these rates are relative
+ln_speciation_hidden_mean <- ln(1.0)
+
+# We draw the standard deviation of the hidden rates from an exponential distribution with mean H
+# (so that we expect the 95% interval of the hidden speciation rate to span 1 order of magnitude).
+H = 0.587405
+speciation_hidden_sd ~ dnExponential( 1.0 / H )
+moves.append( mvScale(speciation_hidden_sd, lambda=1, tune=true, weight=2.0) )
+
+# Create a deterministic variable for the hidden speciation rate categories
+# using a discretized lognormal distribution (the N-quantiles of it)
+speciation_hidden_unormalized := fnDiscretizeDistribution( dnLognormal(ln_speciation_hidden_mean, speciation_hidden_sd), num_hidden )
+
+# We normalize the hidden speciation rates by dividing the rates with the main
+# (so the mean of the normalized rates equals to 1.0)
+speciation_hidden := speciation_hidden_unormalized / mean(speciation_hidden_unormalized)
+
+### Second, we create the hidden extinction rates
+# We fix the (log) mean of the hidden extinction rate to 1.0, so that these rates are relative
+ln_extinction_hidden_mean <- ln(1.0)
+
+# We draw the standard deviation of the hidden extinction rates from an exponential distribution with mean H
+# (so that we expect the 95% interval of the hidden extinction rate to span 1 order of magnitude).
+extinction_hidden_sd ~ dnExponential( 1.0 / H )
+moves.append( mvScale(extinction_hidden_sd, lambda=1, tune=true, weight=2.0) )
+
+# Create a deterministic variable for the hidden extinction rate categories
+# using a discretized lognormal distribution (the N-quantiles of it)
+extinction_hidden_unormalized := fnDiscretizeDistribution( dnLognormal(ln_extinction_hidden_mean, extinction_hidden_sd), num_hidden )
+
+# We normalize the hidden extinction rates by dividing the rates with the main
+# (so the mean of the normalized rates equals to 1.0)
+extinction_hidden := extinction_hidden_unormalized / mean(extinction_hidden_unormalized)
+
+### Third, we create the speciation and extinction rates for the observed states
+for (i in 1:num_states) {
+
+    ### Create a loguniform distributed variable for the speciation rate
+    speciation_observed[i] ~ dnLoguniform( 1E-6, 1E2)
+    speciation_observed[i].setValue( (num_taxa-2) / tree_length )
+    moves.append( mvScale(speciation_observed[i],lambda=1.0,tune=true,weight=3.0) )
+
+    ### Create a loguniform distributed variable for the speciation rate
+    extinction_observed[i] ~ dnLoguniform( 1E-6, 1E2)
+    extinction_observed[i].setValue( speciation_observed[i] / 10.0 )
+    moves.append( mvScale(extinction_observed[i],lambda=1.0,tune=true,weight=3.0) )
+
+}
+
+### Finally, we put the observed and hidden rates together
+for (j in 1:num_hidden) {
+    for (i in 1:num_states) {
+        index = i+(j*num_states)-num_hidden
+        speciation[index] := speciation_observed[i] * speciation_hidden[j]
+        extinction[index] := extinction_observed[i] * extinction_hidden[j]
+    }
+}
+
+#########################################################
+# Set up the transition rate matrix for observed states #
+#########################################################
+
+# Each transition rate between observed states are drawn
+# from an exponential distribution with a mean of 10
+# character state transitions over the tree.
+rate_pr := phy.treeLength() / 10
+for ( i in 1:(num_states*(num_states-1)) ) {
+    transition_rates[i] ~ dnExp(rate_pr)
+    moves.append( mvScale(transition_rates[i],lambda=0.50,tune=true,weight=3.0) )
+}
+
+#########################################################
+# Set up the transition rate matrix for hidden states #
+#########################################################
+
+# We assume the transitions among the hidden states
+# are all equal and drawn from an exponential distriubtion.
+hidden_rate ~ dnExponential(rate_pr)
+moves.append( mvScale(hidden_rate,lambda=0.5,tune=true,weight=5) )
+
+for (i in 1:(num_hidden * (num_hidden - 1))) {
+    R[i] := hidden_rate
+}
+
+######################################################################
+# Create the rate matrix for the combined observed and hidden states #
+######################################################################
+rate_matrix := fnHiddenStateRateMatrix(transition_rates, R, rescaled=false)
+print("Finished constructing transition rate matrix")
+rate_matrix
+
+#####################################
+# Set up the root state frequencies #
+#####################################
+
+### Create a constant variable with the prior probabilities of each rate category at the root.
+rate_category_prior ~ dnDirichlet( rep(1,num_rates) )
+moves.append( mvBetaSimplex(rate_category_prior,tune=true,weight=2) )
+moves.append( mvDirichletSimplex(rate_category_prior,tune=true,weight=2) )
+
+### Create the fix parameter for the age of the root set to the observed age
+root <- phy.rootAge()
+
+### rho is the probability of sampling species at the present
+### fix this to 233/367
+#rho <- phy.ntips()/367
+rho <- 1
+
+#### construct a variable for the tree drawn from a birth death process
+#print("Setting up timetree...")
+#timetree ~ dnCDBDP( rootAge           = root,
+#                    speciationRates   = speciation,
+#                    extinctionRates   = extinction,
+#                    Q                 = rate_matrix,
+#                    delta             = 1.0,
+#                    pi                = rate_category_prior,
+#                    rho               = rho,
+#                    condition         = "time" )
+
+### clamp the model with the "observed" tree
+#timetree.clamp( phy )
+#timetree.clampCharData( data_exp )
+#print("Calculating log probability...")
+#print("Log probability (dnCDBDP): " + timetree.lnProbability())
+# Oddly enough, these are only the same if conditioned on time....
+
+print("Setting up timetree...")
+timetree ~ dnGLHBDSP( originAge = root,
+                      lambda    = speciation,
+                      mu        = extinction,
+                      rho       = 1,
+                      eta       = rate_matrix,
+                      pi        = rate_category_prior,
+                      condition = "time",
+                      taxa      = taxa,
+                      nStates   = 4)
+
+### clamp the model with the "observed" tree
+timetree.clamp( phy )
+timetree.clampCharData( data_exp )
+print("Calculating log probability...")
+print("Log probability (dnGLHBDSP): " + timetree.lnProbability())
+
+#############
+# The Model #
+#############
+
+### workspace model wrapper ###
+mymodel = model(rate_matrix)
+
+### set up the monitors that will output parameter values to file and screen
+monitors.append( mnModel(filename="output/"+dataset+".log", printgen=1) )
+monitors.append( mnJointConditionalAncestralState(tree=timetree, cdbdp=timetree, type="NaturalNumbers", printgen=1, withTips=true, withStartStates=false, filename="output/"+dataset+"_anc_states.log") )
+monitors.append( mnStochasticCharacterMap(cdbdp=timetree, printgen=1, filename="output/"+dataset+"_stoch_map.log", include_simmap=true) )
+monitors.append( mnScreen(printgen=1, speciation_observed[1], speciation_observed[2], extinction_observed[1], extinction_observed[2]) )
+
+################
+# The Analysis #
+################
+
+### workspace mcmc
+mymcmc = mcmc(mymodel, monitors, moves, nruns=2, moveschedule="random", combine="mixed")
+
+### run the MCMC
+print("Setting up MCMC...")
+mymcmc.run(generations=10)
+
+##############################
+# Summarize ancestral states #
+##############################
+
+anc_states = readAncestralStateTrace("output/"+dataset+"_anc_states.log")
+anc_tree = ancestralStateTree(tree=phy,
+                              ancestral_state_trace_vector=anc_states,
+                              include_start_states=false,
+                              file="output/"+dataset+"_anc_states_results.tree",
+                              burnin=0.1,
+                              summary_statistic="MAP",
+                              site=1)
+
+# read in the sampled character histories
+anc_states = readAncestralStateTrace("output/"+dataset+"_stoch_map.log")
+
+summarizeCharacterMaps(anc_states,
+                       phy,
+                       file="output/"+dataset+"_events.tsv",
+                       burnin=0.1)
+
+# make summary tree
+char_map_tree = characterMapTree(tree=phy,
+                 ancestral_state_trace_vector=anc_states,
+                 character_file="output/"+dataset+"_stoch_map_character.tree",
+                 posterior_file="output/"+dataset+"_stoch_map_posterior.tree",
+                 burnin=0.25,
+                 num_time_slices=500)
+
+q()
