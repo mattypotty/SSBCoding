@@ -111,6 +111,11 @@ for (i in 1:num_states) {
 
 }
 
+sp0 := speciation_observed[1]
+sp1 := speciation_observed[2]
+ex0 := extinction_observed[1]
+ex1 := extinction_observed[2]
+
 ### Finally, we put the observed and hidden rates together
 for (j in 1:num_hidden) {
     for (i in 1:num_states) {
@@ -198,7 +203,7 @@ timetree ~ dnGLHBDSP( originAge = root,
                       condition = "time",
                       taxa      = taxa,
                       nStates   = 4,
-                      nproc     = 4)
+                      nProc     = 4)
 
 ### clamp the model with the "observed" tree
 timetree.clamp( phy )
@@ -215,9 +220,9 @@ mymodel = model(rate_matrix)
 
 ### set up the monitors that will output parameter values to file and screen
 monitors.append( mnModel(filename="output/"+dataset+".log", printgen=1) )
-monitors.append( mnJointConditionalAncestralState(tree=timetree, cdbdp=timetree, type="NaturalNumbers", printgen=1, withTips=true, withStartStates=false, filename="output/"+dataset+"_anc_states.log") )
-monitors.append( mnStochasticCharacterMap(cdbdp=timetree, printgen=1, filename="output/"+dataset+"_stoch_map.log", include_simmap=true) )
-monitors.append( mnScreen(printgen=1, speciation_observed[1], speciation_observed[2], extinction_observed[1], extinction_observed[2]) )
+monitors.append( mnJointConditionalAncestralState(tree=timetree, glhbdsp=timetree, type="NaturalNumbers", printgen=1, withTips=true, withStartStates=true, filename="output/"+dataset+"_anc_states.log") )
+monitors.append( mnStochasticCharacterMap(glhbdsp=timetree, printgen=1, filename="output/"+dataset+"_stoch_map.log", include_simmap=true) )
+monitors.append( mnScreen(printgen=1, sp0, sp1, ex0, ex1) )
 
 ################
 # The Analysis #
@@ -225,10 +230,11 @@ monitors.append( mnScreen(printgen=1, speciation_observed[1], speciation_observe
 
 ### workspace mcmc
 mymcmc = mcmc(mymodel, monitors, moves, nruns=2, moveschedule="random", combine="mixed")
+mymcmc.burnin(1000, tuningInterval=10)
 
 ### run the MCMC
 print("Setting up MCMC...")
-mymcmc.run(generations=10)
+mymcmc.run(generations=10000)
 
 ##############################
 # Summarize ancestral states #
@@ -245,7 +251,6 @@ anc_tree = ancestralStateTree(tree=phy,
 
 # read in the sampled character histories
 anc_states = readAncestralStateTrace("output/"+dataset+"_stoch_map.log")
-
 summarizeCharacterMaps(anc_states,
                        phy,
                        file="output/"+dataset+"_events.tsv",
@@ -253,10 +258,10 @@ summarizeCharacterMaps(anc_states,
 
 # make summary tree
 char_map_tree = characterMapTree(tree=phy,
-                 ancestral_state_trace_vector=anc_states,
-                 character_file="output/"+dataset+"_stoch_map_character.tree",
-                 posterior_file="output/"+dataset+"_stoch_map_posterior.tree",
-                 burnin=0.25,
-                 num_time_slices=500)
+                ancestral_state_trace_vector=anc_states,
+                character_file="output/"+dataset+"_stoch_map_character.tree",
+                posterior_file="output/"+dataset+"_stoch_map_posterior.tree",
+                burnin=0.25,
+                num_time_slices=500)
 
 q()
