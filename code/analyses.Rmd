@@ -480,6 +480,75 @@ dev.off()
 include_graphics("../figures/tree.png")
 ```
 
+```{r finished, results='hold', purl=FALSE}
+mcmcglmm <- data.frame(matrix(NA,nrow=0,ncol=4))
+pagel <- data.frame(matrix(NA,nrow=0,ncol=4))
+other <- c()
+
+files <- list.files("../output")
+for (file in files) {
+  #print(file)
+  name_list <- strsplit(strsplit(file,".",fixed=TRUE)[[1]][1],"_",fixed=TRUE)[[1]]
+  if (name_list[1] == "MCMCGLMM") {
+    this_row <- c(name_list[2],name_list[3],name_list[4],name_list[5])
+    mcmcglmm <- rbind(mcmcglmm,this_row)
+  }
+  else if (name_list[1] == "PAGEL") {
+    this_row <- c(name_list[2],name_list[3],name_list[4],name_list[5])
+    pagel <- rbind(pagel,this_row)
+  }
+  else {
+    other <- c(other,paste(name_list,collapse="_"))
+  }
+}
+
+mcmcglmm <- unique(mcmcglmm)
+colnames(mcmcglmm) <- c("SSB","HYP","TREE","NUM")
+
+pagel <- unique(pagel)
+colnames(pagel) <- c("SSB","VAR","TREE","NUM")
+
+nums <- c("001", "002", "003", "004", "005", "006", "007", "008", "009", "010")
+clades <- c("Afrotheria", "Artiodactyla_Aquatic", "Artiodactyla_Terrestrial", "Basal_Euarchontoglires", "Carnivora_Caniformia", "Carnivora_Feliformia", "Chiroptera_Pteropodiformes", "Chiroptera_Vespertilioniformes", "Eulipotyphla", "Lagomorpha", "Marsupalia", "Panperissodactyla", "Primates", "Rodentia_Hystricomorpha", "Rodentia_Sciuromorpha", "Rodentia_Supramyomorpha_Myomorphi", "Rodentia_Supramyomorpha_non-Myomorphi", "Xenarthra")
+
+print("Missing MCMCglmm",quote=F)
+
+table(mcmcglmm[,1:2])
+for (ssb in unique(mcmcglmm$SSB)) {
+  for (hyp in unique(mcmcglmm$HYP)) {
+    search_1 <- which(mcmcglmm$SSB==ssb & mcmcglmm$HYP == hyp & mcmcglmm$TREE=="TREEMCC")
+    numbers_1 <- mcmcglmm$NUM[search_1]
+    missing_1 <- nums[!(nums %in% numbers_1)]
+    if (length(missing_1) > 0) {print(paste0(ssb, " ", hyp, " TREEMCC ", paste(missing_1,collapse=",")),quote=F)}
+    search_2 <- which(mcmcglmm$SSB==ssb & mcmcglmm$HYP == hyp & mcmcglmm$TREE!="TREEMCC")
+    numbers_2 <- mcmcglmm$NUM[search_2]
+    missing_2 <- nums[!(nums %in% numbers_2)]
+    if (length(missing_2) > 0) {print(paste0(ssb, " ", hyp, " RANDOM ", paste(missing_2,collapse=",")),quote=F)}
+  }
+}
+
+print("Missing Pagel",quote=F)
+
+table(pagel[,1:2])
+for (ssb in unique(pagel$SSB)) {
+  for (var in unique(pagel$VAR)) {
+    search_1 <- which(pagel$SSB==ssb & pagel$VAR == var & pagel$TREE=="TREEMCC")
+    numbers_1 <- pagel$NUM[search_1]
+    missing_1 <- nums[!(nums %in% numbers_1)]
+    if (length(missing_1) > 0) {print(paste0(ssb, " ", var, " TREEMCC ", paste(missing_1,collapse=",")),quote=F)}
+    search_2 <- which(pagel$SSB==ssb & pagel$VAR == var & pagel$TREE!="TREEMCC")
+    numbers_2 <- pagel$NUM[search_2]
+    missing_2 <- nums[!(nums %in% numbers_2)]
+    if (length(missing_2) > 0) {print(paste0(ssb, " ", var, " RANDOM ", paste(missing_2,collapse=",")),quote=F)}
+  }
+}
+
+print("Missing SSE",quote=F)
+
+missing_clades <- clades[!(clades %in% other)]
+print(paste(missing_clades,collapse=","),quote=F)
+```
+
 <!--
 ##############################
 ##############################
