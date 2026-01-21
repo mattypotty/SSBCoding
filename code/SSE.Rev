@@ -230,11 +230,11 @@ monitors.append( mnScreen(printgen=1, sp0, sp1, ex0, ex1) )
 
 ### workspace mcmc
 mymcmc = mcmc(mymodel, monitors, moves, nruns=2, moveschedule="random", combine="mixed")
-mymcmc.burnin(1000, tuningInterval=10)
+mymcmc.burnin(2000, tuningInterval=10)
 
 ### run the MCMC
 print("Setting up MCMC...")
-mymcmc.run(generations=10000)
+mymcmc.run(generations=20000)
 
 ##############################
 # Summarize ancestral states #
