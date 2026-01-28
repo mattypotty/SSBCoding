@@ -137,10 +137,11 @@ Making things into functions so we don't have to rewrite so much code
 ```{r do_mcmc, echo=TRUE, eval=TRUE}
 do_mcmc <- function(f) {
   # File names
+  analysis_folder <- paste0(ANALYSIS,"_",SSBTYPE,"_",HYPOTHESIS,"/")
   analysis_name <- paste0(ANALYSIS,"_",SSBTYPE,"_",HYPOTHESIS,"_",tree_number,"_",NUMBER)
   print(paste0("Performing analysis: ",analysis_name),quote=F)
-  out_file <- paste0("../output/",analysis_name,".log.csv")
-  summary_file <- paste0("../output/",analysis_name,".sum.txt")
+  out_file <- paste0("../output/",analysis_folder,analysis_name,".log.csv")
+  summary_file <- paste0("../output/",analysis_folder,analysis_name,".sum.txt")
   
   #Read in data
   columns <- c("Species",all.vars(f))
@@ -170,9 +171,10 @@ do_mcmc <- function(f) {
 ```{r do_pagel, echo=TRUE, eval=TRUE}
 do_pagel <- function() {
   # File names
+  analysis_folder <- paste0(ANALYSIS,"_",SSBTYPE,"_",VARIABLE,"/")
   analysis_name <- paste0(ANALYSIS,"_",SSBTYPE,"_",VARIABLE,"_",tree_number,"_",NUMBER)
   print(paste0("Performing analysis: ",analysis_name),quote=F)
-  summary_file <- paste0("../output/",analysis_name,".sum.txt")
+  summary_file <- paste0("../output/",analysis_folder,analysis_name,".sum.txt")
   
   #Read in data
   columns <- c("Species",SSBTYPE,VARIABLE)
@@ -226,7 +228,7 @@ do_pagel <- function() {
 
 ```{r process_mcmc, echo=TRUE, eval=TRUE}
 process_mcmc <- function(ssbtype,hypothesis) {
-  files <- Sys.glob(paste0("../output/MCMCGLMM_",ssbtype,"_",hypothesis,"_*.log.csv"))
+  files <- Sys.glob(paste0("../output/MCMCGLMM_",ssbtype,"_",hypothesis,"/*.log.csv"))
   results <- data.frame(matrix(NA,nrow=0,ncol=10))
   for (file in files) {
     name_str <- strsplit(strsplit(basename(file),"\\.")[[1]][1],"_")[[1]]
@@ -285,10 +287,10 @@ process_mcmc <- function(ssbtype,hypothesis) {
 
 ```{r process_pagel, echo=TRUE, eval=TRUE}
 process_pagel <- function(ssbtype,variable) {
-  files <- Sys.glob(paste0("../output/PAGEL_",ssbtype,"_",variable,"_*.sum.txt"))
+  files <- Sys.glob(paste0("../output/PAGEL_",ssbtype,"_",variable,"/*.sum.txt"))
   names <- c("Independent", paste0("Dependent ",ssbtype), paste0("Dependent ",variable), "Interdependent")
 
-  file_contents <- readLines(paste0("../output/PAGEL_",ssbtype,"_",variable,"_TREEMCC_001.sum.txt"))
+  file_contents <- readLines(paste0("../output/PAGEL_",ssbtype,"_",variable,"/TREEMCC_001.sum.txt"))
   aic <- data.frame(matrix(as.numeric(strsplit(file_contents[(length(file_contents)-3)]," +")[[1]][2:5]),ncol=4))
   weight <- data.frame(matrix(as.numeric(strsplit(file_contents[(length(file_contents))]," +")[[1]][2:5]),ncol=4))
   results <- rbind(aic,weight)
@@ -1222,11 +1224,13 @@ ind <- 1
 for (file in files) {
   clade <- strsplit(basename(file),"\\.")[[1]][1]
   log <- read.csv(file,sep="\t")
-  results <- log[c("sp0","sp1","ex0","ex1")]
+  results <- log[c("speciation.1.","speciation.2.","speciation.3.","speciation.4.","extinction.1.","extinction.2.","extinction.3.","extinction.4.")]
   
   plot_sp <- ggplot(results) +
-    geom_density(aes(x=sp0,y=..scaled..),color="blue") +
-    geom_density(aes(x=sp1,y=..scaled..),color="red") +
+    geom_density(aes(x=speciation.1.,y=..density..),bounds=c(0,1),color="blue") +
+    geom_density(aes(x=speciation.2.,y=..density..),bounds=c(0,1),color="red") +
+    geom_density(aes(x=speciation.3.,y=..density..),bounds=c(0,1),color="blue",lty="dotted") +
+    geom_density(aes(x=speciation.4.,y=..density..),bounds=c(0,1),color="red",lty="dotted") +
     ggtitle(clade) +
     theme_bw() +
     theme(plot.title=element_text(hjust=0.5),
@@ -1236,8 +1240,10 @@ for (file in files) {
   sp_plot_list[[ind]] <- plot_sp
   
   plot_ex <- ggplot(results) +
-    geom_density(aes(x=ex0,y=..scaled..),color="blue") +
-    geom_density(aes(x=ex1,y=..scaled..),color="red") +
+    geom_density(aes(x=extinction.1.,y=..density..),bounds=c(0,1),color="blue") +
+    geom_density(aes(x=extinction.2.,y=..density..),bounds=c(0,1),color="red") +
+    geom_density(aes(x=extinction.3.,y=..density..),bounds=c(0,1),color="blue",lty="dotted") +
+    geom_density(aes(x=extinction.4.,y=..density..),bounds=c(0,1),color="red",lty="dotted") +
     ggtitle(clade) +
     theme_bw() +
     theme(plot.title=element_text(hjust=0.5),
