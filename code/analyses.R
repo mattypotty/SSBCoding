@@ -35,8 +35,9 @@ library(mcmcr) # Used for analyzing MCMC output
 library(styler) # For knitting
 library(ggplot2) # For plotting
 library(knitr) # For including plots in markdown
-library(HDInterval) # For processing MCMC
 library(patchwork) # For combining multiple plots
+
+
 
 
 ## ----directories, eval=TRUE---------------------------------------------------
@@ -112,6 +113,7 @@ prior <- list(G=list(G1=list(V=1,nu=0.02)),
 do_mcmc <- function(f) {
   # File names
   analysis_folder <- paste0(ANALYSIS,"_",SSBTYPE,"_",HYPOTHESIS,"/")
+  ifelse(!dir.exists(paste0("../output/",analysis_folder)),dir.create(paste0("../output/",analysis_folder)),FALSE)
   analysis_name <- paste0(ANALYSIS,"_",SSBTYPE,"_",HYPOTHESIS,"_",tree_number,"_",NUMBER)
   print(paste0("Performing analysis: ",analysis_name),quote=F)
   out_file <- paste0("../output/",analysis_folder,analysis_name,".log.csv")
@@ -146,6 +148,7 @@ do_mcmc <- function(f) {
 do_pagel <- function() {
   # File names
   analysis_folder <- paste0(ANALYSIS,"_",SSBTYPE,"_",VARIABLE,"/")
+  ifelse(!dir.exists(paste0("../output/",analysis_folder)),dir.create(paste0("../output/",analysis_folder)),FALSE)
   analysis_name <- paste0(ANALYSIS,"_",SSBTYPE,"_",VARIABLE,"_",tree_number,"_",NUMBER)
   print(paste0("Performing analysis: ",analysis_name),quote=F)
   summary_file <- paste0("../output/",analysis_folder,analysis_name,".sum.txt")
@@ -200,102 +203,8 @@ do_pagel <- function() {
 }
 
 
-## ----process_mcmc, echo=TRUE, eval=TRUE---------------------------------------
-process_mcmc <- function(ssbtype,hypothesis) {
-  files <- Sys.glob(paste0("../output/MCMCGLMM_",ssbtype,"_",hypothesis,"/*.log.csv"))
-  results <- data.frame(matrix(NA,nrow=0,ncol=10))
-  for (file in files) {
-    name_str <- strsplit(strsplit(basename(file),"\\.")[[1]][1],"_")[[1]]
-    treetype <- if (name_str[4] == "TREEMCC") {"TREEMCC"} else {"RANDOM"}
-    number <- name_str[5]
-    log <- read.csv(file)
-    log$treetype <- treetype
-    log$number <- number
-    results <- rbind(results,log)
-  }
-  colnames(results)[1] <- "Intercept"
-  params <- colnames(results)[1:(ncol(results)-2)]
-  
-  plot_list <- list()
-  ind <- 1
-  for (param in params) {
-    hpd95 <- hdi(results[[param]],credMass=.95)
-    hpd90 <- hdi(results[[param]],credMass=.9)
-    hpd80 <- hdi(results[[param]],credMass=.8)
-    hpd_vals <- sort(c(hpd80[[1]],hpd90[[1]],hpd95[[1]],hpd95[[2]],hpd90[[2]],hpd80[[2]],0))
-    if (hpd_vals[1] == 0) {sig=4;hpdsig=c(1,1,1,1,1,1)}
-    if (hpd_vals[2] == 0) {sig=3;hpdsig=c(0,1,1,1,1,1)}
-    if (hpd_vals[3] == 0) {sig=2;hpdsig=c(0,0,1,1,1,1)}
-    if (hpd_vals[4] == 0) {sig=1;hpdsig=c(0,0,0,0,0,0)}
-    if (hpd_vals[5] == 0) {sig=2;hpdsig=c(1,1,1,1,0,0)}
-    if (hpd_vals[6] == 0) {sig=3;hpdsig=c(1,1,1,1,1,0)}
-    if (hpd_vals[7] == 0) {sig=4;hpdsig=c(1,1,1,1,1,1)}
-    markers <- c("","*","**","***")
-    colors <- c("black","gold","darkorange","red")
-    color <- colors[sig]
-    line_colors <- c()
-    for (i in 1:6) {line_colors[i] <- if(hpdsig[i] == 0) {"black"} else {color}}
-    
-    plot <- ggplot(results) +
-      geom_vline(xintercept=0) +
-      geom_density(aes_string(x=param,y="..scaled..",group="treetype",lty="treetype"),color=color) +
-      geom_vline(xintercept=hpd80[[1]],lty="dotted",color=line_colors[3]) +
-      geom_vline(xintercept=hpd90[[1]],lty="dotted",color=line_colors[2]) +
-      geom_vline(xintercept=hpd95[[1]],lty="dotted",color=line_colors[1]) +
-      geom_vline(xintercept=hpd95[[2]],lty="dotted",color=line_colors[6]) +
-      geom_vline(xintercept=hpd90[[2]],lty="dotted",color=line_colors[5]) +
-      geom_vline(xintercept=hpd80[[2]],lty="dotted",color=line_colors[4]) +
-      ggtitle(paste0(param,markers[sig])) +
-      theme_bw() +
-      theme(plot.title=element_text(hjust=0.5),
-            axis.title=element_blank(),
-            legend.position="none",
-            aspect.ratio=1)
-    plot_list[[ind]] <- plot
-    ind <- ind + 1
-  }
-  big_plot <- wrap_plots(plot_list,nrow=1)
-  ggsave(paste0("../figures/",ssbtype,"_",hypothesis,".png"),big_plot,dpi=600,width=3*length(plot_list),height=3)
-}
 
 
-## ----process_pagel, echo=TRUE, eval=TRUE--------------------------------------
-process_pagel <- function(ssbtype,variable) {
-  files <- Sys.glob(paste0("../output/PAGEL_",ssbtype,"_",variable,"/*.sum.txt"))
-  names <- c("Independent", paste0("Dependent ",ssbtype), paste0("Dependent ",variable), "Interdependent")
-
-  file_contents <- readLines(paste0("../output/PAGEL_",ssbtype,"_",variable,"/TREEMCC_001.sum.txt"))
-  aic <- data.frame(matrix(as.numeric(strsplit(file_contents[(length(file_contents)-3)]," +")[[1]][2:5]),ncol=4))
-  weight <- data.frame(matrix(as.numeric(strsplit(file_contents[(length(file_contents))]," +")[[1]][2:5]),ncol=4))
-  results <- rbind(aic,weight)
-  colnames(results) <- names
-
-  aics <- data.frame(matrix(NA,nrow=0,ncol=4))
-  weights <- data.frame(matrix(NA,nrow=0,ncol=4))
-  colnames(aics) <- names
-  colnames(weights) <- names
-    
-  for (file in files) {
-    name_str <- strsplit(strsplit(basename(file),"\\.")[[1]][1],"_")[[1]]
-    treetype <- if (name_str[4] == "TREEMCC") {"TREEMCC"} else {"RANDOM"}
-    number <- name_str[5]
-    if (treetype=="RANDOM") {
-      file_contents <- readLines(file)
-      aic <- data.frame(matrix(as.numeric(strsplit(file_contents[(length(file_contents)-3)]," +")[[1]][2:5]),ncol=4))
-      weight <- data.frame(matrix(as.numeric(strsplit(file_contents[(length(file_contents))]," +")[[1]][2:5]),ncol=4))
-      colnames(aic) <- names
-      colnames(weight) <- names
-      aics <- rbind(aics, aic)
-      weights <- rbind(weights, weight)
-    }
-  }
-  
-  aic_means <- colMeans(aics)
-  aic_weights <- aic.w(aic_means)
-  results <- rbind(results,aic_means,aic_weights)
-  rownames(results) <- c("MCC AIC", "MCC Weights", "Mean AIC", "Mean Weights")
-  return(results)
-}
 
 
 ## ----dataset, eval=TRUE, results="SHOW"---------------------------------------

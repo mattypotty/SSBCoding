@@ -59,8 +59,11 @@ library(mcmcr) # Used for analyzing MCMC output
 library(styler) # For knitting
 library(ggplot2) # For plotting
 library(knitr) # For including plots in markdown
-library(HDInterval) # For processing MCMC
 library(patchwork) # For combining multiple plots
+```
+
+```{r packages_2, eval=TRUE, purl=FALSE}
+library(HDInterval) # For processing MCMC
 ```
 
 ```{r directories, eval=TRUE}
@@ -138,6 +141,7 @@ Making things into functions so we don't have to rewrite so much code
 do_mcmc <- function(f) {
   # File names
   analysis_folder <- paste0(ANALYSIS,"_",SSBTYPE,"_",HYPOTHESIS,"/")
+  ifelse(!dir.exists(paste0("../output/",analysis_folder)),dir.create(paste0("../output/",analysis_folder)),FALSE)
   analysis_name <- paste0(ANALYSIS,"_",SSBTYPE,"_",HYPOTHESIS,"_",tree_number,"_",NUMBER)
   print(paste0("Performing analysis: ",analysis_name),quote=F)
   out_file <- paste0("../output/",analysis_folder,analysis_name,".log.csv")
@@ -172,6 +176,7 @@ do_mcmc <- function(f) {
 do_pagel <- function() {
   # File names
   analysis_folder <- paste0(ANALYSIS,"_",SSBTYPE,"_",VARIABLE,"/")
+  ifelse(!dir.exists(paste0("../output/",analysis_folder)),dir.create(paste0("../output/",analysis_folder)),FALSE)
   analysis_name <- paste0(ANALYSIS,"_",SSBTYPE,"_",VARIABLE,"_",tree_number,"_",NUMBER)
   print(paste0("Performing analysis: ",analysis_name),quote=F)
   summary_file <- paste0("../output/",analysis_folder,analysis_name,".sum.txt")
@@ -226,7 +231,7 @@ do_pagel <- function() {
 }
 ```
 
-```{r process_mcmc, echo=TRUE, eval=TRUE}
+```{r process_mcmc, echo=TRUE, eval=TRUE, purl=FALSE}
 process_mcmc <- function(ssbtype,hypothesis) {
   files <- Sys.glob(paste0("../output/MCMCGLMM_",ssbtype,"_",hypothesis,"/*.log.csv"))
   results <- data.frame(matrix(NA,nrow=0,ncol=10))
@@ -285,7 +290,7 @@ process_mcmc <- function(ssbtype,hypothesis) {
 }
 ```
 
-```{r process_pagel, echo=TRUE, eval=TRUE}
+```{r process_pagel, echo=TRUE, eval=TRUE, purl=FALSE}
 process_pagel <- function(ssbtype,variable) {
   files <- Sys.glob(paste0("../output/PAGEL_",ssbtype,"_",variable,"/*.sum.txt"))
   names <- c("Independent", paste0("Dependent ",ssbtype), paste0("Dependent ",variable), "Interdependent")
