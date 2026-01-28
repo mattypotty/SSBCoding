@@ -59,11 +59,11 @@ library(mcmcr) # Used for analyzing MCMC output
 library(styler) # For knitting
 library(ggplot2) # For plotting
 library(knitr) # For including plots in markdown
-library(patchwork) # For combining multiple plots
 ```
 
 ```{r packages_2, eval=TRUE, purl=FALSE}
 library(HDInterval) # For processing MCMC
+library(patchwork) # For combining multiple plots
 ```
 
 ```{r directories, eval=TRUE}

@@ -35,7 +35,6 @@ library(mcmcr) # Used for analyzing MCMC output
 library(styler) # For knitting
 library(ggplot2) # For plotting
 library(knitr) # For including plots in markdown
-library(patchwork) # For combining multiple plots
 
 
 
