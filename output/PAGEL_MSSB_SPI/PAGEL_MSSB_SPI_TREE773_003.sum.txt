@@ -1,0 +1,110 @@
+Pagel's Directional Test for MSSB and SPI
+--------------------
+Both Independent or Dependent
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.043656  0.007821  0.035835  0.000000
+0|1  0.034251 -0.070085  0.000000  0.035835
+1|0  0.072561  0.000000 -0.080382  0.007821
+1|1  0.000000  0.072561  0.034251 -0.106811
+
+Dependent (x & y) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.049197  0.008427  0.040770  0.000000
+0|1  0.039713 -0.054459  0.000000  0.014746
+1|0  0.074725  0.000000 -0.081430  0.006706
+1|1  0.000000  0.055603  0.026944 -0.082547
+
+Model fit:
+            log-likelihood      AIC
+independent      -375.7697 759.5393
+dependent        -374.4390 764.8780
+
+Hypothesis test result:
+  likelihood-ratio:  2.66134 
+  p-value:  0.615996 
+
+Model fitting method used was fitMk 
+
+R thinks both model optimizations converged.
+
+--------------------
+Dependent MSSB
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.043656  0.007821  0.035835  0.000000
+0|1  0.034251 -0.070085  0.000000  0.035835
+1|0  0.072561  0.000000 -0.080382  0.007821
+1|1  0.000000  0.072561  0.034251 -0.106811
+
+Dependent (x only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.049037  0.007660  0.041377  0.000000
+0|1  0.035078 -0.050415  0.000000  0.015337
+1|0  0.076483  0.000000 -0.084143  0.007660
+1|1  0.000000  0.054860  0.035078 -0.089938
+
+Model fit:
+            log-likelihood      AIC
+independent      -375.7697 759.5393
+dependent        -374.6646 761.3292
+
+Hypothesis test result:
+  likelihood-ratio:  2.21013 
+  p-value:  0.331189 
+
+Model fitting method used was fitMk 
+
+R thinks both model optimizations converged.
+
+--------------------
+Dependent SPI
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.043656  0.007821  0.035835  0.000000
+0|1  0.034251 -0.070085  0.000000  0.035835
+1|0  0.072561  0.000000 -0.080382  0.007821
+1|1  0.000000  0.072561  0.034251 -0.106811
+
+Dependent (y only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.043970  0.009632  0.034338  0.000000
+0|1  0.036323 -0.070661  0.000000  0.034338
+1|0  0.069809  0.000000 -0.074719  0.004910
+1|1  0.000000  0.069809  0.031657 -0.101467
+
+Model fit:
+            log-likelihood      AIC
+independent      -375.7697 759.5393
+dependent        -375.3813 762.7627
+
+Hypothesis test result:
+  likelihood-ratio:  0.776659 
+  p-value:  0.678189 
+
+Model fitting method used was fitMk 
+
+R thinks both model optimizations converged.
+
+--------------------
+AIC
+        independent       dependent SSB       dependent SPI dependent SSB & SPI 
+           759.5393            761.3292            762.7627            764.8780 
+Weights
+        independent       dependent SSB       dependent SPI dependent SSB & SPI 
+         0.59612972          0.24359920          0.11896004          0.04131104 

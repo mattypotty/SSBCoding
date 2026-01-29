@@ -1,0 +1,110 @@
+Pagel's Directional Test for SSB and TSP
+--------------------
+Both Independent or Dependent
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.039753  0.003412  0.036341  0.000000
+0|1  0.007535 -0.043876  0.000000  0.036341
+1|0  0.066110  0.000000 -0.069522  0.003412
+1|1  0.000000  0.066110  0.007535 -0.073644
+
+Dependent (x & y) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.036483  0.001136  0.035347  0.000000
+0|1  0.000000 -0.056317  0.000000  0.056317
+1|0  0.118779  0.000000 -0.130644  0.011865
+1|1  0.000000  0.054211  0.016221 -0.070431
+
+Model fit:
+            log-likelihood      AIC
+independent      -351.0043 710.0087
+dependent        -337.6134 691.2267
+
+Hypothesis test result:
+  likelihood-ratio:  26.782 
+  p-value:  2.20017e-05 
+
+Model fitting method used was fitMk 
+
+R thinks one or both likelihood optimizations did not converge.
+
+--------------------
+Dependent SSB
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.039753  0.003412  0.036341  0.000000
+0|1  0.007535 -0.043876  0.000000  0.036341
+1|0  0.066110  0.000000 -0.069522  0.003412
+1|1  0.000000  0.066110  0.007535 -0.073644
+
+Dependent (x only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.081716  0.003347  0.078368  0.000000
+0|1  0.007646 -0.062929  0.000000  0.055283
+1|0  0.252129  0.000000 -0.255477  0.003347
+1|1  0.000000  0.054783  0.007646 -0.062429
+
+Model fit:
+            log-likelihood      AIC
+independent      -351.0043 710.0087
+dependent        -341.1830 694.3660
+
+Hypothesis test result:
+  likelihood-ratio:  19.6427 
+  p-value:  5.42808e-05 
+
+Model fitting method used was fitMk 
+
+R thinks both model optimizations converged.
+
+--------------------
+Dependent TSP
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.039753  0.003412  0.036341  0.000000
+0|1  0.007535 -0.043876  0.000000  0.036341
+1|0  0.066110  0.000000 -0.069522  0.003412
+1|1  0.000000  0.066110  0.007535 -0.073644
+
+Dependent (y only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.032421  0.000000  0.032421  0.000000
+0|1  0.001821 -0.034242  0.000000  0.032421
+1|0  0.060202  0.000000 -0.079637  0.019435
+1|1  0.000000  0.060202  0.014181 -0.074383
+
+Model fit:
+            log-likelihood      AIC
+independent      -351.0043 710.0087
+dependent        -346.1021 704.2041
+
+Hypothesis test result:
+  likelihood-ratio:  9.80457 
+  p-value:  0.00742959 
+
+Model fitting method used was fitMk 
+
+R thinks both model optimizations converged.
+
+--------------------
+AIC
+        independent       dependent SSB       dependent TSP dependent SSB & TSP 
+           710.0087            694.3660            704.2041            691.2267 
+Weights
+        independent       dependent SSB       dependent TSP dependent SSB & TSP 
+         0.00006900          0.17203717          0.00125691          0.82663692 

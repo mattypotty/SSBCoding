@@ -1,0 +1,110 @@
+Pagel's Directional Test for FSSB and SDT
+--------------------
+Both Independent or Dependent
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.050486  0.019993  0.030493  0.000000
+0|1  0.022090 -0.052583  0.000000  0.030493
+1|0  0.095308  0.000000 -0.115301  0.019993
+1|1  0.000000  0.095308  0.022090 -0.117398
+
+Dependent (x & y) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.031128  0.003766  0.027363  0.000000
+0|1  0.023836 -0.106218  0.000000  0.082382
+1|0  0.021411  0.000000 -0.072636  0.051225
+1|1  0.000000  0.455112  0.000000 -0.455112
+
+Model fit:
+            log-likelihood      AIC
+independent      -412.8831 833.7662
+dependent        -397.3276 810.6552
+
+Hypothesis test result:
+  likelihood-ratio:  31.111 
+  p-value:  2.90585e-06 
+
+Model fitting method used was fitMk 
+
+R thinks one or both likelihood optimizations did not converge.
+
+--------------------
+Dependent FSSB
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.050486  0.019993  0.030493  0.000000
+0|1  0.022090 -0.052583  0.000000  0.030493
+1|0  0.095308  0.000000 -0.115301  0.019993
+1|1  0.000000  0.095308  0.022090 -0.117398
+
+Dependent (x only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.047890  0.020549  0.027341  0.000000
+0|1  0.021457 -0.067966  0.000000  0.046509
+1|0  0.055248  0.000000 -0.075798  0.020549
+1|1  0.000000  0.248133  0.021457 -0.269590
+
+Model fit:
+            log-likelihood      AIC
+independent      -412.8831 833.7662
+dependent        -407.1956 826.3912
+
+Hypothesis test result:
+  likelihood-ratio:  11.375 
+  p-value:  0.00338812 
+
+Model fitting method used was fitMk 
+
+R thinks one or both likelihood optimizations did not converge.
+
+--------------------
+Dependent SDT
+
+Pagel's binary character correlation test:
+
+Assumes "ARD" substitution model for both characters
+
+Independent model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.050486  0.019993  0.030493  0.000000
+0|1  0.022090 -0.052583  0.000000  0.030493
+1|0  0.095308  0.000000 -0.115301  0.019993
+1|1  0.000000  0.095308  0.022090 -0.117398
+
+Dependent (y only) model rate matrix:
+          0|0       0|1       1|0       1|1
+0|0 -0.042967  0.016503  0.026464  0.000000
+0|1  0.016818 -0.043282  0.000000  0.026464
+1|0  0.085403  0.000000 -0.118547  0.033144
+1|1  0.000000  0.085403  0.058678 -0.144081
+
+Model fit:
+            log-likelihood      AIC
+independent      -412.8831 833.7662
+dependent        -411.7439 835.4879
+
+Hypothesis test result:
+  likelihood-ratio:  2.27833 
+  p-value:  0.320087 
+
+Model fitting method used was fitMk 
+
+R thinks both model optimizations converged.
+
+--------------------
+AIC
+        independent       dependent SSB       dependent SDT dependent SSB & SDT 
+           833.7662            826.3912            835.4879            810.6552 
+Weights
+        independent       dependent SSB       dependent SDT dependent SSB & SDT 
+         0.00000958          0.00038264          0.00000405          0.99960373 
