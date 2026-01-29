@@ -15,7 +15,7 @@ fi
 
 # Submit job
 bsub -G compute-michael.landis \
--g /k.swiston \
+-g /k.swiston/SSB \
 -cwd /storage1/fs1/michael.landis/Active/SSBCoding/ \
 -o $JOBDIR/$NAME.stdout.txt \
 -J $NAME \
