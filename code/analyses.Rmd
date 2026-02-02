@@ -295,7 +295,7 @@ process_pagel <- function(ssbtype,variable) {
   files <- Sys.glob(paste0("../output/PAGEL_",ssbtype,"_",variable,"/*.sum.txt"))
   names <- c("Independent", paste0("Dependent ",ssbtype), paste0("Dependent ",variable), "Interdependent")
 
-  file_contents <- readLines(paste0("../output/PAGEL_",ssbtype,"_",variable,"/TREEMCC_001.sum.txt"))
+  file_contents <- readLines(paste0("../output/PAGEL_",ssbtype,"_",variable,"/PAGEL_",ssbtype,"_",variable,"_TREEMCC_001.sum.txt"))
   aic <- data.frame(matrix(as.numeric(strsplit(file_contents[(length(file_contents)-3)]," +")[[1]][2:5]),ncol=4))
   weight <- data.frame(matrix(as.numeric(strsplit(file_contents[(length(file_contents))]," +")[[1]][2:5]),ncol=4))
   results <- rbind(aic,weight)
@@ -488,45 +488,55 @@ dev.off()
 include_graphics("../figures/tree.png")
 ```
 
-```{r finished, results='hold', purl=FALSE}
-mcmcglmm <- data.frame(matrix(NA,nrow=0,ncol=4))
+```{r finished, results='hold', eval=TRUE, purl=FALSE}
+mcmcglmm <- data.frame(matrix(NA,nrow=0,ncol=5))
 pagel <- data.frame(matrix(NA,nrow=0,ncol=4))
 other <- c()
 
-files <- list.files("../output")
-for (file in files) {
-  #print(file)
-  name_list <- strsplit(strsplit(file,".",fixed=TRUE)[[1]][1],"_",fixed=TRUE)[[1]]
-  if (name_list[1] == "MCMCGLMM") {
-    this_row <- c(name_list[2],name_list[3],name_list[4],name_list[5])
-    mcmcglmm <- rbind(mcmcglmm,this_row)
-  }
-  else if (name_list[1] == "PAGEL") {
-    this_row <- c(name_list[2],name_list[3],name_list[4],name_list[5])
-    pagel <- rbind(pagel,this_row)
-  }
-  else {
-    other <- c(other,paste(name_list,collapse="_"))
+dirs <- list.files("../output")
+for (dir in dirs) {
+  files <- list.files(paste0("../output/",dir))
+  for (file in files) {
+    name_list <- strsplit(strsplit(file,".",fixed=TRUE)[[1]][1],"_",fixed=TRUE)[[1]]
+    if (name_list[1] == "MCMCGLMM") {
+      if (grepl("\\.txt$", file)) {
+        line <- strsplit(readLines(paste0("../output/",dir,"/",file),n=1),":",fixed=TRUE)[[1]]
+        if (line[1]=="ESS") {ess <- as.numeric(line[2])} 
+        this_row <- c(name_list[2],name_list[3],name_list[4],name_list[5],ess)
+        mcmcglmm <- rbind(mcmcglmm,this_row)
+      }
+    }
+    else if (name_list[1] == "PAGEL") {
+      this_row <- c(name_list[2],name_list[3],name_list[4],name_list[5])
+      pagel <- rbind(pagel,this_row)
+    }
+    else {
+      other <- c(other,paste(name_list,collapse="_"))
+    }
   }
 }
 
 mcmcglmm <- unique(mcmcglmm)
-colnames(mcmcglmm) <- c("SSB","HYP","TREE","NUM")
+colnames(mcmcglmm) <- c("SSB","HYP","TREE","NUM","ESS")
+table(mcmcglmm[,1:2])
+mean_ess <- mean(as.numeric(mcmcglmm$ESS[which(mcmcglmm$HYP!="IUCN")]))
+print(paste0("Mean ESS for non-IUCN: ",mean_ess),quote=F)
 
 pagel <- unique(pagel)
 colnames(pagel) <- c("SSB","VAR","TREE","NUM")
+table(pagel[,1:2])
 
-nums <- c("001", "002", "003", "004", "005", "006", "007", "008", "009", "010")
+nums <- sprintf("%03d", seq(1:100))
+nums_2 <- sprintf("%03d", seq(1:10))
+nums_3 <- c("001")
 clades <- c("Afrotheria", "Artiodactyla_Aquatic", "Artiodactyla_Terrestrial", "Basal_Euarchontoglires", "Carnivora_Caniformia", "Carnivora_Feliformia", "Chiroptera_Pteropodiformes", "Chiroptera_Vespertilioniformes", "Eulipotyphla", "Lagomorpha", "Marsupalia", "Panperissodactyla", "Primates", "Rodentia_Hystricomorpha", "Rodentia_Sciuromorpha", "Rodentia_Supramyomorpha_Myomorphi", "Rodentia_Supramyomorpha_non-Myomorphi", "Xenarthra")
 
 print("Missing MCMCglmm",quote=F)
-
-table(mcmcglmm[,1:2])
 for (ssb in unique(mcmcglmm$SSB)) {
   for (hyp in unique(mcmcglmm$HYP)) {
     search_1 <- which(mcmcglmm$SSB==ssb & mcmcglmm$HYP == hyp & mcmcglmm$TREE=="TREEMCC")
     numbers_1 <- mcmcglmm$NUM[search_1]
-    missing_1 <- nums[!(nums %in% numbers_1)]
+    missing_1 <- nums_2[!(nums_2 %in% numbers_1)]
     if (length(missing_1) > 0) {print(paste0(ssb, " ", hyp, " TREEMCC ", paste(missing_1,collapse=",")),quote=F)}
     search_2 <- which(mcmcglmm$SSB==ssb & mcmcglmm$HYP == hyp & mcmcglmm$TREE!="TREEMCC")
     numbers_2 <- mcmcglmm$NUM[search_2]
@@ -536,13 +546,11 @@ for (ssb in unique(mcmcglmm$SSB)) {
 }
 
 print("Missing Pagel",quote=F)
-
-table(pagel[,1:2])
 for (ssb in unique(pagel$SSB)) {
   for (var in unique(pagel$VAR)) {
     search_1 <- which(pagel$SSB==ssb & pagel$VAR == var & pagel$TREE=="TREEMCC")
     numbers_1 <- pagel$NUM[search_1]
-    missing_1 <- nums[!(nums %in% numbers_1)]
+    missing_1 <- nums_3[!(nums_3 %in% numbers_1)]
     if (length(missing_1) > 0) {print(paste0(ssb, " ", var, " TREEMCC ", paste(missing_1,collapse=",")),quote=F)}
     search_2 <- which(pagel$SSB==ssb & pagel$VAR == var & pagel$TREE!="TREEMCC")
     numbers_2 <- pagel$NUM[search_2]
@@ -1221,7 +1229,7 @@ include_graphics("../figures/MSSB_IUCN.png")
 #### SSE
 
 ```{r sse_process, echo=TRUE, purl=FALSE}
-files <- Sys.glob(paste0("../output/*.log"))
+files <- Sys.glob(paste0("../output/*/*.log"))
 
 sp_plot_list <- list()
 ex_plot_list <- list()
