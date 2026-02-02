@@ -1,0 +1,34 @@
+ESS: 7263
+
+Iterations = 100001:999901
+Thinning interval = 100 
+Number of chains = 1 
+Sample size per chain = 9000 
+
+1. Empirical mean and standard deviation for each variable,
+   plus standard error of the mean:
+
+               Mean    SD Naive SE Time-series SE
+(Intercept) -135.81 222.4    2.344          2.344
+MGSHAR      -129.81 122.2    1.288          1.314
+MGSHBG        70.34 121.4    1.280          1.280
+MGSMBG        77.33 119.2    1.256          1.282
+MGSMMG        19.42 108.4    1.142          1.142
+MGSMOP      -229.01 134.7    1.419          1.588
+MGSSO        -90.04 106.8    1.125          1.145
+MGSSSG       113.25 119.9    1.264          1.294
+MGSVGS       198.14 138.3    1.458          1.472
+
+2. Quantiles for each variable:
+
+               2.5%      25%     50%      75% 97.5%
+(Intercept) -608.63 -268.234 -123.06    9.246 272.0
+MGSHAR      -376.83 -208.269 -127.31  -48.610 103.3
+MGSHBG      -163.32  -11.437   67.06  148.808 318.4
+MGSMBG      -152.83   -1.078   74.39  153.948 321.4
+MGSMMG      -189.99  -51.402   17.92   90.241 235.1
+MGSMOP      -512.25 -313.835 -225.27 -137.795  25.2
+MGSSO       -304.08 -159.714  -88.24  -19.032 118.3
+MGSSSG      -111.59   30.840  109.54  191.628 354.1
+MGSVGS       -66.75  106.058  194.13  285.601 484.0
+
