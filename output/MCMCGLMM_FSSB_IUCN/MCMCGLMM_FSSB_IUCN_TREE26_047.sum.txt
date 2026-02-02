@@ -1,0 +1,30 @@
+ESS: 0
+
+Iterations = 100001:999901
+Thinning interval = 100 
+Number of chains = 1 
+Sample size per chain = 9000 
+
+1. Empirical mean and standard deviation for each variable,
+   plus standard error of the mean:
+
+                Mean      SD Naive SE Time-series SE
+(Intercept)   -157.2   259.0    2.730          3.267
+IUCNDD      -28317.2 20996.7  221.325       5928.569
+IUCNEN        -185.0   107.1    1.129          1.452
+IUCNEW      -55338.4 29786.0  313.972      11338.795
+IUCNLC        -191.2   102.3    1.079          1.501
+IUCNNT        -196.2   120.0    1.265          1.572
+IUCNVU        -191.1   109.3    1.152          1.455
+
+2. Quantiles for each variable:
+
+                 2.5%      25%      50%       75%     97.5%
+(Intercept)    -732.3   -305.5   -138.1     10.58   313.359
+IUCNDD       -82997.8 -41303.4 -23629.8 -11781.24 -1245.701
+IUCNEN         -412.5   -253.1   -179.7   -111.00    11.232
+IUCNEW      -108450.4 -78463.5 -58823.3 -34176.65 -2198.571
+IUCNLC         -406.3   -255.7   -187.7   -119.49    -4.837
+IUCNNT         -442.0   -272.7   -188.7   -113.82    23.015
+IUCNVU         -420.5   -259.5   -186.8   -116.11    11.610
+
