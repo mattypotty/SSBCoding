@@ -211,11 +211,15 @@ do_pagel <- function() {
 # Note that we want to run this code (eval=TRUE) and show the output (results="SHOW"), but we don't need to see it
 print("Reading in data...",quote=F)
 
-data_file <- read.csv("../data/FINALdata_20251124.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
-#print(data_file$Column.Name.Key[data_file$Column.Name.Key != ""]) # Prints the column name key
-#print(data_file$Mating.Group.Structures.Key[data_file$Mating.Group.Structures.Key != ""]) # prints the group mating structures key
+data_file <- read.csv("../data/FINAL_Covariate_Data_20260217.csv", header = TRUE, sep = ",") # Reads the data, which is a csv file (comma separated values), and saves to "data" variable
+print(data_file$Column.Name.Key[data_file$Column.Name.Key != ""]) # Prints the column name key
+print(data_file$Mating.Group.Structures.Key[data_file$Mating.Group.Structures.Key != ""]) # prints the group mating structures key
 
-data_full <- data.frame(data_file[,-which(colnames(data_file)=="Column.Name.Key" | colnames(data_file)=="Mating.Group.Structures.Key")]) # Removing keys from dataset
+# Removing keys from dataset
+data_full <- data.frame(data_file[,-which(colnames(data_file)=="Column.Name.Key" | 
+                                          colnames(data_file)=="Mating.Group.Structures.Key" |
+                                          colnames(data_file)=="Additional.Sources" |
+                                          colnames(data_file)=="Modifiers")])
 
 # Fixing any problems with the dataset
 data_full$Species[which(data_full$Species=="Otaria flavescens")] <- "Otaria_flavescens"
@@ -229,18 +233,18 @@ for (i in 1:nrow(phylogeny_changes)) {
   }
 }
 
-SOC <- rep(NA,nrow(data_full))
-for (i in 1:nrow(data_full)) {
-  if (data_full$GL[i] == "N") {SOC[i] <- "SOL"}
-  if (data_full$GL[i] == "Y") {SOC[i] <- "GL"}
-  if (data_full$SOG[i] == "Y") {SOC[i] <- "SOG"}
-}
-data_full$SOC <- SOC
+#SOC <- rep(NA,nrow(data_full))
+#for (i in 1:nrow(data_full)) {
+#  if (data_full$GL[i] == "N") {SOC[i] <- "SOL"}
+#  if (data_full$GL[i] == "Y") {SOC[i] <- "GL"}
+#  if (data_full$SOG[i] == "Y") {SOC[i] <- "SOG"}
+#}
+#data_full$SOC <- SOC
 
 quantitative <- c("GP","BM","AFM","MR","PC","FWA","FAM","MAM") # quantitative columns
 binary <- c("RDM","TSP","NB","SDT","GL","SPI","NAC","GIM","GFE","MMC","BG","DHE","DCA","DPMI","DIN","DFR","DGR","DCE","DMOC","SOG","FSSB","MSSB","SSB") # binary columns
-yn <- c("RDM","TSP","NB","SDT","GL","SPI","NAC","GIM","GFE","MMC","BG","DHE","DCA","DPMI","DIN","DFR","DGR","DCE","DMOC","SOG") # binary columns with y/n
-multiple <- c("MGS","IUCN","Modifiers", "SOC") # categorical columns with multiple options
+yn <- c("RDM","TSP","NB","SDT","GL","SPI","NAC","GIM","GFE","MMC","BG","DHE","DCA","DPMI","DIN","DFR","DGR","DCE","DMOC","SOG","HAR") # binary columns with y/n
+multiple <- c("MGS","IUCN","Modifiers","SOC") # categorical columns with multiple options
 categorical <- c(binary,multiple) # all categorical columns
 
 for (i in 1:ncol(data_full)) { # looping through all the columns to format each one correctly
@@ -380,6 +384,36 @@ if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MI" & SSBTYPE == "MSSB") {do_mcmc(f)
 
 
 
+## ----NAC_mcmcglmm, echo=TRUE--------------------------------------------------
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "NAC"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+f <- SSB ~ NAC + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "NAC" & SSBTYPE == "SSB") {do_mcmc(f)}
+
+
+
+
+
+
+## ----NACf_mcmcglmm, echo=TRUE-------------------------------------------------
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "NAC"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+f <- FSSB ~ NAC + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "NAC" & SSBTYPE == "FSSB") {do_mcmc(f)}
+
+
+
+
+
+
+## ----NACm_mcmcglmm, echo=TRUE-------------------------------------------------
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "NAC"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+f <- MSSB ~ NAC + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "NAC" & SSBTYPE == "MSSB") {do_mcmc(f)}
+
+
+
+
+
+
 ## ----NAC_pagel, echo=TRUE-----------------------------------------------------
 ANALYSIS <- "PAGEL"; VARIABLE <- "NAC"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
 if (ANALYSIS == "PAGEL" & VARIABLE == "NAC" & SSBTYPE == "SSB") {do_pagel()}
@@ -472,6 +506,57 @@ f <- MSSB ~ MGS + 1
 if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "MGS" & SSBTYPE == "MSSB") {do_mcmc(f)}
 
 
+
+
+
+
+## ----HAR_mcmcglmm, echo=TRUE--------------------------------------------------
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "HAR"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+f <- SSB ~ HAR + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "HAR" & SSBTYPE == "SSB") {do_mcmc(f)}
+
+
+
+
+
+
+## ----HARf_mcmcglmm, echo=TRUE-------------------------------------------------
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "HAR"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+f <- FSSB ~ HAR + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "HAR" & SSBTYPE == "FSSB") {do_mcmc(f)}
+
+
+
+
+
+
+## ----HARm_mcmcglmm, echo=TRUE-------------------------------------------------
+ANALYSIS <- "MCMCGLMM"; HYPOTHESIS <- "HAR"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+f <- MSSB ~ HAR + 1
+if (ANALYSIS == "MCMCGLMM" & HYPOTHESIS == "HAR" & SSBTYPE == "MSSB") {do_mcmc(f)}
+
+
+
+
+
+
+## ----HAR_pagel, echo=TRUE-----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "HAR"; SSBTYPE <- "SSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "HAR" & SSBTYPE == "SSB") {do_pagel()}
+
+
+
+
+## ----HARf_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "HAR"; SSBTYPE <- "FSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "HAR" & SSBTYPE == "FSSB") {do_pagel()}
+
+
+
+
+## ----HARm_pagel, echo=TRUE----------------------------------------------------
+ANALYSIS <- "PAGEL"; VARIABLE <- "HAR"; SSBTYPE <- "MSSB"; if (USEGLOBAL) {set_global()}
+if (ANALYSIS == "PAGEL" & VARIABLE == "HAR" & SSBTYPE == "MSSB") {do_pagel()}
 
 
 

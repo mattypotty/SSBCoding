@@ -26,4 +26,5 @@ done
 # USERANDOM                 > "TRUE", "FALSE"
 # ANALYSIS                  > "NONE", "MCCTREE", "SPECMATS", "MCMCGLMM", "PAGEL"
 # SSBTYPE                   > "NONE", "SSB", "FSSB", "MSSB"
-# VARIABLE (for Pagel)      > "None", "NAC", "SPI", "TSP", "SDT", "RDM"
+# VARIABLE (for Pagel)      > "None", "NAC", "SPI", "TSP", "SDT", "RDM", "HAR"
+# NEW VARIABLES: "HAR"

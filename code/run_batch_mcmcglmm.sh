@@ -34,4 +34,5 @@ done
 # USERANDOM                 > "TRUE", "FALSE"
 # ANALYSIS                  > "NONE", "MCCTREE", "SPECMATS", "MCMCGLMM", "PAGEL"
 # SSBTYPE                   > "NONE", "SSB", "FSSB", "MSSB"
-# HYPOTHESIS (for MCMCglmm) > "NONE", "MI", "MGS", "SDT", "SOC", "RDM", "AM", "IUCN"
+# HYPOTHESIS (for MCMCglmm) > "NONE", "MI", "MGS", "SDT", "SOC", "RDM", "AM", "IUCN", "NAC"
+# NEW HYPOTHESES: "NAC", "SOC", "HAR"
