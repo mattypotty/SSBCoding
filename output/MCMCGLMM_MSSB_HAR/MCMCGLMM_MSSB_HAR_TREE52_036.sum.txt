@@ -1,0 +1,20 @@
+ESS: 1008
+
+Iterations = 100001:999901
+Thinning interval = 100 
+Number of chains = 1 
+Sample size per chain = 9000 
+
+1. Empirical mean and standard deviation for each variable,
+   plus standard error of the mean:
+
+               Mean     SD Naive SE Time-series SE
+(Intercept) -150.94 150.76   1.5892          4.874
+HAR1          33.91  35.04   0.3693          1.025
+
+2. Quantiles for each variable:
+
+              2.5%     25%     50%    75%  97.5%
+(Intercept) -514.4 -229.18 -124.91 -44.68  76.26
+HAR1         -25.5    8.99   29.01  54.97 111.59
+
