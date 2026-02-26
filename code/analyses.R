@@ -254,6 +254,7 @@ for (i in 1:ncol(data_full)) { # looping through all the columns to format each 
   if (col %in% quantitative) {
     data_full[[col]] <- as.numeric(data_full[[col]])
     data_full[[col]] <- scale(data_full[[col]])
+    print("Scaling quantitative data")
   } # formatting quantitative columns as numeric & scaled
   if (col %in% yn) {data_full[[col]] <- gsub("Y","1",data_full[[col]]); data_full[[col]] <- gsub("N","0",data_full[[col]])} # swapping y/n for 1/0
   if (col %in% categorical) {data_full[[col]] <- as.factor(data_full[[col]])} # formatting all categorical columns as factors
