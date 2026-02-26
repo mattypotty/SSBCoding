@@ -100,12 +100,14 @@ extinction_hidden := extinction_hidden_unormalized / mean(extinction_hidden_unor
 for (i in 1:num_states) {
 
     ### Create a loguniform distributed variable for the speciation rate
-    speciation_observed[i] ~ dnLoguniform( 1E-6, 1E2)
+    #speciation_observed[i] ~ dnLoguniform( 1E-6, 1E2)
+    speciation_observed[i] ~ dnLoguniform( 1E-4, 1E0 )
     speciation_observed[i].setValue( (num_taxa-2) / tree_length )
     moves.append( mvScale(speciation_observed[i],lambda=1.0,tune=true,weight=3.0) )
 
     ### Create a loguniform distributed variable for the speciation rate
-    extinction_observed[i] ~ dnLoguniform( 1E-6, 1E2)
+    #extinction_observed[i] ~ dnLoguniform( 1E-6, 1E2)
+    extinction_observed[i] ~ dnLoguniform( 1E-4, 1E0)
     extinction_observed[i].setValue( speciation_observed[i] / 10.0 )
     moves.append( mvScale(extinction_observed[i],lambda=1.0,tune=true,weight=3.0) )
 
@@ -163,9 +165,11 @@ rate_matrix
 #####################################
 
 ### Create a constant variable with the prior probabilities of each rate category at the root.
-rate_category_prior ~ dnDirichlet( rep(1,num_rates) )
-moves.append( mvBetaSimplex(rate_category_prior,tune=true,weight=2) )
-moves.append( mvDirichletSimplex(rate_category_prior,tune=true,weight=2) )
+#rate_category_prior ~ dnDirichlet( rep(1,num_rates) )
+#moves.append( mvBetaSimplex(rate_category_prior,tune=true,weight=2) )
+#moves.append( mvDirichletSimplex(rate_category_prior,tune=true,weight=2) )
+rate_category_vec <- rep(1,num_rates)
+rate_category_prior <- simplex( rate_category_vec )
 
 ### Create the fix parameter for the age of the root set to the observed age
 root <- phy.rootAge()
