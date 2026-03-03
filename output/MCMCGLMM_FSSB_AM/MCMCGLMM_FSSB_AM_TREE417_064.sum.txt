@@ -1,4 +1,4 @@
-ESS: 3600
+ESS: 3123
 
 Iterations = 100001:999901
 Thinning interval = 100 
@@ -8,15 +8,15 @@ Sample size per chain = 9000
 1. Empirical mean and standard deviation for each variable,
    plus standard error of the mean:
 
-                 Mean      SD Naive SE Time-series SE
-(Intercept) -313.8324 209.128  2.20441        4.76593
-FAM           -0.4096   1.510  0.01592        0.01568
-MAM            1.5629   1.259  0.01327        0.02033
+               Mean     SD Naive SE Time-series SE
+(Intercept) -262.59 202.09   2.1302         4.8615
+FAM          -13.43  50.20   0.5291         0.5291
+MAM           63.53  51.64   0.5443         0.8500
 
 2. Quantiles for each variable:
 
-                 2.5%       25%       50%       75%  97.5%
-(Intercept) -804.8547 -425.4970 -282.8409 -172.4031 11.860
-FAM           -3.4944   -1.3403   -0.3748    0.5119  2.576
-MAM           -0.7036    0.6948    1.4631    2.3567  4.212
+               2.5%     25%     50%     75%  97.5%
+(Intercept) -737.85 -368.21 -231.85 -124.94  55.49
+FAM         -115.68  -44.11  -12.71   16.98  85.99
+MAM          -29.25   27.77   59.38   95.42 173.66
 
