@@ -234,7 +234,7 @@ do_pagel <- function() {
 ```{r process_mcmc, echo=TRUE, eval=TRUE, purl=FALSE}
 process_mcmc <- function(ssbtype,hypothesis) {
   files <- Sys.glob(paste0("../output/MCMCGLMM_",ssbtype,"_",hypothesis,"/*.log.csv"))
-  results <- data.frame(matrix(NA,nrow=0,ncol=10))
+  results <- data.frame(matrix(NA,nrow=0,ncol=0))
   for (file in files) {
     name_str <- strsplit(strsplit(basename(file),"\\.")[[1]][1],"_")[[1]]
     treetype <- if (name_str[4] == "TREEMCC") {"TREEMCC"} else {"RANDOM"}
@@ -266,6 +266,19 @@ process_mcmc <- function(ssbtype,hypothesis) {
     color <- colors[sig]
     line_colors <- c()
     for (i in 1:6) {line_colors[i] <- if(hpdsig[i] == 0) {"black"} else {color}}
+    val <- round(mean(results[[param]]),2)
+    mean_text <- paste0("Mean: ",val)
+    
+    min <- abs(min(results[[param]]))
+    max <- abs(max(results[[param]]))
+    
+    if (min < max) {
+      xpos = Inf
+      hjust = 1.1
+    } else {
+      xpos = -Inf
+      hjust = -0.1
+    }
     
     plot <- ggplot(results) +
       geom_vline(xintercept=0) +
@@ -276,6 +289,7 @@ process_mcmc <- function(ssbtype,hypothesis) {
       geom_vline(xintercept=hpd95[[2]],lty="dotted",color=line_colors[6]) +
       geom_vline(xintercept=hpd90[[2]],lty="dotted",color=line_colors[5]) +
       geom_vline(xintercept=hpd80[[2]],lty="dotted",color=line_colors[4]) +
+      annotate("label",label=mean_text,x=xpos,y=1,hjust=hjust,vjust=1,fill="white",size=3) +
       ggtitle(paste0(param,markers[sig])) +
       theme_bw() +
       theme(plot.title=element_text(hjust=0.5),
@@ -287,6 +301,83 @@ process_mcmc <- function(ssbtype,hypothesis) {
   }
   big_plot <- wrap_plots(plot_list,nrow=1)
   ggsave(paste0("../figures/",ssbtype,"_",hypothesis,".png"),big_plot,dpi=600,width=3*length(plot_list),height=3)
+}
+```
+
+```{r process_hyp, echo=TRUE, eval=TRUE, purl=FALSE}
+process_hyp <- function(hypothesis) {
+  files <- Sys.glob(paste0("../output/MCMCGLMM_","*_",hypothesis,"/*.log.csv"))
+  results <- data.frame(matrix(NA,nrow=0,ncol=0))
+  for (file in files) {
+    name_str <- strsplit(strsplit(basename(file),"\\.")[[1]][1],"_")[[1]]
+    if (name_str[4] != "TREEMCC") {
+      number <- name_str[5]
+      ssbtype <- name_str[2]
+      log <- read.csv(file)
+      log$number <- number
+      log$ssbtype <- ssbtype
+      results <- rbind(results,log)
+    }
+  }
+  colnames(results)[1] <- "Intercept"
+  results$ssbtype <- factor(results$ssbtype,levels=c("SSB","FSSB","MSSB"))
+  params <- colnames(results)[1:(ncol(results)-2)]
+  
+  plot_list <- list()
+  ind <- 1
+  for (param in params) {
+    color_list <- c()
+    val_list <- c()
+    for (ssbtype in c("SSB","FSSB","MSSB")) {
+      results_subset <- results[which(results$ssbtype==ssbtype),]
+      hpd95 <- hdi(results_subset[[param]],credMass=.95)
+      hpd90 <- hdi(results_subset[[param]],credMass=.9)
+      hpd80 <- hdi(results_subset[[param]],credMass=.8)
+      hpd_vals <- sort(c(hpd80[[1]],hpd90[[1]],hpd95[[1]],hpd95[[2]],hpd90[[2]],hpd80[[2]],0))
+      if (hpd_vals[1] == 0) {sig=4}
+      if (hpd_vals[2] == 0) {sig=3}
+      if (hpd_vals[3] == 0) {sig=2}
+      if (hpd_vals[4] == 0) {sig=1}
+      if (hpd_vals[5] == 0) {sig=2}
+      if (hpd_vals[6] == 0) {sig=3}
+      if (hpd_vals[7] == 0) {sig=4}
+      colors <- c("black","gold","darkorange","red")
+      color_list <- c(color_list,colors[sig])
+      val_list <- c(val_list,round(mean(results_subset[[param]]),2))
+    }
+    
+    mean_text <- paste0("SSB: ",val_list[1],"\n",
+                        "FSSB: ",val_list[2],"\n",
+                        "MSSB: ",val_list[3])
+    
+    min <- abs(min(results[[param]]))
+    max <- abs(max(results[[param]]))
+    
+    if (min < max) {
+      xpos = Inf
+      hjust = 1.1
+    } else {
+      xpos = -Inf
+      hjust = -0.1
+    }
+    
+    plot <- ggplot(results) +
+      geom_vline(xintercept=0) +
+      geom_density(aes_string(x=param,y="..density..",group="ssbtype",lty="ssbtype",color="ssbtype")) +
+      scale_color_manual(values=color_list,guide=FALSE) +
+      labs(lty="SSB Type") +
+      annotate("label",label=mean_text,x=xpos,y=Inf,hjust=hjust,vjust=1.1,fill="white",size=2.5) +
+      ggtitle(paste0(param)) +
+      theme_bw() +
+      theme(plot.title=element_text(hjust=0.5),
+            axis.title=element_blank(),
+ 	          #legend.position="none",
+            aspect.ratio=1)
+    plot_list[[ind]] <- plot
+    ind <- ind + 1
+  }
+  big_plot <- wrap_plots(plot_list,nrow=1,guides="collect")
+  ggsave(paste0("../figures/",hypothesis,".png"),big_plot,dpi=600,width=3*length(plot_list),height=3,limitsize=FALSE)
 }
 ```
 
@@ -647,6 +738,16 @@ process_mcmc("MSSB","MI")
 include_graphics("../figures/MSSB_MI.png")
 ```
 
+Combined
+
+```{r MI_process, echo=TRUE, purl=FALSE}
+process_hyp("MI")
+```
+
+```{r MI_show, eval=TRUE, results="SHOW", purl=FALSE}
+include_graphics("../figures/MI.png")
+```
+
 ---
 
 #### MCMCGLMM NAC
@@ -697,6 +798,16 @@ process_mcmc("MSSB","NAC")
 
 ```{r NACm_mcmcglmm_show, eval=TRUE, results="SHOW", purl=FALSE}
 include_graphics("../figures/MSSB_NAC.png")
+```
+
+Combined
+
+```{r NAC_process, echo=TRUE, purl=FALSE}
+process_hyp("NAC")
+```
+
+```{r NAC_show, eval=TRUE, results="SHOW", purl=FALSE}
+include_graphics("../figures/NAC.png")
 ```
 
 ---
@@ -886,6 +997,16 @@ process_mcmc("MSSB","MGS")
 include_graphics("../figures/MSSB_MGS.png")
 ```
 
+Combined
+
+```{r MGS_process, echo=TRUE, purl=FALSE}
+process_hyp("MGS")
+```
+
+```{r MGS_show, eval=TRUE, results="SHOW", purl=FALSE}
+include_graphics("../figures/MGS.png")
+```
+
 ---
 
 #### MCMCGLMM HAR
@@ -936,6 +1057,16 @@ process_mcmc("MSSB","HAR")
 
 ```{r HARm_mcmcglmm_show, eval=TRUE, results="SHOW", purl=FALSE}
 include_graphics("../figures/MSSB_HAR.png")
+```
+
+Combined
+
+```{r HAR_process, echo=TRUE, purl=FALSE}
+process_hyp("HAR")
+```
+
+```{r HAR_show, eval=TRUE, results="SHOW", purl=FALSE}
+include_graphics("../figures/HAR.png")
 ```
 
 ---
@@ -1041,6 +1172,16 @@ process_mcmc("MSSB","SDT")
 include_graphics("../figures/MSSB_SDT.png")
 ```
 
+Combined
+
+```{r SDT_process, echo=TRUE, purl=FALSE}
+process_hyp("SDT")
+```
+
+```{r SDT_show, eval=TRUE, results="SHOW", purl=FALSE}
+include_graphics("../figures/SDT.png")
+```
+
 ---
 
 #### Pagel's Directional Test
@@ -1142,6 +1283,16 @@ process_mcmc("MSSB","SOC")
 include_graphics("../figures/MSSB_SOC.png")
 ```
 
+Combined
+
+```{r SOC_process, echo=TRUE, purl=FALSE}
+process_hyp("SOC")
+```
+
+```{r SOC_show, eval=TRUE, results="SHOW", purl=FALSE}
+include_graphics("../figures/SOC.png")
+```
+
 <!--
 ####################################
 ####################################
@@ -1212,6 +1363,16 @@ process_mcmc("MSSB","RDM")
 
 ```{r RDMm_mcmcglmm_show, eval=TRUE, results="SHOW", purl=FALSE}
 include_graphics("../figures/MSSB_RDM.png")
+```
+
+Combined
+
+```{r RDM_process, echo=TRUE, purl=FALSE}
+process_hyp("RDM")
+```
+
+```{r RDM_show, eval=TRUE, results="SHOW", purl=FALSE}
+include_graphics("../figures/RDM.png")
 ```
 
 ---
@@ -1313,6 +1474,16 @@ process_mcmc("MSSB","AM")
 include_graphics("../figures/MSSB_AM.png")
 ```
 
+Combined
+
+```{r AM_process, echo=TRUE, purl=FALSE}
+process_hyp("AM")
+```
+
+```{r AM_show, eval=TRUE, results="SHOW", purl=FALSE}
+include_graphics("../figures/AM.png")
+```
+
 ### Hypothesis 3: 
 SSB is an energy intensive but reproductively unfruitful endeavor, and will therefore be associated with reduced species success.
 
@@ -1375,6 +1546,16 @@ process_mcmc("MSSB","IUCN")
 
 ```{r IUCNm_mcmcglmm_show, eval=TRUE, results="SHOW", purl=FALSE}
 include_graphics("../figures/MSSB_IUCN.png")
+```
+
+Combined
+
+```{r IUCN_process, echo=TRUE, purl=FALSE}
+process_hyp("IUCN")
+```
+
+```{r IUCN_show, eval=TRUE, results="SHOW", purl=FALSE}
+include_graphics("../figures/IUCN.png")
 ```
 
 #### SSE
