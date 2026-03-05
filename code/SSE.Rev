@@ -233,13 +233,13 @@ monitors.append( mnScreen(printgen=1, sp0, sp1, ex0, ex1) )
 ################
 
 ### workspace mcmc
-mymcmc = mcmcmc(mymodel, monitors, moves, nchains=4)
+mymcmc = mcmc(mymodel, monitors, moves)
 mymcmc.burnin(10000, tuningInterval=100)
 #mymcmc.burnin(100, tuningInterval=10)
 
 ### run the MCMC
 print("Setting up MCMC...")
-mymcmc.run(generations=100000)
+mymcmc.run(generations=10000)
 #mymcmc.run(generations=1000)
 
 ##############################
