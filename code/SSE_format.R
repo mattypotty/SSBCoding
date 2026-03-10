@@ -40,3 +40,21 @@ for (i in 1:length(names)) {
   write.tree(phy,out_treepath)
 
 }
+
+phy <- read.tree("SSE_Clades/formatted/Rodentia_Supramyomorpha_Myomorphi.txt")
+file.copy("SSE_Clades/formatted/Rodentia_Supramyomorpha_Myomorphi.txt",
+          "SSE_Clades/formatted/old_Rodentia_Supramyomorpha_Myomorphi.txt")
+
+node_ind <- which(phy$edge.length == min(phy$edge.length))
+node <- phy$edge[node_ind,]
+parent_ind <- which(phy$edge[,2]==node[1])
+parent <- phy$edge[parent_ind,]
+node_length <- phy$edge.length[node_ind]
+parent_length <- phy$edge.length[parent_ind]
+new_node_length <- node_length + 0.0001
+new_parent_length <- parent_length - 0.0001
+
+phy$edge.length[node_ind] <- new_node_length
+phy$edge.length[parent_ind] <- new_parent_length
+
+write.tree(phy,"SSE_Clades/formatted/Rodentia_Supramyomorpha_Myomorphi.txt")
