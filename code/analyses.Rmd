@@ -59,6 +59,7 @@ library(mcmcr) # Used for analyzing MCMC output
 library(styler) # For knitting
 library(ggplot2) # For plotting
 library(knitr) # For including plots in markdown
+library(birdring) # For analysing posterior distributions
 ```
 
 ```{r packages_2, eval=TRUE, purl=FALSE}
@@ -1565,18 +1566,20 @@ files <- Sys.glob(paste0("../output/*/*.log"))
 
 sp_plot_list <- list()
 ex_plot_list <- list()
+both_plot_list <- list()
 ind <- 1
 
 for (file in files) {
   clade <- strsplit(basename(file),"\\.")[[1]][1]
   log <- read.csv(file,sep="\t")
-  results <- log[c("speciation.1.","speciation.2.","speciation.3.","speciation.4.","extinction.1.","extinction.2.","extinction.3.","extinction.4.")]
+  results <- log[c("speciation.1.","speciation.2.","speciation.3.","speciation.4.","extinction.1.","extinction.2.","extinction.3.","extinction.4.","speciation_observed.1.","speciation_observed.2.","extinction_observed.1.","extinction_observed.2.")]
   
   plot_sp <- ggplot(results) +
     geom_density(aes(x=speciation.1.,y=..density..),bounds=c(0,1),color="blue") +
     geom_density(aes(x=speciation.2.,y=..density..),bounds=c(0,1),color="red") +
     geom_density(aes(x=speciation.3.,y=..density..),bounds=c(0,1),color="blue",lty="dotted") +
     geom_density(aes(x=speciation.4.,y=..density..),bounds=c(0,1),color="red",lty="dotted") +
+    xlim(c(0,1)) +
     ggtitle(clade) +
     theme_bw() +
     theme(plot.title=element_text(hjust=0.5),
@@ -1584,12 +1587,13 @@ for (file in files) {
           legend.position="none",
           aspect.ratio=1)
   sp_plot_list[[ind]] <- plot_sp
-  
+
   plot_ex <- ggplot(results) +
     geom_density(aes(x=extinction.1.,y=..density..),bounds=c(0,1),color="blue") +
     geom_density(aes(x=extinction.2.,y=..density..),bounds=c(0,1),color="red") +
     geom_density(aes(x=extinction.3.,y=..density..),bounds=c(0,1),color="blue",lty="dotted") +
     geom_density(aes(x=extinction.4.,y=..density..),bounds=c(0,1),color="red",lty="dotted") +
+    xlim(c(0,1)) +
     ggtitle(clade) +
     theme_bw() +
     theme(plot.title=element_text(hjust=0.5),
@@ -1597,6 +1601,42 @@ for (file in files) {
           legend.position="none",
           aspect.ratio=1)
   ex_plot_list[[ind]] <- plot_ex
+  
+  splim <- quantile(c(results$speciation_observed.1.,results$speciation_observed.2.),0.99)
+  exlim <- quantile(c(results$extinction_observed.1.,results$extinction_observed.2.),0.99)
+  
+  spoverlap <- sprintf("%.2f",round(overlap(results$speciation_observed.1.,results$speciation_observed.2.,0,1),2))
+  exoverlap <- sprintf("%.2f",round(overlap(results$extinction_observed.1.,results$extinction_observed.2.,0,1),2))
+  
+  plot_both_sp <- ggplot(results) +
+    geom_density(aes(x=speciation_observed.1.,y=..scaled..),bounds=c(0,1),color="red") +
+    geom_density(aes(x=speciation_observed.2.,y=..scaled..),bounds=c(0,1),color="blue") +
+    xlim(c(0,splim)) +
+    annotate("label",label=spoverlap,x=splim,y=1,hjust="inward",vjust="inward",fill="white",size=4) +
+    ggtitle(clade) +
+    theme_bw() +
+    theme(plot.title=element_text(hjust=0.5),
+          axis.title=element_blank(),
+          axis.text.y=element_blank(),
+          axis.ticks.y=element_blank(),
+          panel.grid.major.y=element_blank(),
+          panel.grid.minor.y=element_blank(),
+          legend.position="none",
+          aspect.ratio=1/3)
+  plot_both_ex <- ggplot(results) +
+    geom_density(aes(x=extinction_observed.1.,y=..scaled..),bounds=c(0,1),color="red",lty="dotted") +
+    geom_density(aes(x=extinction_observed.2.,y=..scaled..),bounds=c(0,1),color="blue",lty="dotted") +
+    xlim(c(0,exlim)) +
+    annotate("label",label=exoverlap,x=exlim,y=1,hjust="inward",vjust="inward",fill="white",size=4) +
+    theme_bw() +
+    theme(axis.title=element_blank(),
+          axis.text.y=element_blank(),
+          axis.ticks.y=element_blank(),
+          panel.grid.major.y=element_blank(),
+          panel.grid.minor.y=element_blank(),
+          legend.position="none",
+          aspect.ratio=1/3)
+  both_plot_list[[ind]] <- plot_both_sp / plot_both_ex
   
   ind <- ind + 1
 }
@@ -1606,6 +1646,13 @@ ggsave(paste0("../figures/SSE_sp.png"),big_plot_sp,dpi=600,width=16,height=16)
 
 big_plot_ex <- wrap_plots(ex_plot_list,ncol=4)
 ggsave(paste0("../figures/SSE_ex.png"),big_plot_ex,dpi=600,width=16,height=16)
+
+big_plot_both <- wrap_plots(both_plot_list,ncol=4)
+ggsave(paste0("../figures/SSE.png"),big_plot_both,dpi=600,width=16,height=14)
+```
+
+```{r SSE_show, eval=TRUE, results="SHOW", purl=FALSE}
+include_graphics("../figures/SSE.png")
 ```
 
 <!--
