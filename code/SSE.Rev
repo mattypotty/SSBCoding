@@ -239,7 +239,7 @@ mymcmc.burnin(10000, tuningInterval=100)
 
 ### run the MCMC
 print("Setting up MCMC...")
-mymcmc.run(generations=10000)
+mymcmc.run(generations=50000)
 #mymcmc.run(generations=1000)
 
 ##############################
